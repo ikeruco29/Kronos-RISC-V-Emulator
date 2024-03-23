@@ -1,0 +1,32 @@
+# Directorios y archivos generados por CMake
+CMakeFiles/
+CMakeCache.txt
+CMakeScripts/
+CMakeScripts.cmake
+CMakeScripts/*.cmake
+CMakeScripts/*.cmake.in
+cmake_install.cmake
+install_manifest.txt
+Makefile
+CTestTestfile.cmake
+
+# Directorio de compilación de CMake
+build/
+
+# Archivos de Visual Studio
+.vs/
+*.suo
+*.user
+*.sln.docstates
+
+# Archivos de análisis estático de código
+*.VC.db
+
+# Carpetas y archivos de caché
+ipch/
+*.log
+
+# Archivos de respaldo y temporales
+*~
+*.bak
+*.tmp
