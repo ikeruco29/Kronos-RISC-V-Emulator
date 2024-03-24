@@ -25,7 +25,7 @@ void CPU::decode() {
     switch (opcode)
     {
         case 0b00110011:    // R
-            decode_R();
+            decode_R(ir);
             break;
         case 0b00010011:    // I
             decode_I();
