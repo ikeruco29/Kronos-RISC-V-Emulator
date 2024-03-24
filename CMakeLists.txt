@@ -12,7 +12,17 @@ endif()
 project ("Emulador-RISC-V")
 
 # Agregue un origen al ejecutable de este proyecto.
-add_executable (Emulador-RISC-V "Emulador-RISC-V.cpp" "Emulador-RISC-V.h" "RAM/RAM.h" "RAM/RAM.cpp" "CPU/CPU.cpp" "CPU/CPU.h" "Computer/Computer.h" "Computer/Computer.cpp" "CPU/decoder.h" "CPU/add_instruction.h")
+add_executable (Emulador-RISC-V 
+		"Emulador-RISC-V.cpp" 
+		"Emulador-RISC-V.h" 
+		"RAM/RAM.h" 
+		"RAM/RAM.cpp" 
+		"CPU/CPU.cpp" 
+		"CPU/CPU.h" 
+		"Computer/Computer.h" 
+		"Computer/Computer.cpp" 
+		"CPU/decoder.h" 
+)
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET Emulador-RISC-V PROPERTY CXX_STANDARD 20)
