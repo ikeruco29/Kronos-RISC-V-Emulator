@@ -1,7 +1,7 @@
 #pragma once
 #include <cstdint>
 #include <vector>
-//#include "decoder.h"
+#include "decoder.h"
 
 using Register = int32_t;
 
@@ -9,15 +9,6 @@ class CPU {
     public:
         CPU();
         ~CPU();
-
-        enum FMT {
-            R,
-            I,
-            S,
-            B,
-            U,
-            J
-        };
 
 
         // Fetch siguiente instrucción
@@ -30,6 +21,7 @@ class CPU {
         uint32_t pc = 0x00000000;  // Program counter
         uint32_t ir = pc;       // Instruction register
 
+        Decoded instDecoded;
 
         // INSTRUCTIONS
         // R format

@@ -6,7 +6,6 @@
 using namespace std;
 
 #include "Computer/Computer.h"
-//#include "yaml-cpp/yaml.h"
 #include <iostream>
 
 int main() {

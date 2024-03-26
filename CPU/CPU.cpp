@@ -1,6 +1,6 @@
 #include "CPU.h"
 #include <iostream>
-#include "decoder.h"
+
 
 CPU::CPU(){
     // Inicialización de los registros
@@ -9,7 +9,6 @@ CPU::CPU(){
         registers[i] = 0x00000000;
     }
     
-
 }
 
 CPU::~CPU(){}
@@ -25,13 +24,14 @@ void CPU::decode() {
     switch (opcode)
     {
         case 0b00110011:    // R
-            decode_R(ir);
+            Decoded decoded = decode_R(ir);            
+            std::cout << decoded.op << ", " << decoded.registers[2] << std::endl;
             break;
         case 0b00010011:    // I
-            decode_I();
+            decode_I(ir);
             break;
         case 0b00000011:    // I
-            decode_I();
+            decode_I(ir);
             break;
         case 0b00100011:    // S
             decode_S();
@@ -43,7 +43,7 @@ void CPU::decode() {
             decode_J();
             break;
         case 0b01100111:    // I
-            decode_I();
+            decode_I(ir);
             break;
         case 0b00110111:    // U
             decode_U();
@@ -52,7 +52,7 @@ void CPU::decode() {
             decode_U();
             break;
         case 0b01110011:    // I
-            decode_I();
+            decode_I(ir);
             break;
         default:
             break;

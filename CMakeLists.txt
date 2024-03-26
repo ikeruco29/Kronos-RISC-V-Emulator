@@ -17,12 +17,12 @@ add_executable (Emulador-RISC-V
 		"Emulador-RISC-V.h" 
 		"RAM/RAM.h" 
 		"RAM/RAM.cpp" 
-		"CPU/CPU.cpp" 
 		"CPU/CPU.h" 
+		"CPU/CPU.cpp" 
 		"Computer/Computer.h" 
 		"Computer/Computer.cpp" 
 		"CPU/decoder.h" 
-)
+		"CPU/decoder.cpp")
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET Emulador-RISC-V PROPERTY CXX_STANDARD 20)
