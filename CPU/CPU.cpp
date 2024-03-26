@@ -64,5 +64,7 @@ uint32_t CPU::execute(){
 }
 
 void CPU::ADD(){
-    
+    uint32_t rs1 = instDecoded.registers[1];
+    uint32_t rs2 = instDecoded.registers[2];
+    registers[instDecoded.registers[0]] = registers[rs1] + registers[rs2];
 }
