@@ -159,3 +159,55 @@ void CPU::ADD(){
     uint32_t rs2 = instDecoded.registers[2];
     registers[instDecoded.registers[0]] = registers[rs1] + registers[rs2];
 }
+
+
+void CPU::SUB() {}
+void CPU::XOR() {}
+void CPU::OR() {}
+void CPU::AND() {}
+void CPU::SLL() {}
+void CPU::SRL() {}
+void CPU::SRA() {}
+void CPU::SLT() {}
+void CPU::SLTU() {}
+
+// I format
+void CPU::ADDI() {}
+void CPU::XORI() {}
+void CPU::ORI() {}
+void CPU::ANDI() {}
+void CPU::SLLI() {}
+void CPU::SRLI() {}
+void CPU::SRAI() {}
+void CPU::SLTI() {}
+void CPU::SLTIU() {}
+void CPU::LB() {}
+void CPU::LH() {}
+void CPU::LW() {}
+void CPU::LBU() {}
+void CPU::LHU() {}
+
+void CPU::JALR() {}
+
+void CPU::ECALL() {}
+void CPU::EBREAK() {}
+
+// S format
+void CPU::SB() {}
+void CPU::SH() {}
+void CPU::SW() {}
+
+// B format
+void CPU::BEQ() {}
+void CPU::BNE() {}
+void CPU::BLT() {}
+void CPU::BGE() {}
+void CPU::BLTU() {}
+void CPU::BGEU() {}
+
+// J format
+void CPU::JAL() {}
+
+// U format
+void CPU::LUI() {}
+void CPU::AUIPC() {}
