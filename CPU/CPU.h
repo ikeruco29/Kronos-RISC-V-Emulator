@@ -3,7 +3,7 @@
 #include <vector>
 #include "decoder.h"
 
-using Register = int32_t;
+using reg = int32_t;
 
 class CPU {
     public:
@@ -16,7 +16,7 @@ class CPU {
         void decode();
         uint32_t execute();
 
-        Register registers[32];
+        reg registers[32];
 
         uint32_t pc = 0x00000000;  // Program counter
         uint32_t ir = pc;       // Instruction register
@@ -30,7 +30,7 @@ class CPU {
 
         // I format
         void ADDI(); void XORI(); void ORI(); void ANDI();
-        void SLLI(); void SRLI(); void SRAI(); void SLTI(); void SLTUI(); 
+        void SLLI(); void SRLI(); void SRAI(); void SLTI(); void SLTIU();
         void LB(); void LH(); void LW(); void LBU(); void LHU();
 
         void JALR();

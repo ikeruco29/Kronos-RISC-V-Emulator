@@ -28,10 +28,10 @@ void CPU::decode() {
             //std::cout << instDecoded.op << ", " << instDecoded.registers[2] << std::endl;
             break;
         case 0b00010011:    // I
-            decode_I(ir);
+            instDecoded = decode_I(ir);
             break;
         case 0b00000011:    // I
-            decode_I(ir);
+            instDecoded = decode_I(ir, 1);
             break;
         case 0b00100011:    // S
             decode_S();
@@ -43,7 +43,7 @@ void CPU::decode() {
             decode_J();
             break;
         case 0b01100111:    // I
-            decode_I(ir);
+            instDecoded = decode_I(ir, 2);
             break;
         case 0b00110111:    // U
             decode_U();
@@ -52,7 +52,7 @@ void CPU::decode() {
             decode_U();
             break;
         case 0b01110011:    // I
-            decode_I(ir);
+            instDecoded = decode_I(ir, 3);
             break;
         default:
             break;
@@ -94,6 +94,59 @@ uint32_t CPU::execute(){
             SLTU();
             break;
             
+        // Formato I
+        case Operation::ADDI:
+            ADDI();
+            break;
+        case Operation::SLTI:
+            SLTI();
+            break;
+        case Operation::SLTIU:
+            SLTIU();
+            break;
+        case Operation::XORI:
+            XORI();
+            break;
+        case Operation::ORI:
+            ORI();
+            break;
+        case Operation::ANDI:
+            ANDI();
+            break;
+        case Operation::SLLI:
+            SLLI();
+            break;
+        case Operation::SRLI:
+            SRLI();
+            break;
+        case Operation::SRAI:
+            SRAI();
+            break;
+        case Operation::LB:
+            LB();
+            break;
+        case Operation::LH:
+            LH();
+            break;
+        case Operation::LW:
+            LW();
+            break;
+        case Operation::LBU:
+            LBU();
+            break;
+        case Operation::LHU:
+            LHU();
+            break;
+        case Operation::JALR:
+            JALR();
+            break;
+        case Operation::ECALL:
+            ECALL();
+            break;
+        case Operation::EBREAK:
+            EBREAK();
+            break;
+
         // Formato S
         default:
             break;

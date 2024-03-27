@@ -13,7 +13,7 @@ enum Operation
 
 	// Formato I
 	ADDI, XORI, ORI, ANDI,
-	SLLI, SRLI, SRAI, SLTI, SLTUI,
+	SLLI, SRLI, SRAI, SLTI, SLTIU,
 	LB, LH, LW, LBU, LHU,
 
 	JALR,
@@ -41,7 +41,7 @@ struct Decoded
 
 Decoded decode_R(uint32_t ir);
 
-void decode_I(uint32_t ir);
+Decoded decode_I(uint32_t ir, uint8_t op = 0);
 
 void decode_S();
 
