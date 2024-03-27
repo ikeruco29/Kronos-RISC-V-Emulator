@@ -24,8 +24,8 @@ void CPU::decode() {
     switch (opcode)
     {
         case 0b00110011:    // R
-            Decoded decoded = decode_R(ir);            
-            std::cout << decoded.op << ", " << decoded.registers[2] << std::endl;
+            instDecoded = decode_R(ir); // Recoge la instrucción decodificada y la guarda en la variable global de la clase
+            //std::cout << instDecoded.op << ", " << instDecoded.registers[2] << std::endl;
             break;
         case 0b00010011:    // I
             decode_I(ir);
@@ -60,6 +60,44 @@ void CPU::decode() {
 }
 
 uint32_t CPU::execute(){
+    switch (instDecoded.op)
+    {
+        // Formato R
+        case Operation::ADD:
+            ADD();
+            break;
+        case Operation::SUB:
+            SUB();
+            break;
+        case Operation::XOR:
+            XOR();
+            break;
+        case Operation::OR:
+            OR();
+            break;
+        case Operation::AND:
+            AND();
+            break;
+        case Operation::SLL:
+            SLL();
+            break;
+        case Operation::SRL:
+            SRL();
+            break;
+        case Operation::SRA:
+            SRA();
+            break;
+        case Operation::SLT:
+            SLT();
+            break;
+        case Operation::SLTU:
+            SLTU();
+            break;
+            
+        // Formato S
+        default:
+            break;
+    }
     return 0;
 }
 

@@ -38,6 +38,7 @@ int main() {
     computer.ram.write(0x00000000, 0x002301B3);
     computer.cpu.fetch(computer.ram.read(computer.cpu.pc));
     computer.cpu.decode();
+    computer.cpu.execute();
     // cout << hex << computer.ram.read(0x000000) << endl;
 
 
