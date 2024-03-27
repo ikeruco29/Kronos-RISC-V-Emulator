@@ -41,7 +41,7 @@ struct Decoded
 
 Decoded decode_R(uint32_t ir);
 
-Decoded decode_I(uint32_t ir, uint8_t op = 0);
+Decoded decode_I(uint32_t ir, uint8_t op);
 
 void decode_S();
 

@@ -28,7 +28,7 @@ void CPU::decode() {
             //std::cout << instDecoded.op << ", " << instDecoded.registers[2] << std::endl;
             break;
         case 0b00010011:    // I
-            instDecoded = decode_I(ir);
+            instDecoded = decode_I(ir, 0);
             break;
         case 0b00000011:    // I
             instDecoded = decode_I(ir, 1);
