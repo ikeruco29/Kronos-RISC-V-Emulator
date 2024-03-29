@@ -288,8 +288,11 @@ Decoded decode_J(uint32_t ir) {
 	int32_t inm = (ir >> 12);
 	std::cout << "inm: " << std::hex << inm << std::endl;
 
+	// Bit 20 en la posición 19 (empezando en 0)
 	uint32_t bit20 = inm & 0b10000000000000000000;
 	std::cout << "bit 20: " << std::hex << bit20 << std::endl;
+
+	// Bit 11 en la posición 8 (empezando en 0)
 	uint16_t bit11 = inm & 0b100000000;
 	std::cout << "bit 11: " << std::hex << bit11 << std::endl;
 
@@ -299,10 +302,15 @@ Decoded decode_J(uint32_t ir) {
 	std::cout << "inm_1: " << std::hex << inm_1 << std::endl;
 
 	int32_t inm_fin = inm_2 | inm_1;
-	if (bit11 != 0)
+	if (bit11 != 0)	// Si el bit 11 está en 1, lo añade
 		inm_fin = inm_fin | 0b100000000000;
-	if (bit20 != 0)
+	
+	// Si el bit 20 está en 1, significa que es
+	// un número negativo, por lo que hay que rellenar todo
+	// lo demás con 1.
+	if (bit20 != 0)	
 		inm_fin = inm_fin | 0xfff00000;
+
 	std::cout << "inm: " << std::hex << inm_fin << std::endl;
 
 	Decoded dec;
