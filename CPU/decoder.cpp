@@ -239,7 +239,7 @@ Decoded decode_B(uint32_t ir) {
 	// el primer bit será el último del número
 	uint8_t bit11 = inm_1 & 0x01;
 	uint8_t bit12 = inm_2 >> 6;
-	uint32_t inmediate = 0;
+	int32_t inmediate = 0;
 	if (bit11 == 1) {
 		inmediate = 0b100000000000;
 	}
@@ -268,7 +268,13 @@ Decoded decode_B(uint32_t ir) {
 }
 
 Decoded decode_U(uint32_t ir) {
+	uint32_t rd = (ir >> 7) & 0x1F;
+	int32_t inm = (ir >> 12);
+
 	Decoded dec;
+	dec.op = JAL;
+	dec.inmediate = inm;
+	dec.registers = new uint32_t[1] {rd};
 	return dec;
 }
 
