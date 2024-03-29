@@ -199,14 +199,35 @@ uint32_t CPU::execute(){
 
 // R format
 void CPU::ADD(){
-    uint32_t rs1 = instDecoded.registers[1];
-    uint32_t rs2 = instDecoded.registers[2];
-    registers[instDecoded.registers[0]] = registers[rs1] + registers[rs2];
+    uint8_t rd = instDecoded.registers[0];
+    uint8_t rs1 = instDecoded.registers[1];
+    uint8_t rs2 = instDecoded.registers[2];
+    registers[rd] = registers[rs1] + registers[rs2];
 }
-void CPU::SUB() {}
-void CPU::XOR() {}
-void CPU::OR() {}
-void CPU::AND() {}
+void CPU::SUB() {
+    uint8_t rd = instDecoded.registers[0];
+    uint8_t rs1 = instDecoded.registers[1];
+    uint8_t rs2 = instDecoded.registers[2];
+    registers[rd] = registers[rs1] - registers[rs2];
+}
+void CPU::XOR() {
+    uint8_t rd = instDecoded.registers[0];
+    uint8_t rs1 = instDecoded.registers[1];
+    uint8_t rs2 = instDecoded.registers[2];
+    registers[rd] = registers[rs1] ^ registers[rs2];
+}
+void CPU::OR() {
+    uint8_t rd = instDecoded.registers[0];
+    uint8_t rs1 = instDecoded.registers[1];
+    uint8_t rs2 = instDecoded.registers[2];
+    registers[rd] = registers[rs1] | registers[rs2];
+}
+void CPU::AND() {
+    uint8_t rd = instDecoded.registers[0];
+    uint8_t rs1 = instDecoded.registers[1];
+    uint8_t rs2 = instDecoded.registers[2];
+    registers[rd] = registers[rs1] & registers[rs2];
+}
 void CPU::SLL() {}
 void CPU::SRL() {}
 void CPU::SRA() {}
@@ -214,7 +235,13 @@ void CPU::SLT() {}
 void CPU::SLTU() {}
 
 // I format
-void CPU::ADDI() {}
+void CPU::ADDI() {
+    uint8_t rd = instDecoded.registers[0];
+    uint8_t rs1 = instDecoded.registers[1];
+    int32_t inmediate = instDecoded.inmediate;
+
+    registers[rd] = registers[rs1] + inmediate;
+}
 void CPU::XORI() {}
 void CPU::ORI() {}
 void CPU::ANDI() {}
