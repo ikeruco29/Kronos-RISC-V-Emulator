@@ -48,6 +48,6 @@ Decoded decode_S(uint32_t ir);
 
 Decoded decode_B(uint32_t ir);
 
-Decoded decode_U(uint32_t ir);
+Decoded decode_U(uint32_t ir, uint8_t op);
 
 Decoded decode_J(uint32_t ir);

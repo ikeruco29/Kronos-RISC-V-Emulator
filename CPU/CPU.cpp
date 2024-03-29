@@ -46,10 +46,10 @@ void CPU::decode() {
             instDecoded = decode_I(ir, 2);
             break;
         case 0b00110111:    // U
-            decode_U(ir);
+            decode_U(ir, 0);
             break;
         case 0b00010111:    // U
-            decode_U(ir);
+            decode_U(ir, 1);
             break;
         case 0b01110011:    // I
             instDecoded = decode_I(ir, 3);

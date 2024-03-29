@@ -267,18 +267,25 @@ Decoded decode_B(uint32_t ir) {
 	return dec;
 }
 
-Decoded decode_U(uint32_t ir) {
+Decoded decode_U(uint32_t ir, uint8_t op) {
 	uint32_t rd = (ir >> 7) & 0x1F;
 	int32_t inm = (ir >> 12);
 
 	Decoded dec;
-	dec.op = JAL;
+
+	if (op == 0)
+		dec.op = LUI;
+	else
+		dec.op = AUIPC;
+
 	dec.inmediate = inm;
 	dec.registers = new uint32_t[1] {rd};
 	return dec;
 }
 
 Decoded decode_J(uint32_t ir) {
+
+
 	Decoded dec;
 	return dec;
 }
