@@ -36,6 +36,7 @@ int main() {
     Computer computer = Computer(RAM_SIZE);
 
     computer.ram.write(0x00000000, 0x002301B3);
+    computer.ram.write(0x00000000, 0b11000000000100000000101111100011);
     computer.cpu.fetch(computer.ram.read(computer.cpu.pc));
     computer.cpu.decode();
     computer.cpu.execute();

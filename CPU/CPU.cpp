@@ -34,22 +34,22 @@ void CPU::decode() {
             instDecoded = decode_I(ir, 1);
             break;
         case 0b00100011:    // S
-            decode_S();
+            decode_S(ir);
             break;
         case 0b01100011:    // B
-            decode_B();
+            decode_B(ir);
             break;
         case 0b01101111:    // J
-            decode_J();
+            decode_J(ir);
             break;
         case 0b01100111:    // I
             instDecoded = decode_I(ir, 2);
             break;
         case 0b00110111:    // U
-            decode_U();
+            decode_U(ir);
             break;
         case 0b00010111:    // U
-            decode_U();
+            decode_U(ir);
             break;
         case 0b01110011:    // I
             instDecoded = decode_I(ir, 3);
@@ -154,13 +154,12 @@ uint32_t CPU::execute(){
     return 0;
 }
 
+// R format
 void CPU::ADD(){
     uint32_t rs1 = instDecoded.registers[1];
     uint32_t rs2 = instDecoded.registers[2];
     registers[instDecoded.registers[0]] = registers[rs1] + registers[rs2];
 }
-
-
 void CPU::SUB() {}
 void CPU::XOR() {}
 void CPU::OR() {}

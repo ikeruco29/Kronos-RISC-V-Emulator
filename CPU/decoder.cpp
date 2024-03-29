@@ -168,21 +168,111 @@ Decoded decode_I(uint32_t ir, uint8_t op) {
 	Decoded dec;
 	dec.op = nOperation;
 	dec.registers = new uint32_t[2]{ rd, rs1 };
+	dec.inmediate = inm;
 	return dec;
 }
 
-void decode_S() {
+Decoded decode_S(uint32_t ir) {
+	// inm[11:5] rs2 rs1 funct3 inm[4:0] opcode
+	uint32_t inm_1 = (ir >> 7) & 0x1F;		
+	uint8_t funct3 = (ir >> 12) & 0x7;
+	uint32_t rs1 = (ir >> 15) & 0x1F;
+	uint32_t rs2 = (ir >> 20) & 0x1F;
+	uint32_t inm_2 = (ir >> 25) & 0x7F;
+	int nOperation = -1;
 
+	uint16_t inm = (inm_2 << 5) & inm_1; // desplaza 5 bits a la izquierda el inm_2 y lo une con inm_1
+
+	if (funct3 == 0x0)
+		nOperation = SB;
+	else if (funct3 == 0x1)
+		nOperation = SH;
+	else
+		nOperation = SW;
+
+	// Devuelve la operación y los registros 
+	Decoded dec;
+	dec.op = nOperation;
+	dec.registers = new uint32_t[2]{ rs1, rs2 };
+	dec.inmediate = inm;
+	return dec;
 }
 
-void decode_B() {
+Decoded decode_B(uint32_t ir) {
+	uint32_t inm_1 = (ir >> 7) & 0x1F;
+	uint8_t funct3 = (ir >> 12) & 0x7;
+	uint32_t rs1 = (ir >> 15) & 0x1F;
+	uint32_t rs2 = (ir >> 20) & 0x1F;
+	uint32_t inm_2 = (ir >> 25) & 0x7F;
 
+	int nOperation = -1;
+
+	switch (funct3)
+	{
+		case 0x0:
+			nOperation = BEQ;
+			break;
+		case 0x1:
+			nOperation = BNE;
+		case 0x4:
+			nOperation = BLT;
+		case 0x5:
+			nOperation = BGE;
+		case 0x6:
+			nOperation = BLTU;
+			break;
+		case 0x7:
+			nOperation = BGEU;
+			break;
+		default:
+			break;
+	}
+
+	// inm_1 tiene los bits 4:1|11
+	// inm_2 tiene los bits 12|10:5
+	// Esto con la extensión de signo hecha, es decir,
+	// con el complemento a 2 si es necesario
+	std::cout << "Instrucción: " << std::hex << ir << std::endl;
+	std::cout << "Inmediato [4:1|11]: " << std::hex << inm_1 << std::endl;
+	std::cout << "Inmediato [12|10:5]: " << std::hex << inm_2 << std::endl;
+
+	// el primer bit será el último del número
+	uint8_t bit11 = inm_1 & 0x01;
+	uint8_t bit12 = inm_2 >> 6;
+	uint32_t inmediate = 0;
+	if (bit11 == 1) {
+		inmediate = 0b100000000000;
+	}
+	
+	inmediate = inmediate | (inm_1 & 0b11110); // 11011 -> 1101 0
+	std::cout << "inmediate | (inm_1 & 0b11110): " << std::hex << inmediate << std::endl;
+	inmediate = inmediate | ((inm_2 << 5) & 0b011111111111); // 1001011    -> 1001 0110 0000
+	std::cout << "inmediate | (inm_2 << 5): " << std::hex << inmediate << std::endl;
+
+	if (bit12 == 1) {
+		// 1111 1111 1111 1111 1111 0000 0000 0000
+		inmediate = inmediate | 0xFFFFF000;
+	}
+
+
+	std::cout << "Inmediato final: " << std::hex << inmediate << std::endl;
+
+	
+
+	// Devuelve la operación y los registros 
+	Decoded dec;
+	dec.op = nOperation;
+	dec.registers = new uint32_t[2]{ rs1, rs2 };
+	dec.inmediate = inmediate;
+	return dec;
 }
 
-void decode_U() {
-
+Decoded decode_U(uint32_t ir) {
+	Decoded dec;
+	return dec;
 }
 
-void decode_J() {
-
+Decoded decode_J(uint32_t ir) {
+	Decoded dec;
+	return dec;
 }

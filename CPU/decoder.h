@@ -37,16 +37,17 @@ struct Decoded
 {
 	int op;
 	uint32_t* registers;
+	int32_t inmediate;
 };
 
 Decoded decode_R(uint32_t ir);
 
 Decoded decode_I(uint32_t ir, uint8_t op);
 
-void decode_S();
+Decoded decode_S(uint32_t ir);
 
-void decode_B();
+Decoded decode_B(uint32_t ir);
 
-void decode_U();
+Decoded decode_U(uint32_t ir);
 
-void decode_J();
+Decoded decode_J(uint32_t ir);
