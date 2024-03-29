@@ -37,6 +37,8 @@ int main() {
 
     computer.ram.write(0x00000000, 0x002301B3);
     computer.ram.write(0x00000000, 0b11000000000100000000101111100011);
+    computer.ram.write(0x00000000, 0xc19ff0ef);
+    //computer.ram.write(0x00000000, 0x3e8000ef);
     computer.cpu.fetch(computer.ram.read(computer.cpu.pc));
     computer.cpu.decode();
     computer.cpu.execute();

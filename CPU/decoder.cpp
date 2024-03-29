@@ -284,8 +284,30 @@ Decoded decode_U(uint32_t ir, uint8_t op) {
 }
 
 Decoded decode_J(uint32_t ir) {
+	uint32_t rd = (ir >> 7) & 0x1F;
+	int32_t inm = (ir >> 12);
+	std::cout << "inm: " << std::hex << inm << std::endl;
 
+	uint32_t bit20 = inm & 0b10000000000000000000;
+	std::cout << "bit 20: " << std::hex << bit20 << std::endl;
+	uint16_t bit11 = inm & 0b100000000;
+	std::cout << "bit 11: " << std::hex << bit11 << std::endl;
+
+	uint32_t inm_2 = (inm & 0xFF) << 12;
+	uint16_t inm_1 = (inm >> 8) & 0x7FE; // 0111 1111 1110
+	std::cout << "inm_2: " << std::hex << inm_2 << std::endl;
+	std::cout << "inm_1: " << std::hex << inm_1 << std::endl;
+
+	int32_t inm_fin = inm_2 | inm_1;
+	if (bit11 != 0)
+		inm_fin = inm_fin | 0b100000000000;
+	if (bit20 != 0)
+		inm_fin = inm_fin | 0xfff00000;
+	std::cout << "inm: " << std::hex << inm_fin << std::endl;
 
 	Decoded dec;
+	dec.op = JAL;
+	dec.inmediate = inm_fin;
+	dec.registers = new uint32_t[1]{ rd };
 	return dec;
 }
