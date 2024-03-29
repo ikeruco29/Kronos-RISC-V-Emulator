@@ -34,22 +34,22 @@ void CPU::decode() {
             instDecoded = decode_I(ir, 1);
             break;
         case 0b00100011:    // S
-            decode_S(ir);
+            instDecoded = decode_S(ir);
             break;
         case 0b01100011:    // B
-            decode_B(ir);
+            instDecoded = decode_B(ir);
             break;
         case 0b01101111:    // J
-            decode_J(ir);
+            instDecoded = decode_J(ir);
             break;
         case 0b01100111:    // I
             instDecoded = decode_I(ir, 2);
             break;
         case 0b00110111:    // U
-            decode_U(ir, 0);
+            instDecoded = decode_U(ir, 0);
             break;
         case 0b00010111:    // U
-            decode_U(ir, 1);
+            instDecoded = decode_U(ir, 1);
             break;
         case 0b01110011:    // I
             instDecoded = decode_I(ir, 3);
@@ -148,6 +148,49 @@ uint32_t CPU::execute(){
             break;
 
         // Formato S
+        case Operation::SB:
+            SB();
+            break;
+        case Operation::SH:
+            SH();
+            break;
+        case Operation::SW:
+            SW();
+            break;
+
+        //Formato B
+        case Operation::BEQ:
+            BEQ();
+            break;
+        case Operation::BNE:
+            BNE();
+            break;
+        case Operation::BLT:
+            BLT();
+            break;
+        case Operation::BGE:
+            BGE();
+            break;
+        case Operation::BLTU:
+            BLTU();
+            break;
+        case Operation::BGEU:
+            BGEU();
+            break;
+
+        // Formato U
+        case Operation::LUI:
+            LUI();
+            break;
+        case Operation::AUIPC:
+            AUIPC();
+            break;
+
+        // Formato J
+        case Operation::JAL:
+            JAL();
+            break;
+
         default:
             break;
     }

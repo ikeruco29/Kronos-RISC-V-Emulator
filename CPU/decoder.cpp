@@ -181,7 +181,10 @@ Decoded decode_S(uint32_t ir) {
 	uint32_t inm_2 = (ir >> 25) & 0x7F;
 	int nOperation = -1;
 
-	uint16_t inm = (inm_2 << 5) & inm_1; // desplaza 5 bits a la izquierda el inm_2 y lo une con inm_1
+	int32_t inm = (inm_2 << 5) | inm_1; // desplaza 5 bits a la izquierda el inm_2 y lo une con inm_1
+
+	if ((inm & 0b100000000000) != 0)	// Para el complemento a dos de los negativos
+		inm = inm | 0xFFFFF000;
 
 	if (funct3 == 0x0)
 		nOperation = SB;
@@ -214,10 +217,13 @@ Decoded decode_B(uint32_t ir) {
 			break;
 		case 0x1:
 			nOperation = BNE;
+			break;
 		case 0x4:
 			nOperation = BLT;
+			break;
 		case 0x5:
 			nOperation = BGE;
+			break;
 		case 0x6:
 			nOperation = BLTU;
 			break;
