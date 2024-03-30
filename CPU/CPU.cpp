@@ -2,13 +2,13 @@
 #include <iostream>
 
 
-CPU::CPU(){
+CPU::CPU(RAM *ram){
     // Inicialización de los registros
     for (int i = 0; i < 32; i++)
     {
         registers[i] = 0x00000000;
     }
-    
+    this->ram = ram;
 }
 
 CPU::~CPU(){}
@@ -228,11 +228,36 @@ void CPU::AND() {
     uint8_t rs2 = instDecoded.registers[2];
     registers[rd] = registers[rs1] & registers[rs2];
 }
-void CPU::SLL() {}
-void CPU::SRL() {}
-void CPU::SRA() {}
-void CPU::SLT() {}
-void CPU::SLTU() {}
+void CPU::SLL() {
+    uint8_t rd = instDecoded.registers[0];
+    uint8_t rs1 = instDecoded.registers[1];
+    uint8_t rs2 = instDecoded.registers[2];
+    registers[rd] = static_cast<uint32_t>(registers[rs1]) << registers[rs2];
+}
+void CPU::SRL() {
+    uint8_t rd = instDecoded.registers[0];
+    uint8_t rs1 = instDecoded.registers[1];
+    uint8_t rs2 = instDecoded.registers[2];
+    registers[rd] = static_cast<uint32_t>( registers[rs1] ) >> registers[rs2];
+}
+void CPU::SRA() {
+    uint8_t rd = instDecoded.registers[0];
+    uint8_t rs1 = instDecoded.registers[1];
+    uint8_t rs2 = instDecoded.registers[2];
+    registers[rd] = registers[rs1] >> registers[rs2];
+}
+void CPU::SLT() {
+    uint8_t rd = instDecoded.registers[0];
+    uint8_t rs1 = instDecoded.registers[1];
+    uint8_t rs2 = instDecoded.registers[2];
+    registers[rd] = (registers[rs1] < registers[rs2]) ? 1 : 0;
+}
+void CPU::SLTU() {
+    uint8_t rd = instDecoded.registers[0];
+    uint8_t rs1 = instDecoded.registers[1];
+    uint8_t rs2 = instDecoded.registers[2];
+    registers[rd] = (static_cast<uint32_t>(registers[rs1]) < static_cast<uint32_t>(registers[rs1])) ? 1 : 0;
+}
 
 // I format
 void CPU::ADDI() {
@@ -242,18 +267,95 @@ void CPU::ADDI() {
 
     registers[rd] = registers[rs1] + inmediate;
 }
-void CPU::XORI() {}
-void CPU::ORI() {}
-void CPU::ANDI() {}
-void CPU::SLLI() {}
-void CPU::SRLI() {}
-void CPU::SRAI() {}
-void CPU::SLTI() {}
-void CPU::SLTIU() {}
-void CPU::LB() {}
-void CPU::LH() {}
-void CPU::LW() {}
-void CPU::LBU() {}
+void CPU::XORI() {
+    uint8_t rd = instDecoded.registers[0];
+    uint8_t rs1 = instDecoded.registers[1];
+    int32_t inmediate = instDecoded.inmediate;
+
+    registers[rd] = registers[rs1] ^ inmediate;
+}
+void CPU::ORI() {
+    uint8_t rd = instDecoded.registers[0];
+    uint8_t rs1 = instDecoded.registers[1];
+    int32_t inmediate = instDecoded.inmediate;
+
+    registers[rd] = registers[rs1] | inmediate;
+}
+void CPU::ANDI() {
+    uint8_t rd = instDecoded.registers[0];
+    uint8_t rs1 = instDecoded.registers[1];
+    int32_t inmediate = instDecoded.inmediate;
+
+    registers[rd] = registers[rs1] & inmediate;
+}
+void CPU::SLLI() {
+    uint8_t rd = instDecoded.registers[0];
+    uint8_t rs1 = instDecoded.registers[1];
+    int32_t inmediate = instDecoded.inmediate;
+
+    registers[rd] = static_cast<uint32_t>(registers[rs1]) << (static_cast<uint32_t>(inmediate) & 0b11111);
+}
+void CPU::SRLI() {
+    uint8_t rd = instDecoded.registers[0];
+    uint8_t rs1 = instDecoded.registers[1];
+    int32_t inmediate = instDecoded.inmediate;
+
+    registers[rd] = static_cast<uint32_t>(registers[rs1]) >> (static_cast<uint32_t>(inmediate) & 0b11111);
+}
+void CPU::SRAI() {
+    uint8_t rd = instDecoded.registers[0];
+    uint8_t rs1 = instDecoded.registers[1];
+    int32_t inmediate = instDecoded.inmediate;
+
+    registers[rd] = registers[rs1] >> (inmediate & 0b11111);
+}
+void CPU::SLTI() {
+    uint8_t rd = instDecoded.registers[0];
+    uint8_t rs1 = instDecoded.registers[1];
+    int32_t inmediate = instDecoded.inmediate;
+    registers[rd] = (registers[rs1] < inmediate) ? 1 : 0;
+}
+void CPU::SLTIU() {
+    uint8_t rd = instDecoded.registers[0];
+    uint8_t rs1 = instDecoded.registers[1];
+    uint8_t inmediate = instDecoded.inmediate;
+    registers[rd] = (static_cast<uint32_t>(registers[rs1]) < static_cast<uint32_t>(inmediate)) ? 1 : 0;
+}
+// TODO: PENSAR SI, POR EJEMPLO, EN LA POSICIÓN 1 HAY EL NUMERO 0X0000FFFF,
+//       SI RECOJO UN BYTE, ES DECIR FF, QUÉ SUCEDE CON LOS OTROS 3 BYTES,
+//       SE RELLENAN A 1 PORQUE TOMA COMO SIGNO EL BIT NÚMERO 8 O NO?
+void CPU::LB() {
+    uint8_t rd = instDecoded.registers[0];
+    uint8_t rs1 = instDecoded.registers[1];
+    int32_t inmediate = instDecoded.inmediate;
+
+    int32_t byte = (ram->read(registers[rs1] + inmediate)) & 0xFF;
+    std::cout << "byte: " << std::hex << byte;
+
+    registers[rd] = (ram->read(registers[rs1] + inmediate)) & 0xFF;
+}
+void CPU::LH() {
+    uint8_t rd = instDecoded.registers[0];
+    uint8_t rs1 = instDecoded.registers[1];
+    int32_t inmediate = instDecoded.inmediate;
+    registers[rd] = (ram->read(registers[rs1] + inmediate)) & 0xFFFF;
+}
+void CPU::LW() {
+    uint8_t rd = instDecoded.registers[0];
+    uint8_t rs1 = instDecoded.registers[1];
+    int32_t inmediate = instDecoded.inmediate;
+    registers[rd] = ram->read(registers[rs1] + inmediate);
+}
+void CPU::LBU() {
+    uint8_t rd = instDecoded.registers[0];
+    uint8_t rs1 = instDecoded.registers[1];
+    int32_t inmediate = instDecoded.inmediate;
+
+    int32_t byte = (ram->read(registers[rs1] + inmediate)) & 0xFF;
+    std::cout << "byte: " << std::hex << byte;
+
+    registers[rd] = (ram->read(registers[rs1] + inmediate)) & 0xFF;
+}
 void CPU::LHU() {}
 
 void CPU::JALR() {}

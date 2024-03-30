@@ -6,8 +6,8 @@ class RAM {
         RAM(int RAM_SIZE);
         ~RAM();
 
-        uint32_t *ram;
+        int32_t *ram;
 
         void write(uint32_t addr, int32_t data);
-        uint32_t read(uint32_t addr);
+        int32_t read(uint32_t addr);
 };

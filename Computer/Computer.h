@@ -9,4 +9,6 @@ class Computer {
 
         CPU cpu;
         RAM ram;
+
+        void On(int cycles);
 };

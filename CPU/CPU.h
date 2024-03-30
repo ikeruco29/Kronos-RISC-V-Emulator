@@ -2,14 +2,16 @@
 #include <cstdint>
 #include <vector>
 #include "decoder.h"
+#include "../RAM/RAM.h"
 
 using reg = int32_t;
 
 class CPU {
     public:
-        CPU();
+        CPU(RAM *ram);
         ~CPU();
 
+        RAM* ram;
 
         // Fetch siguiente instrucción
         void fetch(uint32_t mem);
