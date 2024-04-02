@@ -421,7 +421,16 @@ void CPU::BLTU() {}
 void CPU::BGEU() {}
 
 // J format
-void CPU::JAL() {}
+void CPU::JAL() {
+    uint8_t rd = instDecoded.registers[0];
+    uint8_t rs1 = instDecoded.registers[1];
+
+    // La dirección que tocaría si no se hiciera el salto se guarda en rd
+    // para saltar más adelante de vuelta
+
+    registers[rd] = pc + 1;
+    pc += registers[rs1];
+}
 
 // U format
 void CPU::LUI() {}
