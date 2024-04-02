@@ -1,5 +1,6 @@
 #include "CPU.h"
 #include <iostream>
+#include "endian.h"
 
 
 CPU::CPU(RAM *ram){
@@ -352,14 +353,14 @@ void CPU::LH() {
     uint8_t rd = instDecoded.registers[0];
     uint8_t rs1 = instDecoded.registers[1];
     int32_t inmediate = instDecoded.inmediate;
-    int16_t half = (ram->readHalf(registers[rs1] + inmediate)) & 0xFFFF;
+    int16_t half = FlipHalf(ram->readHalf(registers[rs1] + inmediate));
     registers[rd] = half;
 }
 void CPU::LW() {
     uint8_t rd = instDecoded.registers[0];
     uint8_t rs1 = instDecoded.registers[1];
     int32_t inmediate = instDecoded.inmediate;
-    registers[rd] = ram->readWord(registers[rs1] + inmediate);
+    registers[rd] = FlipWord(ram->readWord(registers[rs1] + inmediate));
 }
 void CPU::LBU() {
     uint8_t rd = instDecoded.registers[0];
@@ -379,7 +380,7 @@ void CPU::LHU() {
     // En este caso, al ser un unsigned, con hacer el AND ya 
     // saca el valor adecuado
 
-    registers[rd] = (ram->readHalf(registers[rs1] + inmediate)) & 0xFFFF;
+    registers[rd] = FlipHalf(ram->readHalf(registers[rs1] + inmediate));
 }
 
 void CPU::JALR() {
@@ -408,9 +409,34 @@ void CPU::EBREAK() {
 }
 
 // S format
-void CPU::SB() {}
-void CPU::SH() {}
-void CPU::SW() {}
+void CPU::SB() {
+    uint8_t rs1 = instDecoded.registers[0];
+    uint8_t rs2 = instDecoded.registers[1];
+    uint32_t inmediate = instDecoded.inmediate;
+
+    uint8_t toStore = (registers[rs2] & 0xFF);
+
+    ram->writeByte(registers[rs1] + inmediate, toStore);
+}
+void CPU::SH() {
+    uint8_t rs1 = instDecoded.registers[0];
+    uint8_t rs2 = instDecoded.registers[1];
+    uint32_t inmediate = instDecoded.inmediate;
+
+    uint16_t toStore = (registers[rs2] & 0xFFFF);
+    toStore = FlipHalf(toStore);
+
+    ram->writeHalf(registers[rs1] + inmediate, toStore);
+}
+void CPU::SW() {
+    uint8_t rs1 = instDecoded.registers[0];
+    uint8_t rs2 = instDecoded.registers[1];
+    uint32_t inmediate = instDecoded.inmediate;
+
+    uint32_t toStore = FlipWord(registers[2]);
+
+    ram->writeWord(registers[rs1] + inmediate, toStore);
+}
 
 // B format
 void CPU::BEQ() {}

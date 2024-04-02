@@ -22,7 +22,7 @@ add_executable (Emulador-RISC-V
 		"Computer/Computer.h" 
 		"Computer/Computer.cpp" 
 		"CPU/decoder.h" 
-		"CPU/decoder.cpp")
+		"CPU/decoder.cpp" "CPU/endian.h" "CPU/endian.cpp")
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET Emulador-RISC-V PROPERTY CXX_STANDARD 20)

@@ -15,3 +15,23 @@ void Computer::On(int cycles) {
 		cycles -= 1;
 	}
 }
+
+int Computer::LoadProgram(std::string filename) {
+
+	// Abrir el archivo en modo binario
+	std::ifstream file(filename, std::ios::binary);
+	if (!file.is_open()) {
+		std::cerr << "Error al abrir el archivo: " << filename << std::endl;
+		return 1;
+	}
+
+	// Leer el archivo byte por byte
+	uint8_t byte;
+	int i = 0;
+	while (file.read(reinterpret_cast<char*>(&byte), sizeof(uint8_t))) {
+		ram.writeByte(i, byte);
+		i++;
+	}
+
+	file.close();
+}
