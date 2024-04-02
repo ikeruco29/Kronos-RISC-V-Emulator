@@ -57,14 +57,6 @@ Decoded decode_R(uint32_t ir) {
 		}
 	}
 
-	/*
-	std::cout << "RD: " << std::hex << rd << std::endl;
-	std::cout << "Funct3: " << std::hex << funct3 << std::endl;
-	std::cout << "RS1: " << std::hex << rs1 << std::endl;
-	std::cout << "RS2: " << std::hex << rs2 << std::endl;
-	std::cout << "Funct7: " << std::hex << funct7 << std::endl;
-	*/
-
 	// Devuelve la operación y los registros 
 	Decoded dec;
 	dec.op = nOperation;
@@ -88,13 +80,6 @@ Decoded decode_I(uint32_t ir, uint8_t op) {
 		inm |= 0xFFFFF000; // Extensión del signo
 	}
 	// 1111 1111 1111 1111 1111 1000 0101 1100
-
-	/*
-	std::cout << "RD: " << std::hex << rd << std::endl;
-	std::cout << "Funct3: " << std::hex << funct3 << std::endl;
-	std::cout << "RS1: " << std::hex << rs1 << std::endl;
-	std::cout << "Inmediato: " << std::hex << inm << std::endl;
-	*/
 	
 	if (op == 0) {
 		switch (funct3)
@@ -238,9 +223,6 @@ Decoded decode_B(uint32_t ir) {
 	// inm_2 tiene los bits 12|10:5
 	// Esto con la extensión de signo hecha, es decir,
 	// con el complemento a 2 si es necesario
-	std::cout << "Instrucción: " << std::hex << ir << std::endl;
-	std::cout << "Inmediato [4:1|11]: " << std::hex << inm_1 << std::endl;
-	std::cout << "Inmediato [12|10:5]: " << std::hex << inm_2 << std::endl;
 
 	// el primer bit será el último del número
 	uint8_t bit11 = inm_1 & 0x01;
@@ -251,19 +233,12 @@ Decoded decode_B(uint32_t ir) {
 	}
 	
 	inmediate = inmediate | (inm_1 & 0b11110); // 11011 -> 1101 0
-	std::cout << "inmediate | (inm_1 & 0b11110): " << std::hex << inmediate << std::endl;
 	inmediate = inmediate | ((inm_2 << 5) & 0b011111111111); // 1001011    -> 1001 0110 0000
-	std::cout << "inmediate | (inm_2 << 5): " << std::hex << inmediate << std::endl;
 
 	if (bit12 == 1) {
 		// 1111 1111 1111 1111 1111 0000 0000 0000
 		inmediate = inmediate | 0xFFFFF000;
-	}
-
-
-	std::cout << "Inmediato final: " << std::hex << inmediate << std::endl;
-
-	
+	}	
 
 	// Devuelve la operación y los registros 
 	Decoded dec;
@@ -292,20 +267,15 @@ Decoded decode_U(uint32_t ir, uint8_t op) {
 Decoded decode_J(uint32_t ir) {
 	uint32_t rd = (ir >> 7) & 0x1F;
 	int32_t inm = (ir >> 12);
-	std::cout << "inm: " << std::hex << inm << std::endl;
 
 	// Bit 20 en la posición 19 (empezando en 0)
 	uint32_t bit20 = inm & 0b10000000000000000000;
-	std::cout << "bit 20: " << std::hex << bit20 << std::endl;
 
 	// Bit 11 en la posición 8 (empezando en 0)
 	uint16_t bit11 = inm & 0b100000000;
-	std::cout << "bit 11: " << std::hex << bit11 << std::endl;
 
 	uint32_t inm_2 = (inm & 0xFF) << 12;
 	uint16_t inm_1 = (inm >> 8) & 0x7FE; // 0111 1111 1110
-	std::cout << "inm_2: " << std::hex << inm_2 << std::endl;
-	std::cout << "inm_1: " << std::hex << inm_1 << std::endl;
 
 	int32_t inm_fin = inm_2 | inm_1;
 	if (bit11 != 0)	// Si el bit 11 está en 1, lo añade
@@ -317,7 +287,6 @@ Decoded decode_J(uint32_t ir) {
 	if (bit20 != 0)	
 		inm_fin = inm_fin | 0xfff00000;
 
-	std::cout << "inm: " << std::hex << inm_fin << std::endl;
 
 	Decoded dec;
 	dec.op = JAL;
