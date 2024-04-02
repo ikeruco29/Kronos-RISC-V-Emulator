@@ -344,7 +344,7 @@ void CPU::LB() {
         -1, extiende automáticamente el signo sin tener que hcer operaciones.
         Esta misma lógica aplica al resto de operaciones LX.
     */
-    int8_t byte = (ram->read(registers[rs1] + inmediate)) & 0xFF;
+    int8_t byte = (ram->readByte(registers[rs1] + inmediate));
 
     registers[rd] = byte;
 }
@@ -352,14 +352,14 @@ void CPU::LH() {
     uint8_t rd = instDecoded.registers[0];
     uint8_t rs1 = instDecoded.registers[1];
     int32_t inmediate = instDecoded.inmediate;
-    int16_t half = (ram->read(registers[rs1] + inmediate)) & 0xFFFF;
+    int16_t half = (ram->readHalf(registers[rs1] + inmediate)) & 0xFFFF;
     registers[rd] = half;
 }
 void CPU::LW() {
     uint8_t rd = instDecoded.registers[0];
     uint8_t rs1 = instDecoded.registers[1];
     int32_t inmediate = instDecoded.inmediate;
-    registers[rd] = ram->read(registers[rs1] + inmediate);
+    registers[rd] = ram->readWord(registers[rs1] + inmediate);
 }
 void CPU::LBU() {
     uint8_t rd = instDecoded.registers[0];
@@ -369,7 +369,7 @@ void CPU::LBU() {
     // En este caso, al ser un unsigned, con hacer el AND ya 
     // saca el valor adecuado
 
-    registers[rd] = (ram->read(registers[rs1] + inmediate)) & 0xFF;
+    registers[rd] = (ram->readByte(registers[rs1] + inmediate)) & 0xFF;
 }
 void CPU::LHU() {
     uint8_t rd = instDecoded.registers[0];
@@ -379,7 +379,7 @@ void CPU::LHU() {
     // En este caso, al ser un unsigned, con hacer el AND ya 
     // saca el valor adecuado
 
-    registers[rd] = (ram->read(registers[rs1] + inmediate)) & 0xFFFF;
+    registers[rd] = (ram->readHalf(registers[rs1] + inmediate)) & 0xFFFF;
 }
 
 void CPU::JALR() {

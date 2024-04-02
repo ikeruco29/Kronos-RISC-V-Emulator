@@ -6,11 +6,11 @@ Computer::~Computer() {}
 
 void Computer::On(int cycles) {
 	while (cycles != 0) {
-		cpu.fetch(ram.read(cpu.pc));
+		cpu.fetch(ram.readWord(cpu.pc));
 		cpu.decode();
 		cpu.execute();
 		
-		cpu.pc += 1;
+		cpu.pc += 4;
 
 		cycles -= 1;
 	}

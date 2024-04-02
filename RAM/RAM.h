@@ -1,13 +1,24 @@
 #pragma once
 #include <cstdint>
+#include <iostream>
 
 class RAM {
     public:
         RAM(int RAM_SIZE);
         ~RAM();
 
-        int32_t *ram;
+        uint8_t *ram;
 
-        void write(uint32_t addr, int32_t data);
-        int32_t read(uint32_t addr);
+        void writeByte(uint32_t addr, int8_t data);
+        void writeHalf(uint32_t addr, int16_t data);
+        void writeWord(uint32_t addr, int32_t data);
+
+        // Lee un byte de memoria
+        uint8_t readByte(uint32_t addr);
+        // Lee 16 bits de la memoria y lo devuelve
+        uint16_t readHalf(uint32_t addr);
+        // Lee 32 bits de la memoria y lo devuelve como uint32_t
+        uint32_t readWord(uint32_t addr);
+
+        void showRam();
 };

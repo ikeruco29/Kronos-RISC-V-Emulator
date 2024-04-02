@@ -9,7 +9,7 @@ using namespace std;
 #include <iostream>
 
 int main() {
-    int RAM_SIZE = 64, SCREEN_HEIGHT, SCREEN_WIDTH;
+    int RAM_SIZE = 1, SCREEN_HEIGHT, SCREEN_WIDTH;
     bool DEBUG;
 
 
@@ -35,14 +35,16 @@ int main() {
 
     Computer computer = Computer(RAM_SIZE);
 
-    computer.ram.write(0, 0x03200193);
+    computer.ram.writeWord(0x00000000, 0x03200193);
     
-    computer.ram.write(1, 0xfb500113);
+    computer.ram.writeWord(4, 0xfb500113);
     
-    computer.ram.write(2, 0x00310233);
+    computer.ram.writeWord(8, 0x00310233);
 
-    computer.ram.write(3, 0x00400283);
-    computer.ram.write(4, 0x0000FFFF);
+    computer.ram.writeWord(12, 0x00400283);
+    computer.ram.writeWord(16, 0x0000FFFF);
+
+    computer.ram.showRam();
 
     computer.On(4);
     // cout << hex << computer.ram.read(0x000000) << endl;
