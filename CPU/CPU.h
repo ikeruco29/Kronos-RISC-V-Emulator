@@ -12,6 +12,7 @@ class CPU {
         ~CPU();
 
         RAM* ram;
+        bool bEbreak = 0;
 
         // Fetch siguiente instrucción
         void fetch(uint32_t mem);

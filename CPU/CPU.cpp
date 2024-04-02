@@ -382,10 +382,30 @@ void CPU::LHU() {
     registers[rd] = (ram->read(registers[rs1] + inmediate)) & 0xFFFF;
 }
 
-void CPU::JALR() {}
+void CPU::JALR() {
+    uint8_t rd = instDecoded.registers[0];
+    uint8_t rs1 = instDecoded.registers[1];
+    uint32_t inmediate = instDecoded.inmediate;
 
-void CPU::ECALL() {}
-void CPU::EBREAK() {}
+    // La dirección que tocaría si no se hiciera el salto se guarda en rd
+    // para saltar más adelante de vuelta
+
+    registers[rd] = pc + 1;
+    pc = registers[rs1] + inmediate;
+}
+
+void CPU::ECALL() {
+    // Detener ejecución de programa
+}
+void CPU::EBREAK() {
+    bEbreak = true;
+
+    while (bEbreak)
+    {
+        // show info
+        // Comprobar si se ha pulsado una tecla
+    }
+}
 
 // S format
 void CPU::SB() {}
