@@ -439,12 +439,54 @@ void CPU::SW() {
 }
 
 // B format
-void CPU::BEQ() {}
-void CPU::BNE() {}
-void CPU::BLT() {}
-void CPU::BGE() {}
-void CPU::BLTU() {}
-void CPU::BGEU() {}
+void CPU::BEQ() {
+    uint8_t rs1 = instDecoded.registers[0];
+    uint8_t rs2 = instDecoded.registers[1];
+    uint32_t inmediate = instDecoded.inmediate;
+
+    if (registers[rs1] == registers[rs2])
+        pc += inmediate;
+}
+void CPU::BNE() {
+    uint8_t rs1 = instDecoded.registers[0];
+    uint8_t rs2 = instDecoded.registers[1];
+    uint32_t inmediate = instDecoded.inmediate;
+
+    if (registers[rs1] != registers[rs2])
+        pc += inmediate;
+}
+void CPU::BLT() {
+    uint8_t rs1 = instDecoded.registers[0];
+    uint8_t rs2 = instDecoded.registers[1];
+    uint32_t inmediate = instDecoded.inmediate;
+
+    if (registers[rs1] < registers[rs2])
+        pc += inmediate;
+}
+void CPU::BGE() {
+    uint8_t rs1 = instDecoded.registers[0];
+    uint8_t rs2 = instDecoded.registers[1];
+    uint32_t inmediate = instDecoded.inmediate;
+
+    if (registers[rs1] >= registers[rs2])
+        pc += inmediate;
+}
+void CPU::BLTU() {
+    uint8_t rs1 = instDecoded.registers[0];
+    uint8_t rs2 = instDecoded.registers[1];
+    uint32_t inmediate = instDecoded.inmediate;
+
+    if (static_cast<uint32_t>(registers[rs1]) < static_cast<uint32_t>(registers[rs2]))
+        pc += inmediate;
+}
+void CPU::BGEU() {
+    uint8_t rs1 = instDecoded.registers[0];
+    uint8_t rs2 = instDecoded.registers[1];
+    uint32_t inmediate = instDecoded.inmediate;
+
+    if (static_cast<uint32_t>(registers[rs1]) <= static_cast<uint32_t>(registers[rs2]))
+        pc += inmediate;
+}
 
 // J format
 void CPU::JAL() {
