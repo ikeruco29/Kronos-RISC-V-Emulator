@@ -433,7 +433,7 @@ void CPU::SW() {
     uint8_t rs2 = instDecoded.registers[1];
     uint32_t inmediate = instDecoded.inmediate;
 
-    uint32_t toStore = FlipWord(registers[2]);
+    uint32_t toStore = FlipWord(registers[rs2]);
 
     ram->writeWord(registers[rs1] + inmediate, toStore);
 }
@@ -459,5 +459,15 @@ void CPU::JAL() {
 }
 
 // U format
-void CPU::LUI() {}
-void CPU::AUIPC() {}
+void CPU::LUI() {
+    uint8_t rd = instDecoded.registers[0];
+    uint32_t inmediate = instDecoded.inmediate;
+
+    registers[rd] = inmediate << 12;
+}
+void CPU::AUIPC() {
+    uint8_t rd = instDecoded.registers[0];
+    uint32_t inmediate = instDecoded.inmediate;
+
+    registers[rd] = pc + (inmediate << 12);
+}

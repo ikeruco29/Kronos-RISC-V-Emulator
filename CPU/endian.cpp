@@ -13,7 +13,7 @@ uint32_t FlipWord(uint32_t word) {
 	// aa bb a0 ff
 	printf("Número: %.8X", word);
 
-	uint32_t half1 = FlipHalf(word) << 8;
+	uint32_t half1 = FlipHalf(word) << 16;
 	uint16_t half2 = FlipHalf(word >> 16);
 
 	printf("Número en little: %.8X", (half1 | half2));
