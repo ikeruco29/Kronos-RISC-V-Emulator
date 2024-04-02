@@ -329,16 +329,31 @@ void CPU::LB() {
     uint8_t rs1 = instDecoded.registers[1];
     int32_t inmediate = instDecoded.inmediate;
 
-    int32_t byte = (ram->read(registers[rs1] + inmediate)) & 0xFF;
-    std::cout << "byte: " << std::hex << byte;
+    /* La lógica de esto es la siguiente:
+    
+        Con la primera línea se obtienen los 
+        primeros 8 bits, pero el número resultante es
+        0x000000FF. Esto si se guarda directamente en una variable
+        de tipo int32_t, se queda tal cual representando el número
+        255. 
 
-    registers[rd] = (ram->read(registers[rs1] + inmediate)) & 0xFF;
+        Pero lo que queremos es que ese número se interprete
+        como -1, que es el que realmente es si solo interpretamos los primeros
+        8 bits, por lo que lo guardamos en una variable int8_t para que lo interprete como
+        -1 y luego lo guardamos en el registro, que es un int32_t, pero como parte de un
+        -1, extiende automáticamente el signo sin tener que hcer operaciones.
+        Esta misma lógica aplica al resto de operaciones LX.
+    */
+    int8_t byte = (ram->read(registers[rs1] + inmediate)) & 0xFF;
+
+    registers[rd] = byte;
 }
 void CPU::LH() {
     uint8_t rd = instDecoded.registers[0];
     uint8_t rs1 = instDecoded.registers[1];
     int32_t inmediate = instDecoded.inmediate;
-    registers[rd] = (ram->read(registers[rs1] + inmediate)) & 0xFFFF;
+    int16_t half = (ram->read(registers[rs1] + inmediate)) & 0xFFFF;
+    registers[rd] = half;
 }
 void CPU::LW() {
     uint8_t rd = instDecoded.registers[0];
@@ -351,12 +366,21 @@ void CPU::LBU() {
     uint8_t rs1 = instDecoded.registers[1];
     int32_t inmediate = instDecoded.inmediate;
 
-    int32_t byte = (ram->read(registers[rs1] + inmediate)) & 0xFF;
-    std::cout << "byte: " << std::hex << byte;
+    // En este caso, al ser un unsigned, con hacer el AND ya 
+    // saca el valor adecuado
 
     registers[rd] = (ram->read(registers[rs1] + inmediate)) & 0xFF;
 }
-void CPU::LHU() {}
+void CPU::LHU() {
+    uint8_t rd = instDecoded.registers[0];
+    uint8_t rs1 = instDecoded.registers[1];
+    int32_t inmediate = instDecoded.inmediate;
+
+    // En este caso, al ser un unsigned, con hacer el AND ya 
+    // saca el valor adecuado
+
+    registers[rd] = (ram->read(registers[rs1] + inmediate)) & 0xFFFF;
+}
 
 void CPU::JALR() {}
 
