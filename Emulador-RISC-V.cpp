@@ -9,7 +9,7 @@ using namespace std;
 #include <iostream>
 
 int main() {
-    int RAM_SIZE = 1, SCREEN_HEIGHT, SCREEN_WIDTH;
+    int RAM_SIZE = 1;
     bool DEBUG;
 
 
@@ -21,8 +21,6 @@ int main() {
     //    cout << "Aplicando configuración..." << endl;
 
     //    RAM_SIZE = config["RAM_SIZE"].as<int>();
-    //    SCREEN_WIDTH = config["SCREEN_WIDTH"].as<int>();
-    //    SCREEN_HEIGHT = config["SCREEN_HEIGHT"].as<int>();
     //    DEBUG = config["DEBUG"].as<bool>();
 
     //    // Imprimir los datos leídos
