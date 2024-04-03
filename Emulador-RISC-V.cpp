@@ -35,21 +35,10 @@ int main() {
 
     Computer computer = Computer(RAM_SIZE);
 
-    //computer.ram.writeWord(0x00000000, 0x03200193);
-    //
-    //computer.ram.writeWord(4, 0xfb500113);
-    //
-    //computer.ram.writeWord(8, 0x00310233);
-
-    //computer.ram.writeWord(12, 0x00400283);
-    //computer.ram.writeWord(16, 0x0000FFFF);
     computer.LoadProgram("C:/Users/ikeru/Desktop/Universidad/TFG/risc-v-programs/prueba2.hex");
 
     computer.On(8);
     computer.ram.showRam();
-    // cout << hex << computer.ram.read(0x000000) << endl;
-
-
 
     return 0;
 }
