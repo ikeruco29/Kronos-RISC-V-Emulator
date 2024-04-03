@@ -10,6 +10,13 @@ CPU::CPU(RAM *ram){
         registers[i] = 0x00000000;
     }
     this->ram = ram;
+
+    instDecoded.inmediate = 0;
+    instDecoded.op = -1;
+
+    for (int i = 0; i < 39; i++) {
+        ciclosTotales[i] = 0;
+    }
 }
 
 CPU::~CPU(){}
@@ -66,130 +73,169 @@ uint32_t CPU::execute(){
         // Formato R
         case Operation::ADD:
             ADD();
+            ciclosTotales[Operation::ADD]++;
             break;
         case Operation::SUB:
             SUB();
+            ciclosTotales[Operation::SUB]++;
             break;
         case Operation::XOR:
             XOR();
+            ciclosTotales[Operation::XOR]++;
             break;
         case Operation::OR:
             OR();
+            ciclosTotales[Operation::OR]++;
             break;
         case Operation::AND:
             AND();
+            ciclosTotales[Operation::AND]++;
             break;
         case Operation::SLL:
             SLL();
+            ciclosTotales[Operation::SLL]++;
             break;
         case Operation::SRL:
             SRL();
+            ciclosTotales[Operation::SRL]++;
             break;
         case Operation::SRA:
             SRA();
+            ciclosTotales[Operation::SRA]++;
             break;
         case Operation::SLT:
             SLT();
+            ciclosTotales[Operation::SLT]++;
             break;
         case Operation::SLTU:
             SLTU();
+            ciclosTotales[Operation::SLTU]++;
             break;
-            
-        // Formato I
+
+            // Formato I
         case Operation::ADDI:
             ADDI();
+            ciclosTotales[Operation::ADDI]++;
             break;
         case Operation::SLTI:
             SLTI();
+            ciclosTotales[Operation::SLTI]++;
             break;
         case Operation::SLTIU:
             SLTIU();
+            ciclosTotales[Operation::SLTIU]++;
             break;
         case Operation::XORI:
             XORI();
+            ciclosTotales[Operation::XORI]++;
             break;
         case Operation::ORI:
             ORI();
+            ciclosTotales[Operation::ORI]++;
             break;
         case Operation::ANDI:
             ANDI();
+            ciclosTotales[Operation::ANDI]++;
             break;
         case Operation::SLLI:
             SLLI();
+            ciclosTotales[Operation::SLLI]++;
             break;
         case Operation::SRLI:
             SRLI();
+            ciclosTotales[Operation::SRLI]++;
             break;
         case Operation::SRAI:
             SRAI();
+            ciclosTotales[Operation::SRAI]++;
             break;
         case Operation::LB:
             LB();
+            ciclosTotales[Operation::LB]++;
             break;
         case Operation::LH:
             LH();
+            ciclosTotales[Operation::LH]++;
             break;
         case Operation::LW:
             LW();
+            ciclosTotales[Operation::LW]++;
             break;
         case Operation::LBU:
             LBU();
+            ciclosTotales[Operation::LBU]++;
             break;
         case Operation::LHU:
             LHU();
+            ciclosTotales[Operation::LHU]++;
             break;
         case Operation::JALR:
             JALR();
+            ciclosTotales[Operation::JALR]++;
             break;
         case Operation::ECALL:
             ECALL();
+            ciclosTotales[Operation::ECALL]++;
             break;
         case Operation::EBREAK:
             EBREAK();
+            ciclosTotales[Operation::EBREAK]++;
             break;
 
-        // Formato S
+            // Formato S
         case Operation::SB:
             SB();
+            ciclosTotales[Operation::SB]++;
             break;
         case Operation::SH:
             SH();
+            ciclosTotales[Operation::SH]++;
             break;
         case Operation::SW:
             SW();
+            ciclosTotales[Operation::SW]++;
             break;
 
-        //Formato B
+            //Formato B
         case Operation::BEQ:
             BEQ();
+            ciclosTotales[Operation::BEQ]++;
             break;
         case Operation::BNE:
             BNE();
+            ciclosTotales[Operation::BNE]++;
             break;
         case Operation::BLT:
             BLT();
+            ciclosTotales[Operation::BLT]++;
             break;
         case Operation::BGE:
             BGE();
+            ciclosTotales[Operation::BGE]++;
             break;
         case Operation::BLTU:
             BLTU();
+            ciclosTotales[Operation::BLTU]++;
             break;
         case Operation::BGEU:
             BGEU();
+            ciclosTotales[Operation::BGEU]++;
             break;
 
-        // Formato U
+            // Formato U
         case Operation::LUI:
             LUI();
+            ciclosTotales[Operation::LUI]++;
             break;
         case Operation::AUIPC:
             AUIPC();
+            ciclosTotales[Operation::AUIPC]++;
             break;
 
-        // Formato J
+            // Formato J
         case Operation::JAL:
             JAL();
+            ciclosTotales[Operation::JAL]++;
             break;
 
         default:

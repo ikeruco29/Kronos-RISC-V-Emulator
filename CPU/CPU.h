@@ -52,4 +52,8 @@ class CPU {
         // U format
         void LUI(); void AUIPC();
 
+        
+        
+        // Para los ciclos
+        uint64_t ciclosTotales[39];
 };
