@@ -1,9 +1,12 @@
 #include "RAM.h"
 
-RAM::RAM(int RAM_SIZE){
-    ram = new uint8_t[RAM_SIZE * 1024];
+int iRamSize;
 
-    for(int i = 0; i < RAM_SIZE * 1024; i++){
+RAM::RAM(uint32_t RAM_SIZE){
+    iRamSize = RAM_SIZE;
+    ram = new uint8_t[RAM_SIZE];
+
+    for(uint32_t i = 0; i < RAM_SIZE; i++){
         ram[i] = 0x00;
     }
 };
@@ -43,11 +46,11 @@ uint32_t RAM::readWord(uint32_t addr){
 void RAM::showRam() {
     printf("         |  00 01 02 03\n-----------------------\n");
     printf("00000000 |  ");
-    for (int i = 1; i <= 32 * 5; i++)
+    for (uint32_t i = 1; i <= iRamSize; i++)
     {
         printf("%.2X ", readByte(i - 1));
 
-        if (i % 4 == 0 && i != 0) {
+        if (i % 16 == 0 && i != 0) {
             printf("\n");
             printf("%.8X |  ", 0x00000000 + i);
         }

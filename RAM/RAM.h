@@ -4,7 +4,7 @@
 
 class RAM {
     public:
-        RAM(int RAM_SIZE);
+        RAM(uint32_t RAM_SIZE);
         ~RAM();
 
         uint8_t *ram;

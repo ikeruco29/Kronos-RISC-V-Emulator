@@ -9,7 +9,7 @@ using namespace std;
 #include <iostream>
 
 int main() {
-    int RAM_SIZE = 1;
+    uint32_t RAM_SIZE = 0x80003021;
     bool DEBUG;
 
 
@@ -33,9 +33,9 @@ int main() {
 
     Computer computer = Computer(RAM_SIZE);
 
-    computer.LoadProgram("C:/Users/ikeru/Desktop/Universidad/TFG/risc-v-programs/prueba2.hex");
+    computer.LoadProgram("C:/Users/ikeru/Downloads/SHA_RV32I.bin");
 
-    computer.On(8);
+    computer.On(0);
     computer.ram.showRam();
 
     return 0;
