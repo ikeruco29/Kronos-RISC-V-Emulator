@@ -33,7 +33,9 @@ int main() {
 
     Computer computer = Computer(RAM_SIZE);
 
-    computer.LoadProgram("C:/Users/ikeru/Downloads/SHA_RV32I.bin");
+    if(computer.LoadProgram("C:/Users/ikeru/Downloads/SHA_RV32I.bin") == 1){
+        exit(-1);
+    };
 
     computer.On(0);
     computer.ram.showRam();

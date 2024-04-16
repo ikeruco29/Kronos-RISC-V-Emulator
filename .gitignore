@@ -15,6 +15,7 @@ build/
 
 # Archivos de Visual Studio
 .vs/
+.vscode/
 *.suo
 *.user
 *.sln.docstates
