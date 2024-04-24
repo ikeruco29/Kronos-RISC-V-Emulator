@@ -1,5 +1,4 @@
-#include "CPU.h"
-#include <iostream>
+#include "cpu.h"
 #include "endian.h"
 
 
@@ -31,215 +30,215 @@ void CPU::decode() {
 
     switch (opcode)
     {
-        case 0b00110011:    // R
-            instDecoded = decode_R(ir); // Recoge la instrucción decodificada y la guarda en la variable global de la clase
-            //std::cout << instDecoded.op << ", " << instDecoded.registers[2] << std::endl;
-            break;
-        case 0b00010011:    // I
-            instDecoded = decode_I(ir, 0);
-            break;
-        case 0b00000011:    // I
-            instDecoded = decode_I(ir, 1);
-            break;
-        case 0b00100011:    // S
-            instDecoded = decode_S(ir);
-            break;
-        case 0b01100011:    // B
-            instDecoded = decode_B(ir);
-            break;
-        case 0b01101111:    // J
-            instDecoded = decode_J(ir);
-            break;
-        case 0b01100111:    // I
-            instDecoded = decode_I(ir, 2);
-            break;
-        case 0b00110111:    // U
-            instDecoded = decode_U(ir, 0);
-            break;
-        case 0b00010111:    // U
-            instDecoded = decode_U(ir, 1);
-            break;
-        case 0b01110011:    // I
-            instDecoded = decode_I(ir, 3);
-            break;
-        default:
-            break;
+    case 0b00110011:    // R
+        instDecoded = decode_R(ir); // Recoge la instrucción decodificada y la guarda en la variable global de la clase
+        //std::cout << instDecoded.op << ", " << instDecoded.registers[2] << std::endl;
+        break;
+    case 0b00010011:    // I
+        instDecoded = decode_I(ir, 0);
+        break;
+    case 0b00000011:    // I
+        instDecoded = decode_I(ir, 1);
+        break;
+    case 0b00100011:    // S
+        instDecoded = decode_S(ir);
+        break;
+    case 0b01100011:    // B
+        instDecoded = decode_B(ir);
+        break;
+    case 0b01101111:    // J
+        instDecoded = decode_J(ir);
+        break;
+    case 0b01100111:    // I
+        instDecoded = decode_I(ir, 2);
+        break;
+    case 0b00110111:    // U
+        instDecoded = decode_U(ir, 0);
+        break;
+    case 0b00010111:    // U
+        instDecoded = decode_U(ir, 1);
+        break;
+    case 0b01110011:    // I
+        instDecoded = decode_I(ir, 3);
+        break;
+    default:
+        break;
     }
 }
 
 uint32_t CPU::execute(){
     switch (instDecoded.op)
     {
-        // Formato R
-        case Operation::ADD:
-            ADD();
-            ciclosTotales[Operation::ADD]++;
-            break;
-        case Operation::SUB:
-            SUB();
-            ciclosTotales[Operation::SUB]++;
-            break;
-        case Operation::XOR:
-            XOR();
-            ciclosTotales[Operation::XOR]++;
-            break;
-        case Operation::OR:
-            OR();
-            ciclosTotales[Operation::OR]++;
-            break;
-        case Operation::AND:
-            AND();
-            ciclosTotales[Operation::AND]++;
-            break;
-        case Operation::SLL:
-            SLL();
-            ciclosTotales[Operation::SLL]++;
-            break;
-        case Operation::SRL:
-            SRL();
-            ciclosTotales[Operation::SRL]++;
-            break;
-        case Operation::SRA:
-            SRA();
-            ciclosTotales[Operation::SRA]++;
-            break;
-        case Operation::SLT:
-            SLT();
-            ciclosTotales[Operation::SLT]++;
-            break;
-        case Operation::SLTU:
-            SLTU();
-            ciclosTotales[Operation::SLTU]++;
-            break;
+    // Formato R
+    case Operation::ADD:
+        ADD();
+        ciclosTotales[Operation::ADD]++;
+        break;
+    case Operation::SUB:
+        SUB();
+        ciclosTotales[Operation::SUB]++;
+        break;
+    case Operation::XOR:
+        XOR();
+        ciclosTotales[Operation::XOR]++;
+        break;
+    case Operation::OR:
+        OR();
+        ciclosTotales[Operation::OR]++;
+        break;
+    case Operation::AND:
+        AND();
+        ciclosTotales[Operation::AND]++;
+        break;
+    case Operation::SLL:
+        SLL();
+        ciclosTotales[Operation::SLL]++;
+        break;
+    case Operation::SRL:
+        SRL();
+        ciclosTotales[Operation::SRL]++;
+        break;
+    case Operation::SRA:
+        SRA();
+        ciclosTotales[Operation::SRA]++;
+        break;
+    case Operation::SLT:
+        SLT();
+        ciclosTotales[Operation::SLT]++;
+        break;
+    case Operation::SLTU:
+        SLTU();
+        ciclosTotales[Operation::SLTU]++;
+        break;
 
-            // Formato I
-        case Operation::ADDI:
-            ADDI();
-            ciclosTotales[Operation::ADDI]++;
-            break;
-        case Operation::SLTI:
-            SLTI();
-            ciclosTotales[Operation::SLTI]++;
-            break;
-        case Operation::SLTIU:
-            SLTIU();
-            ciclosTotales[Operation::SLTIU]++;
-            break;
-        case Operation::XORI:
-            XORI();
-            ciclosTotales[Operation::XORI]++;
-            break;
-        case Operation::ORI:
-            ORI();
-            ciclosTotales[Operation::ORI]++;
-            break;
-        case Operation::ANDI:
-            ANDI();
-            ciclosTotales[Operation::ANDI]++;
-            break;
-        case Operation::SLLI:
-            SLLI();
-            ciclosTotales[Operation::SLLI]++;
-            break;
-        case Operation::SRLI:
-            SRLI();
-            ciclosTotales[Operation::SRLI]++;
-            break;
-        case Operation::SRAI:
-            SRAI();
-            ciclosTotales[Operation::SRAI]++;
-            break;
-        case Operation::LB:
-            LB();
-            ciclosTotales[Operation::LB]++;
-            break;
-        case Operation::LH:
-            LH();
-            ciclosTotales[Operation::LH]++;
-            break;
-        case Operation::LW:
-            LW();
-            ciclosTotales[Operation::LW]++;
-            break;
-        case Operation::LBU:
-            LBU();
-            ciclosTotales[Operation::LBU]++;
-            break;
-        case Operation::LHU:
-            LHU();
-            ciclosTotales[Operation::LHU]++;
-            break;
-        case Operation::JALR:
-            JALR();
-            ciclosTotales[Operation::JALR]++;
-            break;
-        case Operation::ECALL:
-            ECALL();
-            ciclosTotales[Operation::ECALL]++;
-            break;
-        case Operation::EBREAK:
-            EBREAK();
-            ciclosTotales[Operation::EBREAK]++;
-            break;
+        // Formato I
+    case Operation::ADDI:
+        ADDI();
+        ciclosTotales[Operation::ADDI]++;
+        break;
+    case Operation::SLTI:
+        SLTI();
+        ciclosTotales[Operation::SLTI]++;
+        break;
+    case Operation::SLTIU:
+        SLTIU();
+        ciclosTotales[Operation::SLTIU]++;
+        break;
+    case Operation::XORI:
+        XORI();
+        ciclosTotales[Operation::XORI]++;
+        break;
+    case Operation::ORI:
+        ORI();
+        ciclosTotales[Operation::ORI]++;
+        break;
+    case Operation::ANDI:
+        ANDI();
+        ciclosTotales[Operation::ANDI]++;
+        break;
+    case Operation::SLLI:
+        SLLI();
+        ciclosTotales[Operation::SLLI]++;
+        break;
+    case Operation::SRLI:
+        SRLI();
+        ciclosTotales[Operation::SRLI]++;
+        break;
+    case Operation::SRAI:
+        SRAI();
+        ciclosTotales[Operation::SRAI]++;
+        break;
+    case Operation::LB:
+        LB();
+        ciclosTotales[Operation::LB]++;
+        break;
+    case Operation::LH:
+        LH();
+        ciclosTotales[Operation::LH]++;
+        break;
+    case Operation::LW:
+        LW();
+        ciclosTotales[Operation::LW]++;
+        break;
+    case Operation::LBU:
+        LBU();
+        ciclosTotales[Operation::LBU]++;
+        break;
+    case Operation::LHU:
+        LHU();
+        ciclosTotales[Operation::LHU]++;
+        break;
+    case Operation::JALR:
+        JALR();
+        ciclosTotales[Operation::JALR]++;
+        break;
+    case Operation::ECALL:
+        ECALL();
+        ciclosTotales[Operation::ECALL]++;
+        break;
+    case Operation::EBREAK:
+        EBREAK();
+        ciclosTotales[Operation::EBREAK]++;
+        break;
 
-            // Formato S
-        case Operation::SB:
-            SB();
-            ciclosTotales[Operation::SB]++;
-            break;
-        case Operation::SH:
-            SH();
-            ciclosTotales[Operation::SH]++;
-            break;
-        case Operation::SW:
-            SW();
-            ciclosTotales[Operation::SW]++;
-            break;
+        // Formato S
+    case Operation::SB:
+        SB();
+        ciclosTotales[Operation::SB]++;
+        break;
+    case Operation::SH:
+        SH();
+        ciclosTotales[Operation::SH]++;
+        break;
+    case Operation::SW:
+        SW();
+        ciclosTotales[Operation::SW]++;
+        break;
 
-            //Formato B
-        case Operation::BEQ:
-            BEQ();
-            ciclosTotales[Operation::BEQ]++;
-            break;
-        case Operation::BNE:
-            BNE();
-            ciclosTotales[Operation::BNE]++;
-            break;
-        case Operation::BLT:
-            BLT();
-            ciclosTotales[Operation::BLT]++;
-            break;
-        case Operation::BGE:
-            BGE();
-            ciclosTotales[Operation::BGE]++;
-            break;
-        case Operation::BLTU:
-            BLTU();
-            ciclosTotales[Operation::BLTU]++;
-            break;
-        case Operation::BGEU:
-            BGEU();
-            ciclosTotales[Operation::BGEU]++;
-            break;
+        //Formato B
+    case Operation::BEQ:
+        BEQ();
+        ciclosTotales[Operation::BEQ]++;
+        break;
+    case Operation::BNE:
+        BNE();
+        ciclosTotales[Operation::BNE]++;
+        break;
+    case Operation::BLT:
+        BLT();
+        ciclosTotales[Operation::BLT]++;
+        break;
+    case Operation::BGE:
+        BGE();
+        ciclosTotales[Operation::BGE]++;
+        break;
+    case Operation::BLTU:
+        BLTU();
+        ciclosTotales[Operation::BLTU]++;
+        break;
+    case Operation::BGEU:
+        BGEU();
+        ciclosTotales[Operation::BGEU]++;
+        break;
 
-            // Formato U
-        case Operation::LUI:
-            LUI();
-            ciclosTotales[Operation::LUI]++;
-            break;
-        case Operation::AUIPC:
-            AUIPC();
-            ciclosTotales[Operation::AUIPC]++;
-            break;
+        // Formato U
+    case Operation::LUI:
+        LUI();
+        ciclosTotales[Operation::LUI]++;
+        break;
+    case Operation::AUIPC:
+        AUIPC();
+        ciclosTotales[Operation::AUIPC]++;
+        break;
 
-            // Formato J
-        case Operation::JAL:
-            JAL();
-            ciclosTotales[Operation::JAL]++;
-            break;
+        // Formato J
+    case Operation::JAL:
+        JAL();
+        ciclosTotales[Operation::JAL]++;
+        break;
 
-        default:
-            break;
+    default:
+        break;
     }
     return 0;
 }
@@ -377,12 +376,12 @@ void CPU::LB() {
     int32_t inmediate = instDecoded.inmediate;
 
     /* La lógica de esto es la siguiente:
-    
-        Con la primera línea se obtienen los 
+
+        Con la primera línea se obtienen los
         primeros 8 bits, pero el número resultante es
         0x000000FF. Esto si se guarda directamente en una variable
         de tipo int32_t, se queda tal cual representando el número
-        255. 
+        255.
 
         Pero lo que queremos es que ese número se interprete
         como -1, que es el que realmente es si solo interpretamos los primeros
@@ -413,7 +412,7 @@ void CPU::LBU() {
     uint8_t rs1 = instDecoded.registers[1];
     int32_t inmediate = instDecoded.inmediate;
 
-    // En este caso, al ser un unsigned, con hacer el AND ya 
+    // En este caso, al ser un unsigned, con hacer el AND ya
     // saca el valor adecuado
 
     registers[rd] = (ram->readByte(registers[rs1] + inmediate)) & 0xFF;
@@ -423,7 +422,7 @@ void CPU::LHU() {
     uint8_t rs1 = instDecoded.registers[1];
     int32_t inmediate = instDecoded.inmediate;
 
-    // En este caso, al ser un unsigned, con hacer el AND ya 
+    // En este caso, al ser un unsigned, con hacer el AND ya
     // saca el valor adecuado
 
     registers[rd] = FlipHalf(ram->readHalf(registers[rs1] + inmediate));

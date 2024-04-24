@@ -1,4 +1,4 @@
-#include "RAM.h"
+#include "ram.h"
 
 int iRamSize;
 
@@ -22,7 +22,7 @@ void RAM::writeHalf(uint32_t addr, int16_t data) {
     ram[addr + 1] = data;
 }
 void RAM::writeWord(uint32_t addr, int32_t data){
-    
+
     // 00 00 00 00
     ram[addr] = data >> 24;
     ram[addr + 1] = data >> 16;
@@ -42,7 +42,7 @@ uint32_t RAM::readWord(uint32_t addr){
 
     return word;
 };
-
+/*
 void RAM::showRam() {
     printf("         |  00 01 02 03\n-----------------------\n");
     printf("00000000 |  ");
@@ -55,4 +55,4 @@ void RAM::showRam() {
             printf("%.8X |  ", 0x00000000 + i);
         }
     }
-}
+}*/
