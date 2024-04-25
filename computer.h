@@ -25,6 +25,7 @@ public:
 
     void On(bool *pasoapaso);
     int LoadProgram(std::string filename);
+    int LoadCampaign(std::string filename);
     std::string exportRam();
 };
 

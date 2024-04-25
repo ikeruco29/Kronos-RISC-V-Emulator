@@ -2,6 +2,10 @@
 #include <sstream>
 #include <iostream>
 #include <iomanip>
+#include <QFile>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
 
 Computer::Computer(int RAM_SIZE) : ram(RAM(RAM_SIZE)), cpu(CPU(&ram)), ram_size(RAM_SIZE) {};
 Computer::Computer(int RAM_SIZE, QTextEdit *termb)
@@ -56,6 +60,63 @@ int Computer::LoadProgram(std::string filename) {
     }
 
     file.close();
+    return 0;
+}
+
+int Computer::LoadCampaign(std::string filename) {
+    // Abrir el archivo JSON
+    QFile file(QString::fromStdString(filename));
+    if (!file.open(QIODevice::ReadOnly)) {
+        qWarning() << "No se pudo abrir el archivo JSON";
+        return 1;
+    }
+
+    // Leer todo el contenido del archivo JSON
+    QByteArray jsonData = file.readAll();
+    file.close();
+
+    // Crear un QJsonDocument a partir de los datos leídos
+    QJsonParseError error;
+    QJsonDocument jsonDoc = QJsonDocument::fromJson(jsonData, &error);
+
+    // Verificar errores de parseo
+    if (jsonDoc.isNull()) {
+        qWarning() << "Error al parsear el archivo JSON:" << error.errorString();
+        return 1;
+    }
+
+    // Verificar si el documento es un objeto JSON
+    if (!jsonDoc.isObject()) {
+        qWarning() << "El archivo JSON no contiene un objeto JSON";
+        return 1;
+    }
+
+    // Obtener el objeto JSON raíz
+    QJsonObject jsonObj = jsonDoc.object();
+
+    // Extraer valores del objeto JSON
+    QString programPath = jsonObj["program"].toString();
+    int expectedResult = jsonObj["expected_result"].toInt();
+    int expectedInstructions = jsonObj["expected_instructions"].toInt();
+    QJsonArray injectionsArray = jsonObj["injections"].toArray();
+
+    // Almacenar las inyecciones en un vector de vectores de enteros
+    std::vector<std::vector<int>> injections;
+    for (const auto& injection : injectionsArray) {
+        std::vector<int> injectionVec;
+        QJsonArray injectionArray = injection.toArray();
+        for (const auto& value : injectionArray) {
+            injectionVec.push_back(value.toInt());
+        }
+        injections.push_back(injectionVec);
+    }
+
+    // Imprimir los valores extraídos
+    qDebug() << "Programa:" << programPath;
+    qDebug() << "Resultado Esperado:" << expectedResult;
+    qDebug() << "Instrucciones Esperadas:" << expectedInstructions;
+    qDebug() << "Inyecciones:" << injections;
+
     return 0;
 }
 

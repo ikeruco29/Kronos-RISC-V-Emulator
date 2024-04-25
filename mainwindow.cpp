@@ -33,11 +33,11 @@ void MainWindow::on_actionCargar_programa_triggered()
 
 void MainWindow::on_actionCargar_campa_a_triggered()
 {
-    QString nombreArchivo = QFileDialog::getOpenFileName(this, "Seleccionar archivo", "", "*.bin");
+    QString nombreArchivo = QFileDialog::getOpenFileName(this, "Seleccionar archivo", "", "*.json");
     if (!nombreArchivo.isEmpty()) {
         // Aquí puedes cargar el archivo seleccionado
         qDebug() << "Archivo seleccionado:" << nombreArchivo;
-        //computer->LoadProgram(nombreArchivo.toStdString());
+        computer->LoadCampaign(nombreArchivo.toStdString());
     } else {
         qDebug() << "Ningún archivo seleccionado.";
     }
