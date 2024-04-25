@@ -26,7 +26,11 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         res.qrc
         resources/icons/execute.png resources/icons/stopExe.png
         computer.cpp computer.h cpu.cpp cpu.h decoder.cpp decoder.h endian.cpp endian.h ram.cpp ram.h
+        config.json
     )
+
+    # Copiar el archivo config.json al directorio de salida del ejecutable
+    file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/config.json DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET Emulador-RISC-V APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
 #                 ${CMAKE_CURRENT_SOURCE_DIR}/android)

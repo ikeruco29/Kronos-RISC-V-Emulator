@@ -1,10 +1,14 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 #include <QFileDialog>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
 
-MainWindow::MainWindow(QWidget *parent)
+MainWindow::MainWindow(QWidget *parent, Computer *comp)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
+    , computer(comp)
 {
     ui->setupUi(this);
 }
@@ -20,7 +24,7 @@ void MainWindow::on_actionCargar_programa_triggered()
     if (!nombreArchivo.isEmpty()) {
         // Aquí puedes cargar el archivo seleccionado
         qDebug() << "Archivo seleccionado:" << nombreArchivo;
-        //computer->LoadProgram(nombreArchivo.toStdString());
+        computer->LoadProgram(nombreArchivo.toStdString());
     } else {
         qDebug() << "Ningún archivo seleccionado.";
     }
@@ -48,8 +52,8 @@ void MainWindow::on_actionSalir_triggered()
 
 void MainWindow::on_runButton_clicked()
 {
-    //computer->On();
-    //ui->ramBox->setText(QString::fromStdString(computer->exportRam()));
+    computer->On();
+    ui->ramBox->setText(QString::fromStdString(computer->exportRam()));
 }
 
 
@@ -57,4 +61,3 @@ void MainWindow::on_stopButton_clicked()
 {
 
 }
-

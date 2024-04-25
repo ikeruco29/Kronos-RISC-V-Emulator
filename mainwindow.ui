@@ -23,7 +23,7 @@
    <property name="styleSheet">
     <string notr="true">background-color: rgb(36, 40, 59)</string>
    </property>
-   <widget class="QTextEdit" name="textEdit">
+   <widget class="QTextEdit" name="disassemblyBox">
     <property name="geometry">
      <rect>
       <x>11</x>
@@ -45,7 +45,7 @@
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QTextEdit" name="textEdit_2">
+   <widget class="QTextEdit" name="registerBox">
     <property name="geometry">
      <rect>
       <x>1225</x>
@@ -61,7 +61,7 @@
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QTextEdit" name="textEdit_3">
+   <widget class="QTextEdit" name="terminalBox">
     <property name="geometry">
      <rect>
       <x>371</x>
@@ -106,7 +106,7 @@
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QTextBrowser" name="textBrowser">
+   <widget class="QTextBrowser" name="searchBox">
     <property name="geometry">
      <rect>
       <x>371</x>
@@ -136,7 +136,7 @@ color: rgb(233, 233, 233);</string>
      <string>Escribe para buscar</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton">
+   <widget class="QPushButton" name="runButton">
     <property name="geometry">
      <rect>
       <x>760</x>
@@ -168,7 +168,7 @@ color: rgb(233, 233, 233);</string>
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_2">
+   <widget class="QPushButton" name="stopButton">
     <property name="geometry">
      <rect>
       <x>708</x>
