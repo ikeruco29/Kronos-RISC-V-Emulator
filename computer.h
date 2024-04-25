@@ -14,8 +14,11 @@ public:
     CPU cpu;
     RAM ram;
 
-    void On(int cycles);
+    int ram_size;
+
+    void On(bool pasoapaso = false);
     int LoadProgram(std::string filename);
+    std::string exportRam();
 };
 
 #endif // COMPUTER_H

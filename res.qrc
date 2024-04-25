@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/resources">
+        <file>resources/icons/execute.png</file>
+        <file>resources/icons/stopExe.png</file>
+    </qresource>
+</RCC>
