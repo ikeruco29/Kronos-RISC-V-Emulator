@@ -17,8 +17,9 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr, Computer *comp = nullptr);
     ~MainWindow();
-    int RAM_SIZE;
     Computer *computer;
+    bool pasoapaso;
+
 
 private slots:
     void on_actionCargar_programa_triggered();
@@ -30,6 +31,8 @@ private slots:
     void on_runButton_clicked();
 
     void on_stopButton_clicked();
+
+    void on_runPasoButton_clicked();
 
 private:
     Ui::MainWindow *ui;

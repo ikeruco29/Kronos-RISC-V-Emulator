@@ -52,8 +52,9 @@ void MainWindow::on_actionSalir_triggered()
 
 void MainWindow::on_runButton_clicked()
 {
-    computer->On();
-    ui->ramBox->setText(QString::fromStdString(computer->exportRam()));
+    pasoapaso = false;
+    computer->On(&pasoapaso);
+    ui->ramText->setPlainText(QString::fromStdString(computer->exportRam()));
 }
 
 
@@ -61,3 +62,11 @@ void MainWindow::on_stopButton_clicked()
 {
 
 }
+
+void MainWindow::on_runPasoButton_clicked()
+{
+    pasoapaso = true;
+    computer->On(&pasoapaso);
+    ui->ramText->setPlainText(QString::fromStdString(computer->exportRam()));
+}
+

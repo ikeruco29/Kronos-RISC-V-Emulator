@@ -4,25 +4,27 @@
 #include <iomanip>
 
 Computer::Computer(int RAM_SIZE) : ram(RAM(RAM_SIZE)), cpu(CPU(&ram)), ram_size(RAM_SIZE) {};
+Computer::Computer(int RAM_SIZE, QTextEdit *termb)
+    : ram(RAM(RAM_SIZE)), cpu(CPU(&ram)), ram_size(RAM_SIZE)
+    , terminalBox(termb)
+{};
 
 Computer::~Computer() {}
 
-void Computer::On(bool pasoapaso) {
+void Computer::On(bool *pasoapaso) {
 
-    if(pasoapaso == true){
-        while (pasoapaso != true) {
+    if(*pasoapaso == true){
+        while (*pasoapaso != true) {
             cpu.fetch(ram.readWord(cpu.pc));
             cpu.decode();
             cpu.execute();
 
             cpu.pc += 4;
-            while(!cpu.bEbreak){
 
-            }
             //cycles -= 1;
         }
     } else {
-        while (pasoapaso != true) {
+        while (*pasoapaso != true) {
             cpu.fetch(ram.readWord(cpu.pc));
             cpu.decode();
             cpu.execute();
@@ -32,8 +34,9 @@ void Computer::On(bool pasoapaso) {
             //cycles -= 1;
         }
     }
-
 }
+
+//void Computer::
 
 int Computer::LoadProgram(std::string filename) {
 
@@ -74,6 +77,7 @@ std::string Computer::exportRam(){
         count++;
     }
 
-    return ss.str();
+    rambox->setText(QString::fromStdString(ss.str()));
 
+    return ss.str();
 }

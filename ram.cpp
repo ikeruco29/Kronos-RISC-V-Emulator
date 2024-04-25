@@ -7,7 +7,7 @@ RAM::RAM(uint32_t RAM_SIZE){
     ram = new uint8_t[RAM_SIZE];
 
     for(uint32_t i = 0; i < RAM_SIZE; i++){
-        ram[i] = 0x00;
+        ram[i] = 0xFF;
     }
 };
 
