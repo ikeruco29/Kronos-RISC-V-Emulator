@@ -15,29 +15,8 @@ Computer::Computer(int RAM_SIZE, QTextEdit *termb)
 
 Computer::~Computer() {}
 
-void Computer::On(bool *pasoapaso) {
+void Computer::executeProgram() {
 
-    if(*pasoapaso == true){
-        while (*pasoapaso != true) {
-            cpu.fetch(ram.readWord(cpu.pc));
-            cpu.decode();
-            cpu.execute();
-
-            cpu.pc += 4;
-
-            //cycles -= 1;
-        }
-    } else {
-        while (*pasoapaso != true) {
-            cpu.fetch(ram.readWord(cpu.pc));
-            cpu.decode();
-            cpu.execute();
-
-            cpu.pc += 4;
-
-            //cycles -= 1;
-        }
-    }
 }
 
 //void Computer::
@@ -117,28 +96,56 @@ int Computer::LoadCampaign(std::string filename) {
     qDebug() << "Instrucciones Esperadas:" << expectedInstructions;
     qDebug() << "Inyecciones:" << injections;
 
+    Campaign camp;
+    camp.expectedInstructions = expectedInstructions;
+    camp.programPath = programPath;
+    camp.expectedResult = expectedResult;
+    camp.injections = injections;
+
     return 0;
 }
 
-std::string Computer::exportRam(){
+std::string Computer::showRam(int page){
     std::stringstream ss;
-    ss << "          00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F\r\n\n";
-    ss << "00000000  ";
-    int count = 1;
-    for(int i = 0; i < ram_size; i++){
-        ss << std::hex << std::setfill('0') << std::setw(2) << static_cast<int>(ram.readByte(i)) << " ";
 
-        if (count == 16) {
+    for(int i = 0; i < (1024*4); i++){
+
+        if (i % 16 == 0) {
             ss << "\r\n";
-            ss << std::hex << std::setw(8) << std::setfill('0') << i+1;
+            ss << std::hex << std::uppercase << std::setw(8) << std::setfill('0') << i + (page * (1024*4));
             ss << "  ";
-            count = 0;
         }
 
-        count++;
+        ss << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << static_cast<int>(ram.readByte(i + (page * (1024*4)))) << " ";
     }
 
-    rambox->setText(QString::fromStdString(ss.str()));
+    //ramBox->setPlainText(QString::fromStdString(ss.str()));
 
     return ss.str();
+}
+std::string Computer::showRegisters(){
+    std::stringstream ss;
+
+    ss << "PC:  " << std::hex << std::uppercase << std::setw(8) << std::setfill('0') << cpu.pc;
+    ss << " ";
+    ss << "IR:  " << std::hex << std::uppercase << std::setw(8) << std::setfill('0') << cpu.ir << "\r\n\r\n";
+
+    for(int i = 0; i < 16; i++){
+        if(i < 10)
+            ss << "X" << i << ":  ";
+        else
+            ss << "X" << std::dec << i << ": ";
+
+        ss << std::hex << std::uppercase << std::setw(8) << std::setfill('0') << cpu.registers[i] << " ";
+        ss << "X" << std::dec << (i + 16) << ": ";
+        ss << std::hex << std::uppercase << std::setw(8) << std::setfill('0') << cpu.registers[i + 16] << "\r\n";
+    }
+    return ss.str();
+}
+
+int Computer::executeCampaign(){
+    LoadProgram(campaign.programPath.toStdString());
+
+
+
 }

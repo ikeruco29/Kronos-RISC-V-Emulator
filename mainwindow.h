@@ -19,6 +19,7 @@ public:
     ~MainWindow();
     Computer *computer;
     bool pasoapaso;
+    uint pageToView = 0;
 
 
 private slots:
@@ -33,6 +34,10 @@ private slots:
     void on_stopButton_clicked();
 
     void on_runPasoButton_clicked();
+
+    void on_searchBox_editingFinished();
+
+    void on_openConfigButton_clicked();
 
 private:
     Ui::MainWindow *ui;

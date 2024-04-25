@@ -20,6 +20,15 @@ CPU::CPU(RAM *ram){
 
 CPU::~CPU(){}
 
+void CPU::clock(){
+    fetch(ram->readWord(pc));
+    decode();
+    execute();
+
+    pc += 4;
+    cycles++;
+}
+
 void CPU::fetch(uint32_t mem){
     ir = mem;
 }
@@ -302,7 +311,7 @@ void CPU::SLTU() {
     uint8_t rd = instDecoded.registers[0];
     uint8_t rs1 = instDecoded.registers[1];
     uint8_t rs2 = instDecoded.registers[2];
-    registers[rd] = (static_cast<uint32_t>(registers[rs1]) < static_cast<uint32_t>(registers[rs1])) ? 1 : 0;
+    registers[rd] = (static_cast<uint32_t>(registers[rs1]) < static_cast<uint32_t>(registers[rs2])) ? 1 : 0;
 }
 
 // I format
@@ -445,12 +454,6 @@ void CPU::ECALL() {
 }
 void CPU::EBREAK() {
     bEbreak = true;
-
-    while (bEbreak)
-    {
-        // show info
-        // Comprobar si se ha pulsado una tecla
-    }
 }
 
 // S format
@@ -541,7 +544,7 @@ void CPU::JAL() {
     // La dirección que tocaría si no se hiciera el salto se guarda en rd
     // para saltar más adelante de vuelta
 
-    registers[rd] = pc + 1;
+    registers[rd] = pc + 4;
     pc += inmediate;
 }
 

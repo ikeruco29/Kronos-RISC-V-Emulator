@@ -4,6 +4,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
+#include <QDesktopServices>
 
 MainWindow::MainWindow(QWidget *parent, Computer *comp)
     : QMainWindow(parent)
@@ -11,6 +12,7 @@ MainWindow::MainWindow(QWidget *parent, Computer *comp)
     , computer(comp)
 {
     ui->setupUi(this);
+    //computer->ramBox = ui->ramText;
 }
 
 MainWindow::~MainWindow()
@@ -25,6 +27,7 @@ void MainWindow::on_actionCargar_programa_triggered()
         // Aquí puedes cargar el archivo seleccionado
         qDebug() << "Archivo seleccionado:" << nombreArchivo;
         computer->LoadProgram(nombreArchivo.toStdString());
+        ui->ramText->setPlainText(QString::fromStdString(computer->showRam()));
     } else {
         qDebug() << "Ningún archivo seleccionado.";
     }
@@ -53,20 +56,40 @@ void MainWindow::on_actionSalir_triggered()
 void MainWindow::on_runButton_clicked()
 {
     pasoapaso = false;
-    computer->On(&pasoapaso);
-    ui->ramText->setPlainText(QString::fromStdString(computer->exportRam()));
+    computer->executeProgram();
+    ui->ramText->setPlainText(QString::fromStdString(computer->showRam()));
 }
 
 
 void MainWindow::on_stopButton_clicked()
 {
-
+    // computer.reset();
 }
 
 void MainWindow::on_runPasoButton_clicked()
 {
     pasoapaso = true;
-    computer->On(&pasoapaso);
-    ui->ramText->setPlainText(QString::fromStdString(computer->exportRam()));
+    computer->cpu.clock();
+    ui->ramText->setPlainText(QString::fromStdString(computer->showRam(pageToView)));
+    ui->registerText->setPlainText(QString::fromStdString(computer->showRegisters()));
+}
+
+
+void MainWindow::on_searchBox_editingFinished()
+{
+    QString memoryToView = ui->searchBox->text();
+
+    pageToView = memoryToView.toInt(nullptr, 16);
+    pageToView /= (1024 * 4);
+
+    ui->ramText->setPlainText(QString::fromStdString(computer->showRam(pageToView)));
+
+    qDebug() << pageToView;
+}
+
+
+void MainWindow::on_openConfigButton_clicked()
+{
+    QDesktopServices::openUrl(QUrl::fromLocalFile("./config.json"));
 }
 

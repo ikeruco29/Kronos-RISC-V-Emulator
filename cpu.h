@@ -15,7 +15,8 @@ public:
     ~CPU();
 
     RAM* ram;
-    bool bEbreak = 0;
+    bool bEbreak = false;
+    long cycles = 0;
 
     // Fetch siguiente instrucción
     void fetch(uint32_t mem);
@@ -25,9 +26,11 @@ public:
     reg registers[32];
 
     uint32_t pc = 0x00000000;  // Program counter
-    uint32_t ir = pc;       // Instruction register
+    uint32_t ir = 0x00000000;       // Instruction register
 
     Decoded instDecoded;
+
+    void clock();
 
     // INSTRUCTIONS
     // R format
