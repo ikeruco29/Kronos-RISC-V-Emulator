@@ -14,17 +14,18 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
 
 set(PROJECT_SOURCES
         main.cpp
-        display.cpp
-        display.h
-        display.ui
+        mainwindow.cpp
+        mainwindow.h
+        mainwindow.ui
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(Emulador-RISC-V
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
-        computer.cpp computer.h cpu.cpp cpu.h decoder.cpp decoder.h endian.cpp endian.h ram.cpp ram.h
         res.qrc
+        resources/icons/execute.png resources/icons/stopExe.png
+        computer.cpp computer.h cpu.cpp cpu.h decoder.cpp decoder.h endian.cpp endian.h ram.cpp ram.h
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET Emulador-RISC-V APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR

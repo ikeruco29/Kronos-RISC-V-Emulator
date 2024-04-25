@@ -1,61 +1,60 @@
-#include "display.h"
-#include "./ui_display.h"
+#include "mainwindow.h"
+#include "./ui_mainwindow.h"
 #include <QFileDialog>
 
-Display::Display(QWidget *parent, Computer *comp)
+MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
-    , ui(new Ui::Display)
-    , computer(comp)
+    , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
 }
 
-Display::~Display()
+MainWindow::~MainWindow()
 {
     delete ui;
 }
 
-void Display::on_actionSalir_triggered()
+void MainWindow::on_actionCargar_programa_triggered()
+{
+    QString nombreArchivo = QFileDialog::getOpenFileName(this, "Seleccionar archivo", "", "*.bin");
+    if (!nombreArchivo.isEmpty()) {
+        // Aquí puedes cargar el archivo seleccionado
+        qDebug() << "Archivo seleccionado:" << nombreArchivo;
+        //computer->LoadProgram(nombreArchivo.toStdString());
+    } else {
+        qDebug() << "Ningún archivo seleccionado.";
+    }
+}
+
+
+void MainWindow::on_actionCargar_campa_a_triggered()
+{
+    QString nombreArchivo = QFileDialog::getOpenFileName(this, "Seleccionar archivo", "", "*.bin");
+    if (!nombreArchivo.isEmpty()) {
+        // Aquí puedes cargar el archivo seleccionado
+        qDebug() << "Archivo seleccionado:" << nombreArchivo;
+        //computer->LoadProgram(nombreArchivo.toStdString());
+    } else {
+        qDebug() << "Ningún archivo seleccionado.";
+    }
+}
+
+
+void MainWindow::on_actionSalir_triggered()
 {
     qApp->quit();
 }
 
 
-void Display::on_actionCargar_programa_triggered()
+void MainWindow::on_runButton_clicked()
 {
-    QString nombreArchivo = QFileDialog::getOpenFileName(this, "Seleccionar archivo", "", "*.bin");
-    if (!nombreArchivo.isEmpty()) {
-        // Aquí puedes cargar el archivo seleccionado
-        qDebug() << "Archivo seleccionado:" << nombreArchivo;
-        computer->LoadProgram(nombreArchivo.toStdString());
-    } else {
-        qDebug() << "Ningún archivo seleccionado.";
-    }
+    //computer->On();
+    //ui->ramBox->setText(QString::fromStdString(computer->exportRam()));
 }
 
 
-void Display::on_actionCargar_campa_a_triggered()
-{
-    QString nombreArchivo = QFileDialog::getOpenFileName(this, "Seleccionar archivo", "", "*.bin");
-    if (!nombreArchivo.isEmpty()) {
-        // Aquí puedes cargar el archivo seleccionado
-        qDebug() << "Archivo seleccionado:" << nombreArchivo;
-        computer->LoadProgram(nombreArchivo.toStdString());
-    } else {
-        qDebug() << "Ningún archivo seleccionado.";
-    }
-}
-
-
-void Display::on_pushButton_2_clicked()
+void MainWindow::on_stopButton_clicked()
 {
 
-}
-
-
-void Display::on_pushButton_clicked()
-{
-    computer->On(0);
-    ui->ramBox->setText(QString::fromStdString(computer->exportRam()));
 }
 
