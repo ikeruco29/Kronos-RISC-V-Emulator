@@ -18,7 +18,6 @@ public:
     MainWindow(QWidget *parent = nullptr, Computer *comp = nullptr);
     ~MainWindow();
     Computer *computer;
-    bool pasoapaso;
     uint pageToView = 0;
 
 
@@ -41,5 +40,7 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
+
+    void resetInterface();
 };
 #endif // MAINWINDOW_H

@@ -19,7 +19,14 @@ void Computer::executeProgram() {
 
 }
 
-//void Computer::
+void Computer::reset(){
+    cpu.reset();
+    ram.reset();
+
+    campaign.expectedInstructions = 0;
+    campaign.expectedResult = 0;
+    campaign.programPath = "";
+}
 
 int Computer::LoadProgram(std::string filename) {
 
@@ -143,9 +150,11 @@ std::string Computer::showRegisters(){
     return ss.str();
 }
 
+std::string Computer::showDisassembly(){
+    std::string str = cpu.disassembly.back();
+    return str;
+}
+
 int Computer::executeCampaign(){
     LoadProgram(campaign.programPath.toStdString());
-
-
-
 }

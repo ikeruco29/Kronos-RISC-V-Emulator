@@ -4,6 +4,7 @@
 #pragma once
 #include <cstdint>
 #include <vector>
+#include <string>
 #include "decoder.h"
 #include "ram.h"
 
@@ -16,7 +17,7 @@ public:
 
     RAM* ram;
     bool bEbreak = false;
-    long cycles = 0;
+    uint32_t cycles = 0;
 
     // Fetch siguiente instrucción
     void fetch(uint32_t mem);
@@ -29,8 +30,10 @@ public:
     uint32_t ir = 0x00000000;       // Instruction register
 
     Decoded instDecoded;
+    std::vector<std::string> disassembly;
 
     void clock();
+    void reset();
 
     // INSTRUCTIONS
     // R format

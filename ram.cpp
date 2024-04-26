@@ -42,6 +42,12 @@ uint32_t RAM::readWord(uint32_t addr){
 
     return word;
 };
+
+void RAM::reset(){
+    for(uint32_t i = 0; i < iRamSize; i++){
+        ram[i] = 0xFF;
+    }
+}
 /*
 void RAM::showRam() {
     printf("         |  00 01 02 03\n-----------------------\n");

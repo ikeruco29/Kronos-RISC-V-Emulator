@@ -21,6 +21,8 @@ public:
     // Lee 32 bits de la memoria y lo devuelve como uint32_t
     uint32_t readWord(uint32_t addr);
 
+    void reset();
+
     //void showRam();
 };
 

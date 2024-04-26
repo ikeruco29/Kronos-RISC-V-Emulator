@@ -70,7 +70,7 @@
      <string/>
     </property>
     <property name="icon">
-     <iconset resource="res.qrc">
+     <iconset>
       <normaloff>:/resources/resources/icons/execute.png</normaloff>:/resources/resources/icons/execute.png</iconset>
     </property>
     <property name="iconSize">
@@ -105,7 +105,7 @@
      <string/>
     </property>
     <property name="icon">
-     <iconset resource="res.qrc">
+     <iconset>
       <normaloff>:/resources/resources/icons/stopExe.png</normaloff>:/resources/resources/icons/stopExe.png</iconset>
     </property>
     <property name="iconSize">
@@ -140,7 +140,7 @@
      <string/>
     </property>
     <property name="icon">
-     <iconset resource="res.qrc">
+     <iconset>
       <normaloff>:/resources/resources/icons/executePaso.png</normaloff>:/resources/resources/icons/executePaso.png</iconset>
     </property>
     <property name="iconSize">
@@ -447,23 +447,7 @@ border: 0px;</string>
       <bool>true</bool>
      </property>
      <property name="plainText">
-      <string>ADDI x0, x1, 500
-SUB x0, x1, x2
-ADDI x0, x1, 500
-SUB x0, x1, x2
-ADDI x0, x1, 500
-SUB x0, x1, x2
-ADDI x0, x1, 500
-SUB x0, x1, x2
-ADDI x0, x1, 500
-SUB x0, x1, x2
-ADDI x0, x1, 500
-SUB x0, x1, x2
-ADDI x0, x1, 500
-ADDI x0, x1, 500
-ADDI x0, x1, 500
-ADDI x0, x1, 500
-ADDI x0, x1, 500</string>
+      <string/>
      </property>
     </widget>
    </widget>
@@ -2772,7 +2756,7 @@ border: 0px;</string>
      </property>
     </widget>
    </widget>
-   <widget class="QLineEdit" name="lineEdit">
+   <widget class="QLineEdit" name="filenameText">
     <property name="geometry">
      <rect>
       <x>373</x>
@@ -2789,7 +2773,7 @@ border: 0px;</string>
      </font>
     </property>
     <property name="text">
-     <string>archivo_01.bin</string>
+     <string/>
     </property>
     <property name="frame">
      <bool>false</bool>
@@ -2850,8 +2834,6 @@ border: 0px;</string>
    </property>
   </action>
  </widget>
- <resources>
-  <include location="res.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

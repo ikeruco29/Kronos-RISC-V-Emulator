@@ -33,11 +33,13 @@ public:
     int ram_size;
 
     void executeProgram();
+    void reset();
     int LoadProgram(std::string filename);
     int LoadCampaign(std::string filename);
     int executeCampaign();
     std::string showRam(int page = 0);
     std::string showRegisters();
+    std::string showDisassembly();
 };
 
 #endif // COMPUTER_H

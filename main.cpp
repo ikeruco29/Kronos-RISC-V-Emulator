@@ -64,7 +64,7 @@ int readConfigFile(){
     ramSize = jsonObj["ramSize"].toInt() * 1024;
 
     // Imprimir los valores extraídos
-    qDebug() << "Ram Size:" << ramSize << "kb";
+    qDebug() << "Ram Size:" << ramSize << "B";
 
     return 0;
 }
