@@ -55,6 +55,9 @@
     </property>
    </widget>
    <widget class="QPushButton" name="runButton">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>776</x>
@@ -70,7 +73,7 @@
      <string/>
     </property>
     <property name="icon">
-     <iconset>
+     <iconset resource="res.qrc">
       <normaloff>:/resources/resources/icons/execute.png</normaloff>:/resources/resources/icons/execute.png</iconset>
     </property>
     <property name="iconSize">
@@ -105,7 +108,7 @@
      <string/>
     </property>
     <property name="icon">
-     <iconset>
+     <iconset resource="res.qrc">
       <normaloff>:/resources/resources/icons/stopExe.png</normaloff>:/resources/resources/icons/stopExe.png</iconset>
     </property>
     <property name="iconSize">
@@ -140,7 +143,7 @@
      <string/>
     </property>
     <property name="icon">
-     <iconset>
+     <iconset resource="res.qrc">
       <normaloff>:/resources/resources/icons/executePaso.png</normaloff>:/resources/resources/icons/executePaso.png</iconset>
     </property>
     <property name="iconSize">
@@ -2834,6 +2837,8 @@ border: 0px;</string>
    </property>
   </action>
  </widget>
- <resources/>
+ <resources>
+  <include location="res.qrc"/>
+ </resources>
  <connections/>
 </ui>

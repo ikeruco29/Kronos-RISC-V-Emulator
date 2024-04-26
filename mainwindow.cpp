@@ -12,6 +12,8 @@ MainWindow::MainWindow(QWidget *parent, Computer *comp)
     , computer(comp)
 {
     ui->setupUi(this);
+    ui->runButton->setEnabled(false);
+    ui->runPasoButton->setEnabled(false);
     //computer->ramBox = ui->ramText;
 }
 
@@ -36,6 +38,9 @@ void MainWindow::on_actionCargar_programa_triggered()
 
         ui->ramText->setPlainText(QString::fromStdString(computer->showRam()));
         ui->filenameText->setText(filename);
+
+        ui->runButton->setEnabled(true);
+        ui->runPasoButton->setEnabled(true);
     } else {
         qDebug() << "Ningún archivo seleccionado.";
     }
@@ -103,6 +108,9 @@ void MainWindow::on_openConfigButton_clicked()
 }
 
 void MainWindow::resetInterface(){
+    ui->runButton->setEnabled(false);
+    ui->runPasoButton->setEnabled(false);
+
     ui->codeDisassemblyText->clear();
     ui->ramText->clear();
     ui->registerText->setPlainText("PC:  00000000 IR:  00000000\r\n\r\nX0:  00000000 X16: 00000000\r\nX1:  00000000 X17: 00000000\r\nX2:  00000000 X18: 00000000\r\nX3:  00000000 X19: 00000000\r\nX4:  00000000 X20: 00000000\r\nX5:  00000000 X21: 00000000\r\nX6:  00000000 X22: 00000000\r\nX7:  00000000 X23: 00000000\r\nX8:  00000000 X24: 00000000\r\nX9:  00000000 X25: 00000000\r\nX10: 00000000 X26: 00000000\r\nX11: 00000000 X27: 00000000\r\nX12: 00000000 X28: 00000000\r\nX13: 00000000 X29: 00000000\r\nX14: 00000000 X30: 00000000\r\nX15: 00000000 X31: 00000000");
