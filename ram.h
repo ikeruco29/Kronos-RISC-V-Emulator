@@ -10,6 +10,9 @@ public:
 
     uint8_t *ram;
 
+    int iRamSize;
+    uint32_t uStartAddr;
+
     void writeByte(uint32_t addr, int8_t data);
     void writeHalf(uint32_t addr, int16_t data);
     void writeWord(uint32_t addr, int32_t data);

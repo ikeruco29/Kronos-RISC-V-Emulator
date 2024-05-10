@@ -216,6 +216,8 @@ void CPU::decode() {
         break;
     default:
         instDisassembled << "NOP";
+        instDecoded.mnemonic = "NOP";
+        instDecoded.op = Operation::NOP;
         break;
     }
 
