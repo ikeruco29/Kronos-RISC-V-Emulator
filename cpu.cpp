@@ -18,6 +18,61 @@ CPU::CPU(RAM *ram){
     for (int i = 0; i < 39; i++) {
         ciclosTotales[i] = 0;
     }
+
+
+    // Inicialización del vector de funciones
+    vFunctionMap[Operation::ADD] = &CPU::ADD;
+    vFunctionMap[Operation::SUB] = &CPU::SUB;
+    vFunctionMap[Operation::XOR] = &CPU::XOR;
+    vFunctionMap[Operation::OR] = &CPU::OR;
+    vFunctionMap[Operation::AND] = &CPU::AND;
+    vFunctionMap[Operation::SLL] = &CPU::SLL;
+    vFunctionMap[Operation::SRL] = &CPU::SRL;
+    vFunctionMap[Operation::SRA] = &CPU::SRA;
+    vFunctionMap[Operation::SLT] = &CPU::SLT;
+    vFunctionMap[Operation::SLTU] = &CPU::SLTU;
+
+    // Formato I
+    vFunctionMap[Operation::ADDI] = &CPU::ADDI;
+    vFunctionMap[Operation::XORI] = &CPU::XORI;
+    vFunctionMap[Operation::ORI] = &CPU::ORI;
+    vFunctionMap[Operation::ANDI] = &CPU::ANDI;
+    vFunctionMap[Operation::SLLI] = &CPU::SLLI;
+    vFunctionMap[Operation::SRLI] = &CPU::SRLI;
+    vFunctionMap[Operation::SRAI] = &CPU::SRAI;
+    vFunctionMap[Operation::SLTI] = &CPU::SLTI;
+    vFunctionMap[Operation::SLTIU] = &CPU::SLTIU;
+    vFunctionMap[Operation::LB] = &CPU::LB;
+    vFunctionMap[Operation::LH] = &CPU::LH;
+    vFunctionMap[Operation::LW] = &CPU::LW;
+    vFunctionMap[Operation::LBU] = &CPU::LBU;
+    vFunctionMap[Operation::LHU] = &CPU::LHU;
+
+    vFunctionMap[Operation::JALR] = &CPU::JALR;
+    vFunctionMap[Operation::ECALL] = &CPU::ECALL;
+    vFunctionMap[Operation::EBREAK] = &CPU::EBREAK;
+
+    // Formato S
+    vFunctionMap[Operation::SB] = &CPU::SB;
+    vFunctionMap[Operation::SH] = &CPU::SH;
+    vFunctionMap[Operation::SW] = &CPU::SW;
+
+    // Formato B
+    vFunctionMap[Operation::BEQ] = &CPU::BEQ;
+    vFunctionMap[Operation::BNE] = &CPU::BNE;
+    vFunctionMap[Operation::BLT] = &CPU::BLT;
+    vFunctionMap[Operation::BGE] = &CPU::BGE;
+    vFunctionMap[Operation::BLTU] = &CPU::BLTU;
+    vFunctionMap[Operation::BGEU] = &CPU::BGEU;
+
+    // Formato J
+    vFunctionMap[Operation::JAL] = &CPU::JAL;
+
+    // Formato U
+    vFunctionMap[Operation::LUI] = &CPU::LUI;
+    vFunctionMap[Operation::AUIPC] = &CPU::AUIPC;
+
+    vFunctionMap[Operation::NOP] = &CPU::NOP;
 }
 
 CPU::~CPU(){}
@@ -70,7 +125,7 @@ void CPU::decode() {
         instDecoded = decode_R(ir); // Recoge la instrucción decodificada y la guarda en la variable global de la clase
 
 
-        if(instDecoded.op != NOP){
+        if(instDecoded.op != Operation::NOP){
             instDisassembled << formatDissasembly(instDecoded);
             instDisassembled << instDecoded.registers[0] << ", X" << instDecoded.registers[1] << ", X" << instDecoded.registers[2];
         }
@@ -79,7 +134,7 @@ void CPU::decode() {
     case 0b00010011:    // I
         instDecoded = decode_I(ir, 0);
 
-        if(instDecoded.op != NOP){
+        if(instDecoded.op != Operation::NOP){
             instDisassembled << formatDissasembly(instDecoded);
             instDisassembled << instDecoded.registers[0] << ", X" << instDecoded.registers[1] << ", " << instDecoded.inmediate;
         }
@@ -88,7 +143,7 @@ void CPU::decode() {
     case 0b00000011:    // I
         instDecoded = decode_I(ir, 1);
 
-        if(instDecoded.op != NOP){
+        if(instDecoded.op != Operation::NOP){
             instDisassembled << formatDissasembly(instDecoded);
             instDisassembled << instDecoded.registers[0] << ", X" << instDecoded.registers[1] << ", " << instDecoded.inmediate;
         }
@@ -98,7 +153,7 @@ void CPU::decode() {
     case 0b00100011:    // S
         instDecoded = decode_S(ir);
 
-        if(instDecoded.op != NOP){
+        if(instDecoded.op != Operation::NOP){
             instDisassembled << formatDissasembly(instDecoded);
             instDisassembled << instDecoded.registers[1] << ", " << instDecoded.inmediate << "(X" << instDecoded.registers[0] << ")";
         }
@@ -107,7 +162,7 @@ void CPU::decode() {
     case 0b01100011:    // B
         instDecoded = decode_B(ir);
 
-        if(instDecoded.op != NOP){
+        if(instDecoded.op != Operation::NOP){
             instDisassembled << formatDissasembly(instDecoded);
             instDisassembled << instDecoded.registers[0] << ", X" << instDecoded.registers[1] << ", " << instDecoded.inmediate;
         }
@@ -116,7 +171,7 @@ void CPU::decode() {
     case 0b01101111:    // J
         instDecoded = decode_J(ir);
 
-        if(instDecoded.op != NOP){
+        if(instDecoded.op != Operation::NOP){
             instDisassembled << formatDissasembly(instDecoded);
             instDisassembled << instDecoded.registers[0] << ", " << instDecoded.inmediate;
         }
@@ -126,7 +181,7 @@ void CPU::decode() {
     case 0b01100111:    // I
         instDecoded = decode_I(ir, 2);
 
-        if(instDecoded.op != NOP){
+        if(instDecoded.op != Operation::NOP){
             instDisassembled << formatDissasembly(instDecoded);
             instDisassembled << instDecoded.registers[0] << ", X" << instDecoded.registers[1] << ", " << instDecoded.inmediate;
         }
@@ -135,7 +190,7 @@ void CPU::decode() {
     case 0b00110111:    // U
         instDecoded = decode_U(ir, 0);
 
-        if(instDecoded.op != NOP){
+        if(instDecoded.op != Operation::NOP){
             instDisassembled << formatDissasembly(instDecoded);
             instDisassembled << instDecoded.registers[0] << ", " << instDecoded.inmediate;
         }
@@ -144,7 +199,7 @@ void CPU::decode() {
     case 0b00010111:    // U
         instDecoded = decode_U(ir, 1);
 
-        if(instDecoded.op != NOP){
+        if(instDecoded.op != Operation::NOP){
             instDisassembled << formatDissasembly(instDecoded);
             instDisassembled << instDecoded.registers[0] << ", " << instDecoded.inmediate;
         }
@@ -153,7 +208,7 @@ void CPU::decode() {
     case 0b01110011:    // I
         instDecoded = decode_I(ir, 3);
 
-        if(instDecoded.op != NOP){
+        if(instDecoded.op != Operation::NOP){
             instDisassembled << formatDissasembly(instDecoded);
             instDisassembled << instDecoded.registers[0] << ", X" << instDecoded.registers[1] << ", " << instDecoded.inmediate;
         }
@@ -171,182 +226,20 @@ void CPU::decode() {
 
 uint32_t CPU::execute() {
 
-    switch (instDecoded.op) {
-    // Formato R
-    case Operation::ADD:
-        ADD();
-        ciclosTotales[Operation::ADD]++;
-        break;
-    case Operation::SUB:
-        SUB();
-        ciclosTotales[Operation::SUB]++;
-        break;
-    case Operation::XOR:
-        XOR();
-        ciclosTotales[Operation::XOR]++;
-        break;
-    case Operation::OR:
-        OR();
-        ciclosTotales[Operation::OR]++;
-        break;
-    case Operation::AND:
-        AND();
-        ciclosTotales[Operation::AND]++;
-        break;
-    case Operation::SLL:
-        SLL();
-        ciclosTotales[Operation::SLL]++;
-        break;
-    case Operation::SRL:
-        SRL();
-        ciclosTotales[Operation::SRL]++;
-        break;
-    case Operation::SRA:
-        SRA();
-        ciclosTotales[Operation::SRA]++;
-        break;
-    case Operation::SLT:
-        SLT();
-        ciclosTotales[Operation::SLT]++;
-        break;
-    case Operation::SLTU:
-        SLTU();
-        ciclosTotales[Operation::SLTU]++;
-        break;
+    // Se ejecuta la función almacenada en instDecoded
+    (this->*vFunctionMap[instDecoded.op])();
 
-        // Formato I
-    case Operation::ADDI:
-        ADDI();
-        ciclosTotales[Operation::ADDI]++;
-        break;
-    case Operation::SLTI:
-        SLTI();
-        ciclosTotales[Operation::SLTI]++;
-        break;
-    case Operation::SLTIU:
-        SLTIU();
-        ciclosTotales[Operation::SLTIU]++;
-        break;
-    case Operation::XORI:
-        XORI();
-        ciclosTotales[Operation::XORI]++;
-        break;
-    case Operation::ORI:
-        ORI();
-        ciclosTotales[Operation::ORI]++;
-        break;
-    case Operation::ANDI:
-        ANDI();
-        ciclosTotales[Operation::ANDI]++;
-        break;
-    case Operation::SLLI:
-        SLLI();
-        ciclosTotales[Operation::SLLI]++;
-        break;
-    case Operation::SRLI:
-        SRLI();
-        ciclosTotales[Operation::SRLI]++;
-        break;
-    case Operation::SRAI:
-        SRAI();
-        ciclosTotales[Operation::SRAI]++;
-        break;
-    case Operation::LB:
-        LB();
-        ciclosTotales[Operation::LB]++;
-        break;
-    case Operation::LH:
-        LH();
-        ciclosTotales[Operation::LH]++;
-        break;
-    case Operation::LW:
-        LW();
-        ciclosTotales[Operation::LW]++;
-        break;
-    case Operation::LBU:
-        LBU();
-        ciclosTotales[Operation::LBU]++;
-        break;
-    case Operation::LHU:
-        LHU();
-        ciclosTotales[Operation::LHU]++;
-        break;
-    case Operation::JALR:
-        JALR();
-        ciclosTotales[Operation::JALR]++;
-        break;
-    case Operation::ECALL:
-        ECALL();
-        ciclosTotales[Operation::ECALL]++;
-        break;
-    case Operation::EBREAK:
-        EBREAK();
-        ciclosTotales[Operation::EBREAK]++;
-        break;
-
-        // Formato S
-    case Operation::SB:
-        SB();
-        ciclosTotales[Operation::SB]++;
-        break;
-    case Operation::SH:
-        SH();
-        ciclosTotales[Operation::SH]++;
-        break;
-    case Operation::SW:
-        SW();
-        ciclosTotales[Operation::SW]++;
-        break;
-
-        //Formato B
-    case Operation::BEQ:
-        BEQ();
-        ciclosTotales[Operation::BEQ]++;
-        break;
-    case Operation::BNE:
-        BNE();
-        ciclosTotales[Operation::BNE]++;
-        break;
-    case Operation::BLT:
-        BLT();
-        ciclosTotales[Operation::BLT]++;
-        break;
-    case Operation::BGE:
-        BGE();
-        ciclosTotales[Operation::BGE]++;
-        break;
-    case Operation::BLTU:
-        BLTU();
-        ciclosTotales[Operation::BLTU]++;
-        break;
-    case Operation::BGEU:
-        BGEU();
-        ciclosTotales[Operation::BGEU]++;
-        break;
-
-        // Formato U
-    case Operation::LUI:
-        LUI();
-        ciclosTotales[Operation::LUI]++;
-        break;
-    case Operation::AUIPC:
-        AUIPC();
-        ciclosTotales[Operation::AUIPC]++;
-        break;
-
-        // Formato J
-    case Operation::JAL:
-        JAL();
-        ciclosTotales[Operation::JAL]++;
-        break;
-
-    default:
-        break;
-    }
+    ciclosTotales[instDecoded.op]++;
 
     return 0;
 }
 
+
+
+
+//===================================================
+//                  INSTRUCCIONES
+//===================================================
 
 // R format
 void CPU::ADD(){
@@ -656,6 +549,10 @@ void CPU::AUIPC() {
     uint32_t inmediate = instDecoded.inmediate;
 
     registers[rd] = pc + (inmediate << 12);
+}
+
+void CPU::NOP(){
+    return;
 }
 
 

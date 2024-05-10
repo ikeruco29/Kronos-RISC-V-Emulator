@@ -4,6 +4,7 @@
 #pragma once
 #include <cstdint>
 #include <vector>
+#include <unordered_map>
 #include <string>
 #include "decoder.h"
 #include "ram.h"
@@ -28,6 +29,8 @@ public:
 
     uint32_t pc = 0x00000000;  // Program counter
     uint32_t ir = 0x00000000;       // Instruction register
+
+    std::unordered_map<int, void (CPU::*)()> vFunctionMap;
 
     Decoded instDecoded;
 
@@ -63,6 +66,7 @@ public:
     // U format
     void LUI(); void AUIPC();
 
+    void NOP();
 
 
     // Para los ciclos

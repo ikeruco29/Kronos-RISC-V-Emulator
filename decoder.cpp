@@ -1,6 +1,6 @@
 #include "decoder.h"
 
-const std::vector<std::string> mnemonics = {
+std::vector<std::string> mnemonics = {
     // Formato R
     "ADD", "SUB", "XOR", "OR", "AND", "SLL", "SRL", "SRA", "SLT", "SLTU",
 
@@ -37,7 +37,7 @@ Decoded decode_R(uint32_t ir) {
     uint32_t funct7 = (ir >> 25) & 0x7F;
     int nOperation = -1;
 
-    // Ver qu� operaci�n hay que hacer
+    // Ver qué operación hay que hacer
     if (funct7 == 0x00) {
         switch (funct3)
         {
@@ -116,6 +116,7 @@ Decoded decode_I(uint32_t ir, uint8_t op) {
         // Inmediatas
         case 0x0:
             nOperation = ADDI;
+
             break;
         case 0x4:
             nOperation = XORI;

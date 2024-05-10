@@ -44,7 +44,6 @@ struct Decoded
     int op;
     uint32_t* registers;
     int32_t inmediate;
-    void (*instExec)();
 };
 
 Decoded decode_R(uint32_t ir);
