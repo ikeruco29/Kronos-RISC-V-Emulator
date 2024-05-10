@@ -5,6 +5,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QDesktopServices>
+#include <QTimer>
 
 MainWindow::MainWindow(QWidget *parent, Computer *comp)
     : QMainWindow(parent)
@@ -44,6 +45,8 @@ void MainWindow::on_actionCargar_programa_triggered()
     } else {
         qDebug() << "Ningún archivo seleccionado.";
     }
+
+    stopExec = false;
 }
 
 
@@ -69,13 +72,52 @@ void MainWindow::on_actionSalir_triggered()
 
 void MainWindow::on_runButton_clicked()
 {
-    computer->executeProgram();
-    ui->ramText->setPlainText(QString::fromStdString(computer->showRam()));
+    // Todo esto del QTimer es porque si utilizo un bucle que haga
+    // estas cuatro instrucciones:
+    //
+    //      computer->cpu.clock();
+    //      ui->ramText->setPlainText(QString::fromStdString(computer->showRam(pageToView)));
+    //      ui->registerText->setPlainText(QString::fromStdString(computer->showRegisters()));
+    //      ui->codeDisassemblyText->appendPlainText(QString::fromStdString(computer->showDisassembly()));
+    //
+    // No le da tiempo a renderizar, así que necesito que tenga cierto delay.
+    // Realmente no pasa nada porque el procesador no tenga una velocidad vertiginosa
+    // (que la tiene), ya que lo importante es que lleve bien el número de instrucciones
+
+    QTimer *timer = new QTimer(this);
+
+    // Conectar el timeout del QTimer al slot para ejecutar una iteración del bucle
+    connect(timer, &QTimer::timeout, this, &MainWindow::runLoopIteration);
+
+    // Configurar el intervalo del timer en milisegundos
+    timer->setInterval(1);
+
+    timer->start();
 }
+
+
+void MainWindow::runLoopIteration()
+{
+    // TODO: CAMBIAR CONDICIÓN DEL BUCLE            ESTA VARIABLE NO!!!
+    if (computer->ram.readByte(0x00000053) == 0x7A || stopExec) {
+
+        sender()->deleteLater(); // Eliminar el QTimer después de terminar el bucle
+        return;
+    }
+
+    // Ejecutar una iteración del bucle
+    computer->cpu.clock();
+    ui->ramText->setPlainText(QString::fromStdString(computer->showRam(pageToView)));
+    ui->registerText->setPlainText(QString::fromStdString(computer->showRegisters()));
+    ui->codeDisassemblyText->appendPlainText(QString::fromStdString(computer->showDisassembly()));
+}
+
+
 
 
 void MainWindow::on_stopButton_clicked()
 {
+    stopExec = true;
     computer->reset();
     resetInterface();
 }

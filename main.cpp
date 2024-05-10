@@ -61,10 +61,10 @@ int readConfigFile(){
     QJsonObject jsonObj = jsonDoc.object();
 
     // Extraer valores del objeto JSON
-    ramSize = jsonObj["ramSize"].toInt() * 1024;
+    ramSize = jsonObj["ramSize"].toInt();
 
     // Imprimir los valores extraídos
-    qDebug() << "Ram Size:" << ramSize << "B";
+    qDebug() << "Ram Size:" << ramSize << "KB";
 
     return 0;
 }

@@ -38,9 +38,13 @@ private slots:
 
     void on_openConfigButton_clicked();
 
+    void runLoopIteration();
+
 private:
     Ui::MainWindow *ui;
 
     void resetInterface();
+
+    bool stopExec;
 };
 #endif // MAINWINDOW_H
