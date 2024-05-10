@@ -30,7 +30,9 @@ public:
     uint32_t ir = 0x00000000;       // Instruction register
 
     Decoded instDecoded;
+
     std::vector<std::string> disassembly;
+    std::string formatDissasembly(Decoded inst);
 
     void clock();
     void reset();

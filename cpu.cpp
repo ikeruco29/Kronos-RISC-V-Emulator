@@ -60,6 +60,7 @@ void CPU::fetch(uint32_t mem){
 }
 
 void CPU::decode() {
+    std::stringstream instDisassembled;
     // Recoge el opcode (últimos 7 bits)
     uint32_t opcode = ir & 0x7F;
 
@@ -67,296 +68,285 @@ void CPU::decode() {
     {
     case 0b00110011:    // R
         instDecoded = decode_R(ir); // Recoge la instrucción decodificada y la guarda en la variable global de la clase
-        //std::cout << instDecoded.op << ", " << instDecoded.registers[2] << std::endl;
+
+
+        if(instDecoded.op != NOP){
+            instDisassembled << formatDissasembly(instDecoded);
+            instDisassembled << instDecoded.registers[0] << ", X" << instDecoded.registers[1] << ", X" << instDecoded.registers[2];
+        }
+
         break;
     case 0b00010011:    // I
         instDecoded = decode_I(ir, 0);
+
+        if(instDecoded.op != NOP){
+            instDisassembled << formatDissasembly(instDecoded);
+            instDisassembled << instDecoded.registers[0] << ", X" << instDecoded.registers[1] << ", " << instDecoded.inmediate;
+        }
+
         break;
     case 0b00000011:    // I
         instDecoded = decode_I(ir, 1);
+
+        if(instDecoded.op != NOP){
+            instDisassembled << formatDissasembly(instDecoded);
+            instDisassembled << instDecoded.registers[0] << ", X" << instDecoded.registers[1] << ", " << instDecoded.inmediate;
+        }
+
+
         break;
     case 0b00100011:    // S
         instDecoded = decode_S(ir);
+
+        if(instDecoded.op != NOP){
+            instDisassembled << formatDissasembly(instDecoded);
+            instDisassembled << instDecoded.registers[1] << ", " << instDecoded.inmediate << "(X" << instDecoded.registers[0] << ")";
+        }
+
         break;
     case 0b01100011:    // B
         instDecoded = decode_B(ir);
+
+        if(instDecoded.op != NOP){
+            instDisassembled << formatDissasembly(instDecoded);
+            instDisassembled << instDecoded.registers[0] << ", X" << instDecoded.registers[1] << ", " << instDecoded.inmediate;
+        }
+
         break;
     case 0b01101111:    // J
         instDecoded = decode_J(ir);
+
+        if(instDecoded.op != NOP){
+            instDisassembled << formatDissasembly(instDecoded);
+            instDisassembled << instDecoded.registers[0] << ", " << instDecoded.inmediate;
+        }
+
+
         break;
     case 0b01100111:    // I
         instDecoded = decode_I(ir, 2);
+
+        if(instDecoded.op != NOP){
+            instDisassembled << formatDissasembly(instDecoded);
+            instDisassembled << instDecoded.registers[0] << ", X" << instDecoded.registers[1] << ", " << instDecoded.inmediate;
+        }
+
         break;
     case 0b00110111:    // U
         instDecoded = decode_U(ir, 0);
+
+        if(instDecoded.op != NOP){
+            instDisassembled << formatDissasembly(instDecoded);
+            instDisassembled << instDecoded.registers[0] << ", " << instDecoded.inmediate;
+        }
+
         break;
     case 0b00010111:    // U
         instDecoded = decode_U(ir, 1);
+
+        if(instDecoded.op != NOP){
+            instDisassembled << formatDissasembly(instDecoded);
+            instDisassembled << instDecoded.registers[0] << ", " << instDecoded.inmediate;
+        }
+
         break;
     case 0b01110011:    // I
         instDecoded = decode_I(ir, 3);
+
+        if(instDecoded.op != NOP){
+            instDisassembled << formatDissasembly(instDecoded);
+            instDisassembled << instDecoded.registers[0] << ", X" << instDecoded.registers[1] << ", " << instDecoded.inmediate;
+        }
+
         break;
     default:
+        instDisassembled << "NOP";
         break;
     }
+
+    disassembly.push_back(instDisassembled.str());
+
+    instDisassembled.clear();
 }
 
-uint32_t CPU::execute(){
-    std::stringstream instDisassembled;
-    switch (instDecoded.op)
-    {
+uint32_t CPU::execute() {
+
+    switch (instDecoded.op) {
     // Formato R
     case Operation::ADD:
         ADD();
-        instDisassembled << "ADD   X" << instDecoded.registers[0] << ", X" << instDecoded.registers[1] << ", X" << instDecoded.registers[2];
-        disassembly.push_back(instDisassembled.str());
         ciclosTotales[Operation::ADD]++;
         break;
     case Operation::SUB:
         SUB();
-        instDisassembled << "SUB   X" << instDecoded.registers[0] << ", X" << instDecoded.registers[1] << ", X" << instDecoded.registers[2];
-        disassembly.push_back(instDisassembled.str());
         ciclosTotales[Operation::SUB]++;
         break;
     case Operation::XOR:
         XOR();
-        instDisassembled << "XOR   X" << instDecoded.registers[0] << ", X" << instDecoded.registers[1] << ", X" << instDecoded.registers[2];
-        disassembly.push_back(instDisassembled.str());
         ciclosTotales[Operation::XOR]++;
         break;
     case Operation::OR:
         OR();
-        instDisassembled << "OR    X" << instDecoded.registers[0] << ", X" << instDecoded.registers[1] << ", X" << instDecoded.registers[2];
-        disassembly.push_back(instDisassembled.str());
         ciclosTotales[Operation::OR]++;
         break;
     case Operation::AND:
         AND();
-        instDisassembled << "AND   X" << instDecoded.registers[0] << ", X" << instDecoded.registers[1] << ", X" << instDecoded.registers[2];
-        disassembly.push_back(instDisassembled.str());
         ciclosTotales[Operation::AND]++;
         break;
     case Operation::SLL:
         SLL();
-        instDisassembled << "SLL   X" << instDecoded.registers[0] << ", X" << instDecoded.registers[1] << ", X" << instDecoded.registers[2];
-        disassembly.push_back(instDisassembled.str());
         ciclosTotales[Operation::SLL]++;
         break;
     case Operation::SRL:
         SRL();
-        instDisassembled << "SRL   X" << instDecoded.registers[0] << ", X" << instDecoded.registers[1] << ", X" << instDecoded.registers[2];
-        disassembly.push_back(instDisassembled.str());
         ciclosTotales[Operation::SRL]++;
         break;
     case Operation::SRA:
         SRA();
-        instDisassembled << "SRA   X" << instDecoded.registers[0] << ", X" << instDecoded.registers[1] << ", X" << instDecoded.registers[2];
-        disassembly.push_back(instDisassembled.str());
         ciclosTotales[Operation::SRA]++;
         break;
     case Operation::SLT:
         SLT();
-        instDisassembled << "SLT   X" << instDecoded.registers[0] << ", X" << instDecoded.registers[1] << ", X" << instDecoded.registers[2];
-        disassembly.push_back(instDisassembled.str());
         ciclosTotales[Operation::SLT]++;
         break;
     case Operation::SLTU:
         SLTU();
-        instDisassembled << "SLTU  X" << instDecoded.registers[0] << ", X" << instDecoded.registers[1] << ", X" << instDecoded.registers[2];
-        disassembly.push_back(instDisassembled.str());
         ciclosTotales[Operation::SLTU]++;
         break;
 
         // Formato I
     case Operation::ADDI:
         ADDI();
-        instDisassembled << "ADDI  X" << instDecoded.registers[0] << ", X" << instDecoded.registers[1] << ", " << instDecoded.inmediate;
-        disassembly.push_back(instDisassembled.str());
         ciclosTotales[Operation::ADDI]++;
         break;
     case Operation::SLTI:
         SLTI();
-        instDisassembled << "SLTI  X" << instDecoded.registers[0] << ", X" << instDecoded.registers[1] << ", " << instDecoded.inmediate;
-        disassembly.push_back(instDisassembled.str());
         ciclosTotales[Operation::SLTI]++;
         break;
     case Operation::SLTIU:
         SLTIU();
-        instDisassembled << "SLTIU X" << instDecoded.registers[0] << ", X" << instDecoded.registers[1] << ", " << instDecoded.inmediate;
-        disassembly.push_back(instDisassembled.str());
         ciclosTotales[Operation::SLTIU]++;
         break;
     case Operation::XORI:
         XORI();
-        instDisassembled << "XORI  X" << instDecoded.registers[0] << ", X" << instDecoded.registers[1] << ", " << instDecoded.inmediate;
-        disassembly.push_back(instDisassembled.str());
         ciclosTotales[Operation::XORI]++;
         break;
     case Operation::ORI:
         ORI();
-        instDisassembled << "ORI   X" << instDecoded.registers[0] << ", X" << instDecoded.registers[1] << ", " << instDecoded.inmediate;
-        disassembly.push_back(instDisassembled.str());
         ciclosTotales[Operation::ORI]++;
         break;
     case Operation::ANDI:
         ANDI();
-        instDisassembled << "ANDI  X" << instDecoded.registers[0] << ", X" << instDecoded.registers[1] << ", " << instDecoded.inmediate;
-        disassembly.push_back(instDisassembled.str());
         ciclosTotales[Operation::ANDI]++;
         break;
     case Operation::SLLI:
         SLLI();
-        instDisassembled << "SLLI  X" << instDecoded.registers[0] << ", X" << instDecoded.registers[1] << ", " << instDecoded.inmediate;
-        disassembly.push_back(instDisassembled.str());
         ciclosTotales[Operation::SLLI]++;
         break;
     case Operation::SRLI:
         SRLI();
-        instDisassembled << "SRLI  X" << instDecoded.registers[0] << ", X" << instDecoded.registers[1] << ", " << instDecoded.inmediate;
-        disassembly.push_back(instDisassembled.str());
         ciclosTotales[Operation::SRLI]++;
         break;
     case Operation::SRAI:
         SRAI();
-        instDisassembled << "SRAI  X" << instDecoded.registers[0] << ", X" << instDecoded.registers[1] << ", " << instDecoded.inmediate;
-        disassembly.push_back(instDisassembled.str());
         ciclosTotales[Operation::SRAI]++;
         break;
     case Operation::LB:
         LB();
-        instDisassembled << "LB    X" << instDecoded.registers[0] << ", " << instDecoded.inmediate << "(X" << instDecoded.registers[1] << ")";
-        disassembly.push_back(instDisassembled.str());
         ciclosTotales[Operation::LB]++;
         break;
     case Operation::LH:
         LH();
-        instDisassembled << "LH    X" << instDecoded.registers[0] << ", " << instDecoded.inmediate << "(X" << instDecoded.registers[1] << ")";
-        disassembly.push_back(instDisassembled.str());
         ciclosTotales[Operation::LH]++;
         break;
     case Operation::LW:
         LW();
-        instDisassembled << "LW    X" << instDecoded.registers[0] << ", " << instDecoded.inmediate << "(X" << instDecoded.registers[1] << ")";
-        disassembly.push_back(instDisassembled.str());
         ciclosTotales[Operation::LW]++;
         break;
     case Operation::LBU:
         LBU();
-        instDisassembled << "LBU   X" << instDecoded.registers[0] << ", " << instDecoded.inmediate << "(X" << instDecoded.registers[1] << ")";
-        disassembly.push_back(instDisassembled.str());
         ciclosTotales[Operation::LBU]++;
         break;
     case Operation::LHU:
         LHU();
-        instDisassembled << "LHU   X" << instDecoded.registers[0] << ", " << instDecoded.inmediate << "(X" << instDecoded.registers[1] << ")";
-        disassembly.push_back(instDisassembled.str());
         ciclosTotales[Operation::LHU]++;
         break;
     case Operation::JALR:
         JALR();
-        instDisassembled << "JALR  X" << instDecoded.registers[0] << ", " << instDecoded.inmediate << "(X" << instDecoded.registers[1] << ")";
-        disassembly.push_back(instDisassembled.str());
         ciclosTotales[Operation::JALR]++;
         break;
     case Operation::ECALL:
         ECALL();
-        instDisassembled << "ECALL";
-        disassembly.push_back(instDisassembled.str());
         ciclosTotales[Operation::ECALL]++;
         break;
     case Operation::EBREAK:
         EBREAK();
-        instDisassembled << "EBREAK";
-        disassembly.push_back(instDisassembled.str());
         ciclosTotales[Operation::EBREAK]++;
         break;
 
         // Formato S
     case Operation::SB:
         SB();
-        instDisassembled << "SB    X" << instDecoded.registers[1] << ", " << instDecoded.inmediate << "(X" << instDecoded.registers[0] << ")";
-        disassembly.push_back(instDisassembled.str());
         ciclosTotales[Operation::SB]++;
         break;
     case Operation::SH:
         SH();
-        instDisassembled << "SH    X" << instDecoded.registers[1] << ", " << instDecoded.inmediate << "(X" << instDecoded.registers[0] << ")";
-        disassembly.push_back(instDisassembled.str());
         ciclosTotales[Operation::SH]++;
         break;
     case Operation::SW:
         SW();
-        instDisassembled << "SW    X" << instDecoded.registers[1] << ", " << instDecoded.inmediate << "(X" << instDecoded.registers[0] << ")";
-        disassembly.push_back(instDisassembled.str());
         ciclosTotales[Operation::SW]++;
         break;
 
         //Formato B
     case Operation::BEQ:
         BEQ();
-        instDisassembled << "BEQ   X" << instDecoded.registers[0] << ", X" << instDecoded.registers[1] << ", " << instDecoded.inmediate;
-        disassembly.push_back(instDisassembled.str());
         ciclosTotales[Operation::BEQ]++;
         break;
     case Operation::BNE:
         BNE();
-        instDisassembled << "BNE   X" << instDecoded.registers[0] << ", X" << instDecoded.registers[1] << ", " << instDecoded.inmediate;
-        disassembly.push_back(instDisassembled.str());
         ciclosTotales[Operation::BNE]++;
         break;
     case Operation::BLT:
         BLT();
-        instDisassembled << "BLT   X" << instDecoded.registers[0] << ", X" << instDecoded.registers[1] << ", " << instDecoded.inmediate;
-        disassembly.push_back(instDisassembled.str());
         ciclosTotales[Operation::BLT]++;
         break;
     case Operation::BGE:
         BGE();
-        instDisassembled << "BGE   X" << instDecoded.registers[0] << ", X" << instDecoded.registers[1] << ", " << instDecoded.inmediate;
-        disassembly.push_back(instDisassembled.str());
         ciclosTotales[Operation::BGE]++;
         break;
     case Operation::BLTU:
         BLTU();
-        instDisassembled << "BLTU  X" << instDecoded.registers[0] << ", X" << instDecoded.registers[1] << ", " << instDecoded.inmediate;
-        disassembly.push_back(instDisassembled.str());
         ciclosTotales[Operation::BLTU]++;
         break;
     case Operation::BGEU:
         BGEU();
-        instDisassembled << "BGEU  X" << instDecoded.registers[0] << ", X" << instDecoded.registers[1] << ", " << instDecoded.inmediate;
-        disassembly.push_back(instDisassembled.str());
         ciclosTotales[Operation::BGEU]++;
         break;
 
         // Formato U
     case Operation::LUI:
         LUI();
-        instDisassembled << "LUI   X" << instDecoded.registers[0] << ", " << instDecoded.inmediate;
-        disassembly.push_back(instDisassembled.str());
         ciclosTotales[Operation::LUI]++;
         break;
     case Operation::AUIPC:
         AUIPC();
-        instDisassembled << "AUIPC X" << instDecoded.registers[0] << ", " << instDecoded.inmediate;
-        disassembly.push_back(instDisassembled.str());
         ciclosTotales[Operation::AUIPC]++;
         break;
 
         // Formato J
     case Operation::JAL:
         JAL();
-        instDisassembled << "JAL   X" << instDecoded.registers[0] << ", " << instDecoded.inmediate;
-        disassembly.push_back(instDisassembled.str());
         ciclosTotales[Operation::JAL]++;
         break;
 
     default:
         break;
     }
-    instDisassembled.clear();
+
     return 0;
 }
+
 
 // R format
 void CPU::ADD(){
@@ -666,4 +656,20 @@ void CPU::AUIPC() {
     uint32_t inmediate = instDecoded.inmediate;
 
     registers[rd] = pc + (inmediate << 12);
+}
+
+
+std::string CPU::formatDissasembly(Decoded inst){
+    std::stringstream st;
+    st << inst.mnemonic;
+    if(inst.mnemonic.length() == 2)
+        st <<  "    X";
+    else if(inst.mnemonic.length() == 3)
+        st << "   X";
+    else if(inst.mnemonic.length() == 4)
+        st << "  X";
+    else
+        st << " X";
+
+    return st.str();
 }

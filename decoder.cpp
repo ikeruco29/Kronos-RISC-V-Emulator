@@ -1,5 +1,33 @@
 #include "decoder.h"
 
+const std::vector<std::string> mnemonics = {
+    // Formato R
+    "ADD", "SUB", "XOR", "OR", "AND", "SLL", "SRL", "SRA", "SLT", "SLTU",
+
+    // Formato I
+    "ADDI", "XORI", "ORI", "ANDI",
+    "SLLI", "SRLI", "SRAI", "SLTI", "SLTIU",
+    "LB", "LH", "LW", "LBU", "LHU",
+
+    "JALR",
+    "ECALL", "EBREAK",
+
+    // Formato S
+    "SB", "SH", "SW",
+
+    // Formato B
+    "BEQ", "BNE", "BLT", "BGE", "BLTU",
+    "BGEU",
+
+    // Formato J
+    "JAL",
+
+    // Formato U
+    "LUI", "AUIPC",
+
+    "NOP"
+};
+
 Decoded decode_R(uint32_t ir) {
     //funct7 rs2 rs1 funct3 rd opcode
     uint32_t rd = (ir >> 7) & 0x1F;
@@ -38,7 +66,7 @@ Decoded decode_R(uint32_t ir) {
             nOperation = SLTU;
             break;
         default:
-            //std::cerr << "ERROR: No such an operation";
+            nOperation = NOP;
             break;
         }
     }
@@ -52,13 +80,14 @@ Decoded decode_R(uint32_t ir) {
             nOperation = SRA;
             break;
         default:
-            //std::cerr << "ERROR: No such an operation";
+            nOperation = NOP;
             break;
         }
     }
 
-    // Devuelve la operaci�n y los registros
+    // Devuelve la operación y los registros
     Decoded dec;
+    dec.mnemonic = mnemonics[nOperation];
     dec.op = nOperation;
     dec.registers = new uint32_t[3]{ rd, rs1, rs2 };
     return dec;
@@ -76,8 +105,8 @@ Decoded decode_I(uint32_t ir, uint8_t op) {
     int nOperation = -1;
 
     // 1000 0101 1100
-    if (inm & 0x800) { // Si el bit m�s significativo est� establecido
-        inm |= 0xFFFFF000; // Extensi�n del signo
+    if (inm & 0x800) { // Si el bit más significativo está establecido
+        inm |= 0xFFFFF000; // Extensión del signo
     }
     // 1111 1111 1111 1111 1111 1000 0101 1100
 
@@ -113,7 +142,7 @@ Decoded decode_I(uint32_t ir, uint8_t op) {
             nOperation = SLTIU;
             break;
         default:
-            //std::cout << "Operaci�n no reconocida" << std::endl;
+            nOperation = NOP;
             break;
         }
     }
@@ -135,7 +164,7 @@ Decoded decode_I(uint32_t ir, uint8_t op) {
             nOperation = LHU;
             break;
         default:
-            //std::cout << "Operaci�n no reconocida" << std::endl;
+            nOperation = NOP;
             break;
         }
     }
@@ -147,10 +176,13 @@ Decoded decode_I(uint32_t ir, uint8_t op) {
             nOperation = ECALL;
         else
             nOperation = EBREAK;
+    }else{
+        nOperation = NOP;
     }
 
-    // Devuelve la operaci�n y los registros
+    // Devuelve la operación y los registros
     Decoded dec;
+    dec.mnemonic = mnemonics[nOperation];
     dec.op = nOperation;
     dec.registers = new uint32_t[2]{ rd, rs1 };
     dec.inmediate = inm;
@@ -180,6 +212,7 @@ Decoded decode_S(uint32_t ir) {
 
     // Devuelve la operaci�n y los registros
     Decoded dec;
+    dec.mnemonic = mnemonics[nOperation];
     dec.op = nOperation;
     dec.registers = new uint32_t[2]{ rs1, rs2 };
     dec.inmediate = inm;
@@ -216,6 +249,7 @@ Decoded decode_B(uint32_t ir) {
         nOperation = BGEU;
         break;
     default:
+        nOperation = NOP;
         break;
     }
 
@@ -242,6 +276,7 @@ Decoded decode_B(uint32_t ir) {
 
     // Devuelve la operaci�n y los registros
     Decoded dec;
+    dec.mnemonic = mnemonics[nOperation];
     dec.op = nOperation;
     dec.registers = new uint32_t[2]{ rs1, rs2 };
     dec.inmediate = inmediate;
@@ -251,14 +286,18 @@ Decoded decode_B(uint32_t ir) {
 Decoded decode_U(uint32_t ir, uint8_t op) {
     uint32_t rd = (ir >> 7) & 0x1F;
     int32_t inm = (ir >> 12);
+    int nOperation = -1;
 
     Decoded dec;
 
-    if (op == 0)
-        dec.op = LUI;
-    else
-        dec.op = AUIPC;
+    if (op == 0){
+        nOperation = LUI;
+    }else{
+        nOperation = AUIPC;
+    }
 
+    dec.mnemonic = mnemonics[nOperation];
+    dec.op = nOperation;
     dec.inmediate = inm;
     dec.registers = new uint32_t[1] {rd};
     return dec;
@@ -290,6 +329,7 @@ Decoded decode_J(uint32_t ir) {
 
     Decoded dec;
     dec.op = JAL;
+    dec.mnemonic = mnemonics[JAL];
     dec.inmediate = inm_fin;
     dec.registers = new uint32_t[1]{ rd };
     return dec;

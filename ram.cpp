@@ -48,17 +48,4 @@ void RAM::reset(){
         ram[i] = 0xFF;
     }
 }
-/*
-void RAM::showRam() {
-    printf("         |  00 01 02 03\n-----------------------\n");
-    printf("00000000 |  ");
-    for (uint32_t i = 1; i <= iRamSize; i++)
-    {
-        printf("%.2X ", readByte(i - 1));
 
-        if (i % 16 == 0 && i != 0) {
-            printf("\n");
-            printf("%.8X |  ", 0x00000000 + i);
-        }
-    }
-}*/

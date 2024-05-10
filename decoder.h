@@ -6,6 +6,8 @@
     para tenerlo ordenado
 */
 #include <cstdint>
+#include <string>
+#include <vector>
 
 enum Operation
 {
@@ -31,14 +33,18 @@ enum Operation
     JAL,
 
     // Formato U
-    LUI, AUIPC
+    LUI, AUIPC,
+
+    NOP
 };
 
 struct Decoded
 {
+    std::string mnemonic;
     int op;
     uint32_t* registers;
     int32_t inmediate;
+    void (*instExec)();
 };
 
 Decoded decode_R(uint32_t ir);
