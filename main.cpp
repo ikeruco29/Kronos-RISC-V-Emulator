@@ -8,7 +8,7 @@
 
 const QString CONFIG_FILE = "./config.json";
 
-int ramSize;
+uint ramSize;
 QString disassemblyRouteFile, ramRouteFile;
 
 int readConfigFile();
@@ -64,12 +64,12 @@ int readConfigFile(){
     QJsonObject jsonObj = jsonDoc.object();
 
     // Extraer valores del objeto JSON
-    ramSize = jsonObj["ramSize"].toInt();
+    ramSize = jsonObj["ramSize"].toInt() * 1024 * 1024;
     disassemblyRouteFile = jsonObj["disassemblyFileRoute"].toString();
     ramRouteFile = jsonObj["ramFileRoute"].toString();
 
     // Imprimir los valores extraídos
-    qDebug() << "Ram Size:" << ramSize << "KB";
+    qDebug() << "Ram Size:" << ramSize / 1024 / 1024 << "MB";
     qDebug() << "Ram file:" << ramRouteFile;
     qDebug() << "disassembly file:" << disassemblyRouteFile;
 

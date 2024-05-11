@@ -50,6 +50,8 @@ private slots:
 
     void on_exportRamButton_clicked();
 
+    void on_pauseButton_clicked();
+
 private:
     Ui::MainWindow *ui;
 

@@ -21,7 +21,7 @@ public:
     uint32_t cycles = 0;
 
     // Fetch siguiente instrucción
-    void fetch(uint32_t mem);
+    void fetch();
     void decode();
     uint32_t execute();
 

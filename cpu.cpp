@@ -10,6 +10,9 @@ CPU::CPU(RAM *ram){
     {
         registers[i] = 0x00000000;
     }
+
+    registers[2] = 0xbffffff0;
+
     this->ram = ram;
 
     instDecoded.inmediate = 0;
@@ -78,7 +81,7 @@ CPU::CPU(RAM *ram){
 CPU::~CPU(){}
 
 void CPU::clock(){
-    fetch(ram->readWord(pc));
+    fetch();
     decode();
     execute();
 
@@ -92,6 +95,8 @@ void CPU::reset(){
     {
         registers[i] = 0x00000000;
     }
+
+    registers[2] = 0xbffffff0;
 
     instDecoded.inmediate = 0;
     instDecoded.op = -1;
@@ -110,8 +115,8 @@ void CPU::reset(){
     bEbreak = 0;
 }
 
-void CPU::fetch(uint32_t mem){
-    ir = mem;
+void CPU::fetch(){
+    ir = FlipWord(ram->readWord(pc));
 }
 
 void CPU::decode() {

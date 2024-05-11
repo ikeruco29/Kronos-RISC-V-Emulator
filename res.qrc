@@ -3,6 +3,7 @@
         <file>resources/icons/execute.png</file>
         <file>resources/icons/stopExe.png</file>
         <file>resources/icons/executePaso.png</file>
+        <file>resources/icons/pause.png</file>
     </qresource>
     <qresource prefix="/"/>
 </RCC>
