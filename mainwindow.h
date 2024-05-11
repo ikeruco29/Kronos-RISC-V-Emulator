@@ -20,6 +20,10 @@ public:
     Computer *computer;
     uint pageToView = 0;
 
+    // Variables de configuración
+    QString disassemblyFileRoute;
+    QString ramFileRoute;
+
 
 private slots:
     void on_actionCargar_programa_triggered();
@@ -40,11 +44,19 @@ private slots:
 
     void runLoopIteration();
 
+    void on_generateStatsButton_clicked();
+
+    void on_exportDisButton_clicked();
+
+    void on_exportRamButton_clicked();
+
 private:
     Ui::MainWindow *ui;
 
     void resetInterface();
 
     bool stopExec;
+
+
 };
 #endif // MAINWINDOW_H

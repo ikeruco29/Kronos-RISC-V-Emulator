@@ -40,6 +40,7 @@ public:
     std::string showRam(int page = 0);
     std::string showRegisters();
     std::string showDisassembly();
+    std::string exportDisassembly();
 };
 
 #endif // COMPUTER_H

@@ -9,6 +9,7 @@
 const QString CONFIG_FILE = "./config.json";
 
 int ramSize;
+QString disassemblyRouteFile, ramRouteFile;
 
 int readConfigFile();
 
@@ -23,6 +24,8 @@ int main(int argc, char *argv[])
     Computer computer = Computer(ramSize);
 
     w.computer = &computer;
+    w.disassemblyFileRoute = disassemblyRouteFile;
+    w.ramFileRoute = ramRouteFile;
 
     return a.exec();
 }
@@ -62,9 +65,13 @@ int readConfigFile(){
 
     // Extraer valores del objeto JSON
     ramSize = jsonObj["ramSize"].toInt();
+    disassemblyRouteFile = jsonObj["disassemblyFileRoute"].toString();
+    ramRouteFile = jsonObj["ramFileRoute"].toString();
 
     // Imprimir los valores extraídos
     qDebug() << "Ram Size:" << ramSize << "KB";
+    qDebug() << "Ram file:" << ramRouteFile;
+    qDebug() << "disassembly file:" << disassemblyRouteFile;
 
     return 0;
 }

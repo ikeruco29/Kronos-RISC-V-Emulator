@@ -1,4 +1,5 @@
 {
-    "ramSize": 5242880
-
+    "ramSize": 5242880,
+    "disassemblyFileRoute": "C:/Users/ikeru/Desktop/Universidad/TFG/statistics",
+    "ramFileRoute": "C:/Users/ikeru/Desktop/Universidad/TFG/statistics"
 }

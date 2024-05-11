@@ -15,7 +15,6 @@ MainWindow::MainWindow(QWidget *parent, Computer *comp)
     ui->setupUi(this);
     ui->runButton->setEnabled(false);
     ui->runPasoButton->setEnabled(false);
-    //computer->ramBox = ui->ramText;
 }
 
 MainWindow::~MainWindow()
@@ -157,5 +156,78 @@ void MainWindow::resetInterface(){
     ui->ramText->clear();
     ui->registerText->setPlainText("PC:  00000000 IR:  00000000\r\n\r\nX0:  00000000 X16: 00000000\r\nX1:  00000000 X17: 00000000\r\nX2:  00000000 X18: 00000000\r\nX3:  00000000 X19: 00000000\r\nX4:  00000000 X20: 00000000\r\nX5:  00000000 X21: 00000000\r\nX6:  00000000 X22: 00000000\r\nX7:  00000000 X23: 00000000\r\nX8:  00000000 X24: 00000000\r\nX9:  00000000 X25: 00000000\r\nX10: 00000000 X26: 00000000\r\nX11: 00000000 X27: 00000000\r\nX12: 00000000 X28: 00000000\r\nX13: 00000000 X29: 00000000\r\nX14: 00000000 X30: 00000000\r\nX15: 00000000 X31: 00000000");
     ui->filenameText->clear();
+}
+
+
+void MainWindow::on_generateStatsButton_clicked()
+{
+
+}
+
+
+void MainWindow::on_exportDisButton_clicked()
+{
+    std::string programName =  ui->filenameText->text().toStdString();
+
+    // Buscar la posición del último punto en el nombre del archivo
+    uint pos = programName.find('.');
+    QString programNameWithoutExtension  = QString::fromStdString(programName.substr(0, pos));
+
+    // Crear un objeto QFile con la ruta especificada
+    QFile file(disassemblyFileRoute + "/disassembly_" + programNameWithoutExtension + ".txt");
+
+    // Intentar abrir el archivo en modo de escritura de texto
+    if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        // Crear un objeto QTextStream para escribir en el archivo
+        QTextStream out(&file);
+
+        // Escribir el contenido en el archivo
+        QString header = "PROGRAM NAME: " + QString::fromStdString(programName) + "\r\n";
+        int headerSize = header.size();
+
+        for(int i = 0; i < headerSize; i++){
+            header += "-";
+        }
+        header += "\r\n\r\n";
+
+        out << header;
+        out << QString::fromStdString(computer->exportDisassembly());
+
+        // Cerrar el archivo
+        file.close();
+    } else {
+        // Si no se pudo abrir el archivo, mostrar un mensaje de error
+        qDebug() << "No se pudo abrir el archivo:" << file.errorString();
+    }
+}
+
+
+void MainWindow::on_exportRamButton_clicked()
+{
+    std::string programName =  ui->filenameText->text().toStdString();
+
+    // Buscar la posición del último punto en el nombre del archivo
+    uint pos = programName.find('.');
+    QString programNameWithoutExtension  = QString::fromStdString(programName.substr(0, pos));
+
+    // Crear un objeto QFile con la ruta especificada
+    QFile file(disassemblyFileRoute + "/ram_" + programNameWithoutExtension + ".hex");
+
+    // Intentar abrir el archivo en modo de escritura de texto
+    if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        // Crear un objeto QTextStream para escribir en el archivo
+        QDataStream out(&file);
+
+        // Escribir los datos en el archivo
+        for (size_t i = 0; i < computer->ram_size/4; i+=4) {
+            out << static_cast<quint32>(computer->ram.readWord(i)); // Escribir cada byte como un entero de 8 bits sin signo
+        }
+
+        // Cerrar el archivo
+        file.close();
+    } else {
+        // Si no se pudo abrir el archivo, mostrar un mensaje de error
+        qDebug() << "No se pudo abrir el archivo:" << file.errorString();
+    }
 }
 

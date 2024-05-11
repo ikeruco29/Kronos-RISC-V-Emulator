@@ -155,6 +155,19 @@ std::string Computer::showDisassembly(){
     return str;
 }
 
+std::string Computer::exportDisassembly(){
+    std::vector<std::string> st = cpu.disassembly;
+
+    std::stringstream ss;
+
+    for (size_t i = 0; i < st.size(); ++i) {
+        ss << st[i] << std::endl;
+    }
+
+    return ss.str();
+}
+
+
 int Computer::executeCampaign(){
     LoadProgram(campaign.programPath.toStdString());
 }
