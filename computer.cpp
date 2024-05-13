@@ -115,15 +115,15 @@ int Computer::LoadCampaign(std::string filename) {
 std::string Computer::showRam(int page){
     std::stringstream ss;
 
-    for(int i = 0; i < (1024*4); i++){
+    for(int i = 0; i < (16 * 8); i++){
 
         if (i % 16 == 0) {
             ss << "\r\n";
-            ss << std::hex << std::uppercase << std::setw(8) << std::setfill('0') << i + (page * (1024*4));
+            ss << std::hex << std::uppercase << std::setw(8) << std::setfill('0') << i + (page);
             ss << "  ";
         }
 
-        ss << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << static_cast<int>(ram.readByte(i + (page * (1024*4)))) << " ";
+        ss << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << static_cast<int>(ram.readByte(i + (page))) << " ";
     }
 
     //ramBox->setPlainText(QString::fromStdString(ss.str()));

@@ -71,6 +71,8 @@ void MainWindow::on_actionSalir_triggered()
 
 void MainWindow::on_runButton_clicked()
 {
+    stopExec = false;
+
     // Todo esto del QTimer es porque si utilizo un bucle que haga
     // estas cuatro instrucciones:
     //
@@ -89,7 +91,7 @@ void MainWindow::on_runButton_clicked()
     connect(timer, &QTimer::timeout, this, &MainWindow::runLoopIteration);
 
     // Configurar el intervalo del timer en milisegundos
-    timer->setInterval(1);
+    timer->setInterval(5);
 
     timer->start();
 }
@@ -139,10 +141,39 @@ void MainWindow::on_searchBox_editingFinished()
 {
     QString memoryToView = ui->searchBox->text();
 
-    pageToView = memoryToView.toUInt(nullptr, 16);
-    pageToView /= (1024 * 4);
+    int searchBoxInt = memoryToView.toUInt(nullptr, 16);
+
+    pageToView = searchBoxInt;
+
+    int byteMem = pageToView & 0xF;
+    int rowMem = (pageToView >> 4) % 8; // Saca la fila (El modulo 8 es porque se muestran solo 8 filas)
+
+    pageToView = (pageToView & 0xFFFFFF80); // Como son 8 filas
 
     ui->ramText->setPlainText(QString::fromStdString(computer->showRam(pageToView)));
+
+    // Lo pongo en un if para que si no escribe nada, no pinte de rojo la primera posición de la RAM
+    if(searchBoxInt != 0){
+
+        QTextCursor cursor(ui->ramText->document());
+
+        cursor.setPosition(11 + byteMem * 3);  // 8 de los primeros numeros, 2 espacios después de esos + 1 para que empiece en el primer número
+            // hexadecimal. byteMem * 3 es porque son dos numeros y 1 espacio lo que separa a cada numero
+            // del siguiente
+
+        for (int i = 0; i < rowMem; ++i) {  // Baja a la línea que le indique, sacada anteriormente ()0x2A: línea 2
+            cursor.movePosition(QTextCursor::Down);
+        }
+
+        cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, 2); // Selecciona los siguientes dos caracteres
+
+        QTextCharFormat format;
+
+        format.setBackground(Qt::red); // Establece el fondo en rojo
+        cursor.setCharFormat(format);
+
+    }
+
 
     qDebug() << pageToView;
 }
