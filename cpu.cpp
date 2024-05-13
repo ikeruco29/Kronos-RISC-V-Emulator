@@ -4,7 +4,7 @@
 #include <sstream>
 
 
-CPU::CPU(RAM *ram){
+CPU::CPU(Memory *ram){
     // Inicialización de los registros
     for (int i = 0; i < 32; i++)
     {
@@ -82,10 +82,12 @@ CPU::~CPU(){}
 
 void CPU::clock(){
     fetch();
-    decode();
-    execute();
 
-    pc += 4;
+    decode();
+
+    if(execute() == 0)
+        pc += 4;
+
     cycles++;
 }
 
@@ -231,14 +233,14 @@ void CPU::decode() {
     instDisassembled.clear();
 }
 
-uint32_t CPU::execute() {
+int CPU::execute() {
 
     // Se ejecuta la función almacenada en instDecoded
-    (this->*vFunctionMap[instDecoded.op])();
+    int iIsJump = (this->*vFunctionMap[instDecoded.op])();
 
     ciclosTotales[instDecoded.op]++;
 
-    return 0;
+    return iIsJump;
 }
 
 
@@ -249,133 +251,171 @@ uint32_t CPU::execute() {
 //===================================================
 
 // R format
-void CPU::ADD(){
+int CPU::ADD(){
     uint8_t rd = instDecoded.registers[0];
     uint8_t rs1 = instDecoded.registers[1];
     uint8_t rs2 = instDecoded.registers[2];
     registers[rd] = registers[rs1] + registers[rs2];
+
+    return 0;
 }
-void CPU::SUB() {
+int CPU::SUB() {
     uint8_t rd = instDecoded.registers[0];
     uint8_t rs1 = instDecoded.registers[1];
     uint8_t rs2 = instDecoded.registers[2];
     registers[rd] = registers[rs1] - registers[rs2];
+
+    return 0;
 }
-void CPU::XOR() {
+int CPU::XOR() {
     uint8_t rd = instDecoded.registers[0];
     uint8_t rs1 = instDecoded.registers[1];
     uint8_t rs2 = instDecoded.registers[2];
     registers[rd] = registers[rs1] ^ registers[rs2];
+
+    return 0;
 }
-void CPU::OR() {
+int CPU::OR() {
     uint8_t rd = instDecoded.registers[0];
     uint8_t rs1 = instDecoded.registers[1];
     uint8_t rs2 = instDecoded.registers[2];
     registers[rd] = registers[rs1] | registers[rs2];
+
+    return 0;
 }
-void CPU::AND() {
+int CPU::AND() {
     uint8_t rd = instDecoded.registers[0];
     uint8_t rs1 = instDecoded.registers[1];
     uint8_t rs2 = instDecoded.registers[2];
     registers[rd] = registers[rs1] & registers[rs2];
+
+    return 0;
 }
-void CPU::SLL() {
+int CPU::SLL() {
     uint8_t rd = instDecoded.registers[0];
     uint8_t rs1 = instDecoded.registers[1];
     uint8_t rs2 = instDecoded.registers[2];
     registers[rd] = static_cast<uint32_t>(registers[rs1]) << registers[rs2];
+
+    return 0;
 }
-void CPU::SRL() {
+int CPU::SRL() {
     uint8_t rd = instDecoded.registers[0];
     uint8_t rs1 = instDecoded.registers[1];
     uint8_t rs2 = instDecoded.registers[2];
     registers[rd] = static_cast<uint32_t>( registers[rs1] ) >> registers[rs2];
+
+    return 0;
 }
-void CPU::SRA() {
+int CPU::SRA() {
     uint8_t rd = instDecoded.registers[0];
     uint8_t rs1 = instDecoded.registers[1];
     uint8_t rs2 = instDecoded.registers[2];
     registers[rd] = registers[rs1] >> registers[rs2];
+
+    return 0;
 }
-void CPU::SLT() {
+int CPU::SLT() {
     uint8_t rd = instDecoded.registers[0];
     uint8_t rs1 = instDecoded.registers[1];
     uint8_t rs2 = instDecoded.registers[2];
     registers[rd] = (registers[rs1] < registers[rs2]) ? 1 : 0;
+
+    return 0;
 }
-void CPU::SLTU() {
+int CPU::SLTU() {
     uint8_t rd = instDecoded.registers[0];
     uint8_t rs1 = instDecoded.registers[1];
     uint8_t rs2 = instDecoded.registers[2];
     registers[rd] = (static_cast<uint32_t>(registers[rs1]) < static_cast<uint32_t>(registers[rs2])) ? 1 : 0;
+
+    return 0;
 }
 
 // I format
-void CPU::ADDI() {
+int CPU::ADDI() {
     uint8_t rd = instDecoded.registers[0];
     uint8_t rs1 = instDecoded.registers[1];
     int32_t inmediate = instDecoded.inmediate;
 
     registers[rd] = registers[rs1] + inmediate;
+
+    return 0;
 }
-void CPU::XORI() {
+int CPU::XORI() {
     uint8_t rd = instDecoded.registers[0];
     uint8_t rs1 = instDecoded.registers[1];
     int32_t inmediate = instDecoded.inmediate;
 
     registers[rd] = registers[rs1] ^ inmediate;
+
+    return 0;
 }
-void CPU::ORI() {
+int CPU::ORI() {
     uint8_t rd = instDecoded.registers[0];
     uint8_t rs1 = instDecoded.registers[1];
     int32_t inmediate = instDecoded.inmediate;
 
     registers[rd] = registers[rs1] | inmediate;
+
+    return 0;
 }
-void CPU::ANDI() {
+int CPU::ANDI() {
     uint8_t rd = instDecoded.registers[0];
     uint8_t rs1 = instDecoded.registers[1];
     int32_t inmediate = instDecoded.inmediate;
 
     registers[rd] = registers[rs1] & inmediate;
+
+    return 0;
 }
-void CPU::SLLI() {
+int CPU::SLLI() {
     uint8_t rd = instDecoded.registers[0];
     uint8_t rs1 = instDecoded.registers[1];
     int32_t inmediate = instDecoded.inmediate;
 
     registers[rd] = static_cast<uint32_t>(registers[rs1]) << (static_cast<uint32_t>(inmediate) & 0b11111);
+
+    return 0;
 }
-void CPU::SRLI() {
+int CPU::SRLI() {
     uint8_t rd = instDecoded.registers[0];
     uint8_t rs1 = instDecoded.registers[1];
     int32_t inmediate = instDecoded.inmediate;
 
     registers[rd] = static_cast<uint32_t>(registers[rs1]) >> (static_cast<uint32_t>(inmediate) & 0b11111);
+
+    return 0;
 }
-void CPU::SRAI() {
+int CPU::SRAI() {
     uint8_t rd = instDecoded.registers[0];
     uint8_t rs1 = instDecoded.registers[1];
     int32_t inmediate = instDecoded.inmediate;
 
     registers[rd] = registers[rs1] >> (inmediate & 0b11111);
+
+    return 0;
 }
-void CPU::SLTI() {
+int CPU::SLTI() {
     uint8_t rd = instDecoded.registers[0];
     uint8_t rs1 = instDecoded.registers[1];
     int32_t inmediate = instDecoded.inmediate;
     registers[rd] = (registers[rs1] < inmediate) ? 1 : 0;
+
+    return 0;
 }
-void CPU::SLTIU() {
+int CPU::SLTIU() {
     uint8_t rd = instDecoded.registers[0];
     uint8_t rs1 = instDecoded.registers[1];
     uint8_t inmediate = instDecoded.inmediate;
     registers[rd] = (static_cast<uint32_t>(registers[rs1]) < static_cast<uint32_t>(inmediate)) ? 1 : 0;
+
+    return 0;
 }
 // TODO: PENSAR SI, POR EJEMPLO, EN LA POSICIÓN 1 HAY EL NUMERO 0X0000FFFF,
 //       SI RECOJO UN BYTE, ES DECIR FF, QUÉ SUCEDE CON LOS OTROS 3 BYTES,
 //       SE RELLENAN A 1 PORQUE TOMA COMO SIGNO EL BIT NÚMERO 8 O NO?
-void CPU::LB() {
+int CPU::LB() {
     uint8_t rd = instDecoded.registers[0];
     uint8_t rs1 = instDecoded.registers[1];
     int32_t inmediate = instDecoded.inmediate;
@@ -398,21 +438,27 @@ void CPU::LB() {
     int8_t byte = (ram->readByte(registers[rs1] + inmediate));
 
     registers[rd] = byte;
+
+    return 0;
 }
-void CPU::LH() {
+int CPU::LH() {
     uint8_t rd = instDecoded.registers[0];
     uint8_t rs1 = instDecoded.registers[1];
     int32_t inmediate = instDecoded.inmediate;
     int16_t half = FlipHalf(ram->readHalf(registers[rs1] + inmediate));
+
+    return 0;
     registers[rd] = half;
 }
-void CPU::LW() {
+int CPU::LW() {
     uint8_t rd = instDecoded.registers[0];
     uint8_t rs1 = instDecoded.registers[1];
     int32_t inmediate = instDecoded.inmediate;
     registers[rd] = FlipWord(ram->readWord(registers[rs1] + inmediate));
+
+    return 0;
 }
-void CPU::LBU() {
+int CPU::LBU() {
     uint8_t rd = instDecoded.registers[0];
     uint8_t rs1 = instDecoded.registers[1];
     int32_t inmediate = instDecoded.inmediate;
@@ -421,8 +467,10 @@ void CPU::LBU() {
     // saca el valor adecuado
 
     registers[rd] = (ram->readByte(registers[rs1] + inmediate)) & 0xFF;
+
+    return 0;
 }
-void CPU::LHU() {
+int CPU::LHU() {
     uint8_t rd = instDecoded.registers[0];
     uint8_t rs1 = instDecoded.registers[1];
     int32_t inmediate = instDecoded.inmediate;
@@ -431,9 +479,11 @@ void CPU::LHU() {
     // saca el valor adecuado
 
     registers[rd] = FlipHalf(ram->readHalf(registers[rs1] + inmediate));
+
+    return 0;
 }
 
-void CPU::JALR() {
+int CPU::JALR() {
     uint8_t rd = instDecoded.registers[0];
     uint8_t rs1 = instDecoded.registers[1];
     uint32_t inmediate = instDecoded.inmediate;
@@ -441,19 +491,25 @@ void CPU::JALR() {
     // La dirección que tocaría si no se hiciera el salto se guarda en rd
     // para saltar más adelante de vuelta
 
-    registers[rd] = pc;
+    registers[rd] = pc + 4;
     pc = registers[rs1] + inmediate;
+
+    return 1;
 }
 
-void CPU::ECALL() {
+int CPU::ECALL() {
     // Detener ejecución de programa
+
+    return 0;
 }
-void CPU::EBREAK() {
+int CPU::EBREAK() {
     bEbreak = true;
+
+    return 0;
 }
 
 // S format
-void CPU::SB() {
+int CPU::SB() {
     uint8_t rs1 = instDecoded.registers[0];
     uint8_t rs2 = instDecoded.registers[1];
     uint32_t inmediate = instDecoded.inmediate;
@@ -461,8 +517,10 @@ void CPU::SB() {
     uint8_t toStore = (registers[rs2] & 0xFF);
 
     ram->writeByte(registers[rs1] + inmediate, toStore);
+
+    return 0;
 }
-void CPU::SH() {
+int CPU::SH() {
     uint8_t rs1 = instDecoded.registers[0];
     uint8_t rs2 = instDecoded.registers[1];
     uint32_t inmediate = instDecoded.inmediate;
@@ -471,8 +529,10 @@ void CPU::SH() {
     toStore = FlipHalf(toStore);
 
     ram->writeHalf(registers[rs1] + inmediate, toStore);
+
+    return 0;
 }
-void CPU::SW() {
+int CPU::SW() {
     uint8_t rs1 = instDecoded.registers[0];
     uint8_t rs2 = instDecoded.registers[1];
     uint32_t inmediate = instDecoded.inmediate;
@@ -480,60 +540,80 @@ void CPU::SW() {
     uint32_t toStore = FlipWord(registers[rs2]);
 
     ram->writeWord(registers[rs1] + inmediate, toStore);
+
+    return 0;
 }
 
 // B format
-void CPU::BEQ() {
+int CPU::BEQ() {
     uint8_t rs1 = instDecoded.registers[0];
     uint8_t rs2 = instDecoded.registers[1];
     uint32_t inmediate = instDecoded.inmediate;
 
-    if (registers[rs1] == registers[rs2])
+    if (registers[rs1] == registers[rs2]){
         pc += inmediate;
+        return 1;
+    } else
+        return 0;
 }
-void CPU::BNE() {
+int CPU::BNE() {
     uint8_t rs1 = instDecoded.registers[0];
     uint8_t rs2 = instDecoded.registers[1];
     uint32_t inmediate = instDecoded.inmediate;
 
-    if (registers[rs1] != registers[rs2])
+    if (registers[rs1] != registers[rs2]){
         pc += inmediate;
+        return 1;
+    } else
+        return 0;
 }
-void CPU::BLT() {
+int CPU::BLT() {
     uint8_t rs1 = instDecoded.registers[0];
     uint8_t rs2 = instDecoded.registers[1];
     uint32_t inmediate = instDecoded.inmediate;
 
-    if (registers[rs1] < registers[rs2])
+    if (registers[rs1] < registers[rs2]){
         pc += inmediate;
+        return 1;
+    } else
+        return 0;
 }
-void CPU::BGE() {
+int CPU::BGE() {
     uint8_t rs1 = instDecoded.registers[0];
     uint8_t rs2 = instDecoded.registers[1];
     uint32_t inmediate = instDecoded.inmediate;
 
-    if (registers[rs1] >= registers[rs2])
+    if (registers[rs1] >= registers[rs2]){
         pc += inmediate;
+        return 1;
+    } else
+        return 0;
 }
-void CPU::BLTU() {
+int CPU::BLTU() {
     uint8_t rs1 = instDecoded.registers[0];
     uint8_t rs2 = instDecoded.registers[1];
     uint32_t inmediate = instDecoded.inmediate;
 
-    if (static_cast<uint32_t>(registers[rs1]) < static_cast<uint32_t>(registers[rs2]))
+    if (static_cast<uint32_t>(registers[rs1]) < static_cast<uint32_t>(registers[rs2])){
         pc += inmediate;
+        return 1;
+    } else
+        return 0;
 }
-void CPU::BGEU() {
+int CPU::BGEU() {
     uint8_t rs1 = instDecoded.registers[0];
     uint8_t rs2 = instDecoded.registers[1];
     uint32_t inmediate = instDecoded.inmediate;
 
-    if (static_cast<uint32_t>(registers[rs1]) <= static_cast<uint32_t>(registers[rs2]))
+    if (static_cast<uint32_t>(registers[rs1]) >= static_cast<uint32_t>(registers[rs2])){ // estaba <=
         pc += inmediate;
-}
+        return 1;
+    } else
+        return 0;
+    }
 
 // J format
-void CPU::JAL() {
+int CPU::JAL() {
     uint8_t rd = instDecoded.registers[0];
     uint32_t inmediate = instDecoded.inmediate;
 
@@ -542,24 +622,30 @@ void CPU::JAL() {
 
     registers[rd] = pc + 4;
     pc += inmediate;
+
+    return 1;
 }
 
 // U format
-void CPU::LUI() {
+int CPU::LUI() {
     uint8_t rd = instDecoded.registers[0];
     uint32_t inmediate = instDecoded.inmediate;
 
     registers[rd] = inmediate << 12;
+
+    return 0;
 }
-void CPU::AUIPC() {
+int CPU::AUIPC() {
     uint8_t rd = instDecoded.registers[0];
     uint32_t inmediate = instDecoded.inmediate;
 
     registers[rd] = pc + (inmediate << 12);
+
+    return 0;
 }
 
-void CPU::NOP(){
-    return;
+int CPU::NOP(){
+    return 0;
 }
 
 

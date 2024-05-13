@@ -7,30 +7,30 @@
 #include <unordered_map>
 #include <string>
 #include "decoder.h"
-#include "ram.h"
+#include "memory.h"
 
 using reg = int32_t;
 
 class CPU {
 public:
-    CPU(RAM *ram);
+    CPU(Memory *ram);
     ~CPU();
 
-    RAM* ram;
+    Memory* ram;
     bool bEbreak = false;
     uint32_t cycles = 0;
 
     // Fetch siguiente instrucción
     void fetch();
     void decode();
-    uint32_t execute();
+    int execute();
 
     reg registers[32];
 
     uint32_t pc = 0x00000000;  // Program counter
     uint32_t ir = 0x00000000;       // Instruction register
 
-    std::unordered_map<int, void (CPU::*)()> vFunctionMap;
+    std::unordered_map<int, int (CPU::*)()> vFunctionMap;
 
     Decoded instDecoded;
 
@@ -42,31 +42,31 @@ public:
 
     // INSTRUCTIONS
     // R format
-    void ADD(); void SUB(); void XOR(); void OR(); void AND();
-    void SLL(); void SRL(); void SRA(); void SLT(); void SLTU();
+    int ADD(); int SUB(); int XOR(); int OR(); int AND();
+    int SLL(); int SRL(); int SRA(); int SLT(); int SLTU();
 
     // I format
-    void ADDI(); void XORI(); void ORI(); void ANDI();
-    void SLLI(); void SRLI(); void SRAI(); void SLTI(); void SLTIU();
-    void LB(); void LH(); void LW(); void LBU(); void LHU();
+    int ADDI(); int XORI(); int ORI(); int ANDI();
+    int SLLI(); int SRLI(); int SRAI(); int SLTI(); int SLTIU();
+    int LB(); int LH(); int LW(); int LBU(); int LHU();
 
-    void JALR();
-    void ECALL(); void EBREAK();
+    int JALR();
+    int ECALL(); int EBREAK();
 
     // S format
-    void SB(); void SH(); void SW();
+    int SB(); int SH(); int SW();
 
     // B format
-    void BEQ(); void BNE(); void BLT(); void BGE(); void BLTU();
-    void BGEU();
+    int BEQ(); int BNE(); int BLT(); int BGE(); int BLTU();
+    int BGEU();
 
     // J format
-    void JAL();
+    int JAL();
 
     // U format
-    void LUI(); void AUIPC();
+    int LUI(); int AUIPC();
 
-    void NOP();
+    int NOP();
 
 
     // Para los ciclos

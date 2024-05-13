@@ -7,9 +7,9 @@
 #include <QJsonObject>
 #include <QJsonArray>
 
-Computer::Computer(int RAM_SIZE) : ram(RAM(RAM_SIZE)), cpu(CPU(&ram)), ram_size(RAM_SIZE) {};
+Computer::Computer(int RAM_SIZE) : ram(Memory(RAM_SIZE)), cpu(CPU(&ram)), ram_size(RAM_SIZE) {};
 Computer::Computer(int RAM_SIZE, QTextEdit *termb)
-    : ram(RAM(RAM_SIZE)), cpu(CPU(&ram)), ram_size(RAM_SIZE)
+    : ram(Memory(RAM_SIZE)), cpu(CPU(&ram)), ram_size(RAM_SIZE)
     , terminalBox(termb)
 {};
 

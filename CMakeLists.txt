@@ -25,9 +25,10 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         ${PROJECT_SOURCES}
         res.qrc
         resources/icons/execute.png resources/icons/stopExe.png
-        computer.cpp computer.h cpu.cpp cpu.h decoder.cpp decoder.h endian.cpp endian.h ram.cpp ram.h
+        computer.cpp computer.h cpu.cpp cpu.h decoder.cpp decoder.h endian.cpp endian.h memory.cpp memory.h
         config.json
         resources/icons/executePaso.png
+
     )
 
     # Copiar el archivo config.json al directorio de salida del ejecutable

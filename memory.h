@@ -1,17 +1,19 @@
-#ifndef RAM_H
-#define RAM_H
+#ifndef MEMORY_H
+#define MEMORY_H
 
 #include <cstdint>
 
-class RAM {
+class Memory {
 public:
-    RAM(uint32_t RAM_SIZE);
-    ~RAM();
+    Memory(uint32_t MEMORY_SIZE);
+    ~Memory();
 
-    uint8_t *ram;
+    uint32_t iMemorySize;
+    uint32_t iRomSize, iRomStartAddr;
+    int iDataSize;
 
-    int iRamSize;
-    uint32_t uStartAddr;
+    uint8_t *memory;
+    uint8_t *pData, *pIo;
 
     void writeByte(uint32_t addr, int8_t data);
     void writeHalf(uint32_t addr, int16_t data);
@@ -25,8 +27,9 @@ public:
     uint32_t readWord(uint32_t addr);
 
     void reset();
+    void resetMemorySection(uint32_t inicio, uint32_t fin);
 
     //void showRam();
 };
 
-#endif // RAM_H
+#endif // MEMORY_H

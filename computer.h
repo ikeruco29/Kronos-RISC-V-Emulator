@@ -2,7 +2,7 @@
 #define COMPUTER_H
 
 #include "cpu.h"
-#include "ram.h"
+#include "memory.h"
 #include <fstream>
 #include <iostream>
 #include <QTextEdit>
@@ -22,7 +22,7 @@ public:
     ~Computer();
 
     CPU cpu;
-    RAM ram;
+    Memory ram;
 
     // Variables para las campañas
     Campaign campaign;
