@@ -167,6 +167,22 @@ std::string Computer::exportDisassembly(){
     return ss.str();
 }
 
+QString Computer::showVRAM()
+{
+    QString text2 = "";
+
+    // I/O mapeada se encuentra en el final de la memoria
+    for(uint32_t i = ram.iMemorySize - 1500; i < ram.iMemorySize; i++){ // 1500 caracteres que entran en el textbox
+
+        text2 += QChar(ram.readByte(i));
+
+        qDebug() << i;
+
+    }
+
+    return text2;
+}
+
 
 int Computer::executeCampaign(){
     LoadProgram(campaign.programPath.toStdString());

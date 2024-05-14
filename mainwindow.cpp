@@ -108,9 +108,7 @@ void MainWindow::runLoopIteration()
 
     // Ejecutar una iteración del bucle
     computer->cpu.clock();
-    ui->ramText->setPlainText(QString::fromStdString(computer->showRam(pageToView)));
-    ui->registerText->setPlainText(QString::fromStdString(computer->showRegisters()));
-    ui->codeDisassemblyText->appendPlainText(QString::fromStdString(computer->showDisassembly()));
+    this->UpdateInterface();
 }
 
 
@@ -131,9 +129,7 @@ void MainWindow::on_pauseButton_clicked()
 void MainWindow::on_runPasoButton_clicked()
 {
     computer->cpu.clock();
-    ui->ramText->setPlainText(QString::fromStdString(computer->showRam(pageToView)));
-    ui->registerText->setPlainText(QString::fromStdString(computer->showRegisters()));
-    ui->codeDisassemblyText->appendPlainText(QString::fromStdString(computer->showDisassembly()));
+    this->UpdateInterface();
 }
 
 
@@ -184,15 +180,6 @@ void MainWindow::on_openConfigButton_clicked()
     QDesktopServices::openUrl(QUrl::fromLocalFile("./config.json"));
 }
 
-void MainWindow::resetInterface(){
-    ui->runButton->setEnabled(false);
-    ui->runPasoButton->setEnabled(false);
-
-    ui->codeDisassemblyText->clear();
-    ui->ramText->clear();
-    ui->registerText->setPlainText(QString::fromStdString(computer->showRegisters()));
-    ui->filenameText->clear();
-}
 
 
 void MainWindow::on_generateStatsButton_clicked()
@@ -268,5 +255,24 @@ void MainWindow::on_exportRamButton_clicked()
 }
 
 
+void MainWindow::resetInterface(){
+    ui->runButton->setEnabled(false);
+    ui->runPasoButton->setEnabled(false);
+
+    ui->codeDisassemblyText->clear();
+    ui->ramText->clear();
+    ui->registerText->setPlainText(QString::fromStdString(computer->showRegisters()));
+    ui->terminalBox->setPlainText("");
+    ui->filenameText->clear();
+}
+
+
+void MainWindow::UpdateInterface()
+{
+    ui->terminalBox->setPlainText(computer->showVRAM());    // Update terminalBox
+    ui->ramText->setPlainText(QString::fromStdString(computer->showRam(pageToView)));   // Update ramBox
+    ui->registerText->setPlainText(QString::fromStdString(computer->showRegisters()));  // Update registerBox
+    ui->codeDisassemblyText->appendPlainText(QString::fromStdString(computer->showDisassembly()));  // Update disassembly
+}
 
 

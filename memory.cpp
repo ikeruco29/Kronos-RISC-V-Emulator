@@ -70,7 +70,7 @@ void Memory::reset(){
         uint32_t end = (i + 1) * subSectionSize;
         // Si es el último hilo, el rango final será el tamaño total del array
         if (i == numOfThreads - 1) {
-            end = iMemorySize;
+            end = iMemorySize - this->pIo;
         }
         // Crear el hilo y pasarle la función procesarSubArray y los parámetros de inicio y fin
         hilos.emplace_back(&Memory::resetMemorySection, this, start, end);
@@ -81,6 +81,8 @@ void Memory::reset(){
         hilo.join();
     }
 
+    this->resetIOMemory();
+
 }
 
 // Función ejecutada por cada hilo
@@ -88,6 +90,12 @@ void Memory::resetMemorySection(uint32_t inicio, uint32_t fin) {
     // reset del array
     for (uint32_t i = inicio; i < fin; ++i) {
         this->memory[i] = 0xFF;
+    }
+}
+
+void Memory::resetIOMemory(){
+    for (uint32_t i = this->iMemorySize - this->pIo; i < this->iMemorySize; ++i) {
+        this->memory[i] = 0x20; // Caracter de espacio en utf8
     }
 }
 

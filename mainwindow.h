@@ -24,7 +24,6 @@ public:
     QString disassemblyFileRoute;
     QString ramFileRoute;
 
-
 private slots:
     void on_actionCargar_programa_triggered();
 
@@ -58,7 +57,7 @@ private:
     void resetInterface();
 
     bool stopExec;
-
+    void UpdateInterface();
 
 };
 #endif // MAINWINDOW_H

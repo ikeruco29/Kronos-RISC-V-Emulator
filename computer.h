@@ -41,6 +41,8 @@ public:
     std::string showRegisters();
     std::string showDisassembly();
     std::string exportDisassembly();
+
+    QString showVRAM();
 };
 
 #endif // COMPUTER_H
