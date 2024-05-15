@@ -13,7 +13,7 @@ public:
     int iDataSize;
 
     uint8_t *memory;
-    uint32_t pIo = 1500; // 1500 son los caracteres que caben en la pantalla
+    uint32_t pIo = 1024*1024; // 1500 son los caracteres que caben en la pantalla
 
     void writeByte(uint32_t addr, int8_t data);
     void writeHalf(uint32_t addr, int16_t data);

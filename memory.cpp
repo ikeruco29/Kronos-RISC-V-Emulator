@@ -59,7 +59,7 @@ void Memory::reset(){
     int numOfThreads = 16;  // Número de hilos. PREGUNTAR A DANI SI HAY UN LÍMITE O UN ÓPTIMO
 
 
-    uint32_t subSectionSize = iMemorySize / numOfThreads;
+    uint32_t subSectionSize = (iMemorySize - pIo) / numOfThreads;
 
     // Crear un vector para almacenar los hilos
     std::vector<std::thread> hilos;
@@ -97,6 +97,7 @@ void Memory::resetIOMemory(){
     for (uint32_t i = this->iMemorySize - this->pIo; i < this->iMemorySize; ++i) {
         this->memory[i] = 0x20; // Caracter de espacio en utf8
     }
+    memory[0xBFFFFCF5] = 'A';
 }
 
 

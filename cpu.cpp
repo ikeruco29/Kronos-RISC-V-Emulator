@@ -98,7 +98,7 @@ void CPU::reset(){
         registers[i] = 0x00000000;
     }
 
-    registers[2] = 0xbffffff0;
+    registers[2] = ram->iMemorySize - ram->pIo - 1; // Puntero stack
 
     instDecoded.inmediate = 0;
     instDecoded.op = -1;

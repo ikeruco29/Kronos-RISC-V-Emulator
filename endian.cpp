@@ -1,4 +1,4 @@
-#include "endian.h";
+#include "endian.h"
 
 uint16_t FlipHalf(uint16_t half) {
 

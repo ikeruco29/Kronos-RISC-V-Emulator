@@ -9,7 +9,7 @@
 const QString CONFIG_FILE = "./config.json";
 
 uint ramSize;
-QString disassemblyRouteFile, ramRouteFile;
+QString disassemblyRouteFile, ramRouteFile, campaignRoute;
 
 int readConfigFile();
 
@@ -26,6 +26,7 @@ int main(int argc, char *argv[])
     w.computer = &computer;
     w.disassemblyFileRoute = disassemblyRouteFile;
     w.ramFileRoute = ramRouteFile;
+    w.campaignGeneratorRoute = campaignRoute;
 
     return a.exec();
 }
@@ -64,14 +65,17 @@ int readConfigFile(){
     QJsonObject jsonObj = jsonDoc.object();
 
     // Extraer valores del objeto JSON
-    ramSize = jsonObj["ramSize"].toInt() * 1024 * 1024;
+    ramSize = jsonObj["ramSize"].toInt() * 1024 * 1024 * 1024;
     disassemblyRouteFile = jsonObj["disassemblyFileRoute"].toString();
     ramRouteFile = jsonObj["ramFileRoute"].toString();
+    campaignRoute = jsonObj["campaignGeneratorRoute"].toString();
+
 
     // Imprimir los valores extraídos
-    qDebug() << "Ram Size:" << ramSize / 1024 / 1024 << "MB";
+    qDebug() << "Ram Size:" << ramSize / 1024 / 1024 / 1024 << "GB";
     qDebug() << "Ram file:" << ramRouteFile;
     qDebug() << "disassembly file:" << disassemblyRouteFile;
+    qDebug() << "campaign route:" << campaignRoute;
 
     return 0;
 }

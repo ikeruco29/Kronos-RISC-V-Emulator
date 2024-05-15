@@ -1,5 +1,6 @@
 {
-    "ramSize": 3072,
+    "ramSize": 3,
     "disassemblyFileRoute": "C:/Users/ikeru/Desktop/Universidad/TFG/statistics",
-    "ramFileRoute": "C:/Users/ikeru/Desktop/Universidad/TFG/statistics"
+    "ramFileRoute": "C:/Users/ikeru/Desktop/Universidad/TFG/statistics",
+    "campaignGeneratorRoute": "C:/Users/ikeru/Desktop/Universidad/TFG/campaigns"
 }

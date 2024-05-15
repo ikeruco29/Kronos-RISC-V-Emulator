@@ -6,6 +6,11 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
+#include <fstream>
+#include <iostream>
+#include <thread>
+#include <mutex>
+#include <vector>
 
 Computer::Computer(int RAM_SIZE) : ram(Memory(RAM_SIZE)), cpu(CPU(&ram)), ram_size(RAM_SIZE) {};
 Computer::Computer(int RAM_SIZE, QTextEdit *termb)
@@ -15,9 +20,6 @@ Computer::Computer(int RAM_SIZE, QTextEdit *termb)
 
 Computer::~Computer() {}
 
-void Computer::executeProgram() {
-
-}
 
 void Computer::reset(){
     cpu.reset();
@@ -82,8 +84,8 @@ int Computer::LoadCampaign(std::string filename) {
 
     // Extraer valores del objeto JSON
     QString programPath = jsonObj["program"].toString();
-    int expectedResult = jsonObj["expected_result"].toInt();
-    int expectedInstructions = jsonObj["expected_instructions"].toInt();
+    int expectedResult = jsonObj["expectedResult"].toInt();
+    int expectedInstructions = jsonObj["expectedInstructions"].toInt();
     QJsonArray injectionsArray = jsonObj["injections"].toArray();
 
     // Almacenar las inyecciones en un vector de vectores de enteros
@@ -103,11 +105,11 @@ int Computer::LoadCampaign(std::string filename) {
     qDebug() << "Instrucciones Esperadas:" << expectedInstructions;
     qDebug() << "Inyecciones:" << injections;
 
-    Campaign camp;
-    camp.expectedInstructions = expectedInstructions;
-    camp.programPath = programPath;
-    camp.expectedResult = expectedResult;
-    camp.injections = injections;
+
+    campaign.expectedInstructions = expectedInstructions;
+    campaign.programPath = programPath;
+    campaign.expectedResult = expectedResult;
+    campaign.injections = injections;
 
     return 0;
 }
@@ -169,21 +171,36 @@ std::string Computer::exportDisassembly(){
 
 QString Computer::showVRAM()
 {
-    QString text2 = "";
+    QString text2;
+    std::mutex mtx;
 
-    // I/O mapeada se encuentra en el final de la memoria
-    for(uint32_t i = ram.iMemorySize - 1500; i < ram.iMemorySize; i++){ // 1500 caracteres que entran en el textbox
+    auto workerFunction = [&text2, &mtx](int start) {
+        std::string chunk;
+        int end = start + CHUNK_SIZE;
 
-        text2 += QChar(ram.readByte(i));
+        // Simulando el procesamiento de datos en lugar de acceder a la VRAM
+        for (int i = start; i < end; ++i) {
+            // Simulación de datos
+            chunk += std::to_string(i);
+        }
 
-        qDebug() << i;
+        // Proteger la operación de escritura con un mutex
+        std::lock_guard<std::mutex> lock(mtx);
+        text2 += chunk;
+    };
 
+    // Crear y ejecutar los hilos
+    std::vector<std::thread> threads;
+    //                  Saca el número de hilos
+    //                          |
+    for (int i = 0; i < (ram.pIo / CHUNK_SIZE); i += CHUNK_SIZE) {
+        threads.emplace_back(workerFunction, i);
+    }
+
+    // Esperar a que todos los hilos terminen
+    for (auto& thread : threads) {
+        thread.join();
     }
 
     return text2;
-}
-
-
-int Computer::executeCampaign(){
-    LoadProgram(campaign.programPath.toStdString());
 }

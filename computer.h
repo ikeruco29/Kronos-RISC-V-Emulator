@@ -3,8 +3,6 @@
 
 #include "cpu.h"
 #include "memory.h"
-#include <fstream>
-#include <iostream>
 #include <QTextEdit>
 #include <QPlainTextEdit>
 
@@ -32,7 +30,6 @@ public:
 
     int ram_size;
 
-    void executeProgram();
     void reset();
     int LoadProgram(std::string filename);
     int LoadCampaign(std::string filename);
@@ -43,6 +40,10 @@ public:
     std::string exportDisassembly();
 
     QString showVRAM();
+
+private:
+    static constexpr int CHUNK_SIZE = 1024;    // 16 hilos
+
 };
 
 #endif // COMPUTER_H

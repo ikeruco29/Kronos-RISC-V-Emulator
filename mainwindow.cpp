@@ -1,11 +1,14 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
+#include <cstdlib>
 #include <QFileDialog>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QDesktopServices>
 #include <QTimer>
+#include <QDateTime>
+#include <QInputDialog>
 
 MainWindow::MainWindow(QWidget *parent, Computer *comp)
     : QMainWindow(parent)
@@ -15,6 +18,7 @@ MainWindow::MainWindow(QWidget *parent, Computer *comp)
     ui->setupUi(this);
     ui->runButton->setEnabled(false);
     ui->runPasoButton->setEnabled(false);
+    isCampaign = false;
 }
 
 MainWindow::~MainWindow()
@@ -87,8 +91,14 @@ void MainWindow::on_runButton_clicked()
 
     QTimer *timer = new QTimer(this);
 
-    // Conectar el timeout del QTimer al slot para ejecutar una iteración del bucle
-    connect(timer, &QTimer::timeout, this, &MainWindow::runLoopIteration);
+    if(isCampaign){
+        // Conectar el timeout del QTimer al slot para ejecutar una iteración del bucle
+        connect(timer, &QTimer::timeout, this, &MainWindow::runLoopIterationCampaign);
+    } else {
+        // Conectar el timeout del QTimer al slot para ejecutar una iteración del bucle
+        connect(timer, &QTimer::timeout, this, &MainWindow::runLoopIteration);
+    }
+
 
     // Configurar el intervalo del timer en milisegundos
     timer->setInterval(5);
@@ -104,6 +114,31 @@ void MainWindow::runLoopIteration()
 
         sender()->deleteLater(); // Eliminar el QTimer después de terminar el bucle
         return;
+    }
+
+    // Ejecutar una iteración del bucle
+    computer->cpu.clock();
+    this->UpdateInterface();
+}
+
+int MainWindow::runLoopIterationCampaign()
+{
+    // TODO: CAMBIAR CONDICIÓN DEL BUCLE            ESTA VARIABLE NO!!!
+    if (computer->ram.readByte(0x80003020) == 0 || stopExec) {
+
+        sender()->deleteLater(); // Eliminar el QTimer después de terminar el bucle
+        return 0;
+    }
+
+
+    // Si aún no ha tardado el doble en ejecuctarse, sigue ejecutándose.
+    if(computer->campaign.expectedInstructions * 2 < computer->cpu.cycles){
+        int inst = computer->cpu.cycles;    // número de instrucción
+        int reg = computer->campaign.injections[inst][1];   // Registro a cambiar
+        computer->cpu.registers[reg] ^= (1 << computer->campaign.injections[inst][2]); // invierte el bit
+    }else{
+        sender()->deleteLater(); // Eliminar el QTimer después de terminar el bucle
+        return 1;
     }
 
     // Ejecutar una iteración del bucle
@@ -234,7 +269,7 @@ void MainWindow::on_exportRamButton_clicked()
     QString programNameWithoutExtension  = QString::fromStdString(programName.substr(0, pos));
 
     // Crear un objeto QFile con la ruta especificada
-    QFile file(disassemblyFileRoute + "/ram_" + programNameWithoutExtension + ".hex");
+    QFile file(ramFileRoute + "/ram_" + programNameWithoutExtension + ".hex");
 
     // Intentar abrir el archivo en modo de escritura de texto
     if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
@@ -242,7 +277,7 @@ void MainWindow::on_exportRamButton_clicked()
         QDataStream out(&file);
 
         // Escribir los datos en el archivo
-        for (size_t i = 0; i < computer->ram_size/4; i+=4) {
+        for (size_t i = 0; i < computer->ram_size; i+=4) {
             out << static_cast<quint32>(computer->ram.readWord(i)); // Escribir cada byte como un entero de 8 bits sin signo
         }
 
@@ -275,4 +310,95 @@ void MainWindow::UpdateInterface()
     ui->codeDisassemblyText->appendPlainText(QString::fromStdString(computer->showDisassembly()));  // Update disassembly
 }
 
+
+
+void MainWindow::on_actionGenerar_campa_a_aleatoria_triggered()
+{
+    QString program = QInputDialog::getText(nullptr, "Introducir programa", "Introduce la ruta al programa:");
+
+    QDateTime currentDateTime = QDateTime::currentDateTime();
+
+    // Obteniendo el día actual
+    QString currentDay = currentDateTime.toString("dddd").remove('"');
+
+    // Obteniendo la hora actual
+    QString currentTime = currentDateTime.toString("hh-mm-ss").remove('"');
+
+    qDebug() << "Día actual: " << currentDay;
+    qDebug() << "Hora actual: " << currentTime;
+
+    QString programName =  "campaign_" + currentDay + "_" + currentTime;
+
+
+    int instructions = 0;
+
+    QJsonObject jsonObject;
+
+    jsonObject["program"] = program;
+    jsonObject["expectedResult"] = 0;
+    jsonObject["expectedInstructions"] = 0;
+
+    // JSONARRAY para las inyecciones
+    QJsonArray injectionsArr;
+
+    for (int i = 0; i < 10000; ++i) {
+        int inst = i;
+        int reg = std::rand() % 32;
+        int bit = std::rand() % 8;
+
+        QJsonArray injection;
+        injection.append(inst);
+        injection.append(reg);
+        injection.append(bit);
+
+        injectionsArr.append(injection);
+    }
+
+
+
+    jsonObject["injections"] = injectionsArr;
+
+
+
+
+    // Convertir el objeto JSON en un documento JSON
+    QJsonDocument jsonDocument(jsonObject);
+
+    // Convertir el documento JSON en una cadena formateada
+    QByteArray jsonData = jsonDocument.toJson(QJsonDocument::Indented);
+
+    // Escribir la cadena JSON en un archivo
+    QFile jsonFile(campaignGeneratorRoute + "/" + programName + ".json");
+    if (jsonFile.open(QFile::WriteOnly | QFile::Truncate)) {
+        jsonFile.write(jsonData);
+        jsonFile.close();
+        qDebug() << "Campaña generada con éxito.";
+    } else {
+        qDebug() << "Error al generar campaña para escritura.";
+    }
+
+}
+
+
+void MainWindow::on_executeCampaignButton_clicked()
+{
+    // Si la campaña ha sido generada, no hay programa introducido...
+    if(computer->campaign.expectedInstructions == 0){
+        // Carga del programa que hay asociado a la campaña
+        computer->LoadProgram(computer->campaign.programPath.toStdString());
+
+        // Ejecución del programa
+        on_runButton_clicked();
+
+        computer->campaign.expectedInstructions = computer->cpu.cycles;
+    }
+
+    isCampaign = true;  // Indica que es campaña para modificar instrucciones
+
+    // Ejecución de la campaña
+    on_runButton_clicked();
+
+    isCampaign = false;
+
+}
 

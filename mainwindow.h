@@ -23,6 +23,7 @@ public:
     // Variables de configuración
     QString disassemblyFileRoute;
     QString ramFileRoute;
+    QString campaignGeneratorRoute;
 
 private slots:
     void on_actionCargar_programa_triggered();
@@ -51,12 +52,18 @@ private slots:
 
     void on_pauseButton_clicked();
 
+    void on_actionGenerar_campa_a_aleatoria_triggered();
+
+    void on_executeCampaignButton_clicked();
+
+    int runLoopIterationCampaign();
 private:
     Ui::MainWindow *ui;
 
     void resetInterface();
 
     bool stopExec;
+    bool isCampaign;
     void UpdateInterface();
 
 };
