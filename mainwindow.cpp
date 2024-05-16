@@ -9,6 +9,7 @@
 #include <QTimer>
 #include <QDateTime>
 #include <QInputDialog>
+#include <QMessageBox>
 
 MainWindow::MainWindow(QWidget *parent, Computer *comp)
     : QMainWindow(parent)
@@ -55,15 +56,7 @@ void MainWindow::on_actionCargar_programa_triggered()
 
 void MainWindow::on_actionCargar_campa_a_triggered()
 {
-    QString nombreArchivo = QFileDialog::getOpenFileName(this, "Seleccionar archivo", "", "*.json");
-    if (!nombreArchivo.isEmpty()) {
-        // Aquí puedes cargar el archivo seleccionado
-        qDebug() << "Archivo seleccionado:" << nombreArchivo;
-        computer->reset();
-        computer->LoadCampaign(nombreArchivo.toStdString());
-    } else {
-        qDebug() << "Ningún archivo seleccionado.";
-    }
+    loadCampaign();
 }
 
 
@@ -123,8 +116,17 @@ void MainWindow::runLoopIteration()
 
 int MainWindow::runLoopIterationCampaign()
 {
-    // TODO: CAMBIAR CONDICIÓN DEL BUCLE            ESTA VARIABLE NO!!!
-    if (computer->ram.readByte(0x80003020) == 0 || stopExec) {
+    // TODO: CAMBIAR CONDICIÓN DEL BUCLE
+    if (computer->ram.readByte(0x80003020) == 0) {
+
+        // TODO: COMPARAR EL RESULTADO CON LA POSICIÓN DE MEMORIA CONOCIDA
+
+        if(computer->campaign.expectedInstructions > computer->cpu.cycles){
+            QMessageBox::information(nullptr, "Información sobre la campaña", "La campaña ha finalizado. Resultado final: Single Event Delay (SED)");
+        } else {
+            QMessageBox::information(nullptr, "Información sobre la campaña", "La campaña ha finalizado. Resultado final: NO EFFECT");
+        }
+
 
         sender()->deleteLater(); // Eliminar el QTimer después de terminar el bucle
         return 0;
@@ -137,6 +139,8 @@ int MainWindow::runLoopIterationCampaign()
         int reg = computer->campaign.injections[inst][1];   // Registro a cambiar
         computer->cpu.registers[reg] ^= (1 << computer->campaign.injections[inst][2]); // invierte el bit
     }else{
+        QMessageBox::information(nullptr, "Información sobre la campaña", "La campaña ha finalizado. Resultado final: Detected Unrecovery Error (DUE)");
+
         sender()->deleteLater(); // Eliminar el QTimer después de terminar el bucle
         return 1;
     }
@@ -253,6 +257,8 @@ void MainWindow::on_exportDisButton_clicked()
 
         // Cerrar el archivo
         file.close();
+
+        QMessageBox::information(nullptr, "Exportación satisfactoria", "Desencamblado exportado. Archivo en: " + disassemblyFileRoute);
     } else {
         // Si no se pudo abrir el archivo, mostrar un mensaje de error
         qDebug() << "No se pudo abrir el archivo:" << file.errorString();
@@ -283,9 +289,12 @@ void MainWindow::on_exportRamButton_clicked()
 
         // Cerrar el archivo
         file.close();
+
+        QMessageBox::information(nullptr, "Exportación satisfactoria", "RAM exportado. Archivo en: " + ramFileRoute);
     } else {
         // Si no se pudo abrir el archivo, mostrar un mensaje de error
         qDebug() << "No se pudo abrir el archivo:" << file.errorString();
+        QMessageBox::critical(nullptr, "Fallo en la exportación", "Ha habido un fallo inesperado al exportar la RAM");
     }
 }
 
@@ -314,69 +323,77 @@ void MainWindow::UpdateInterface()
 
 void MainWindow::on_actionGenerar_campa_a_aleatoria_triggered()
 {
-    QString program = QInputDialog::getText(nullptr, "Introducir programa", "Introduce la ruta al programa:");
 
-    QDateTime currentDateTime = QDateTime::currentDateTime();
+    QString program = QFileDialog::getOpenFileName(nullptr, "Seleccionar archivo", "", "Archivos (*.bin *.o)");
 
-    // Obteniendo el día actual
-    QString currentDay = currentDateTime.toString("dddd").remove('"');
+    if(!program.isEmpty()){
 
-    // Obteniendo la hora actual
-    QString currentTime = currentDateTime.toString("hh-mm-ss").remove('"');
+        QDateTime currentDateTime = QDateTime::currentDateTime();
 
-    qDebug() << "Día actual: " << currentDay;
-    qDebug() << "Hora actual: " << currentTime;
+        // Obteniendo el día actual
+        QString currentDay = currentDateTime.toString("dddd").remove('"');
 
-    QString programName =  "campaign_" + currentDay + "_" + currentTime;
+        // Obteniendo la hora actual
+        QString currentTime = currentDateTime.toString("hh-mm-ss").remove('"');
 
+        qDebug() << "Día actual: " << currentDay;
+        qDebug() << "Hora actual: " << currentTime;
 
-    int instructions = 0;
-
-    QJsonObject jsonObject;
-
-    jsonObject["program"] = program;
-    jsonObject["expectedResult"] = 0;
-    jsonObject["expectedInstructions"] = 0;
-
-    // JSONARRAY para las inyecciones
-    QJsonArray injectionsArr;
-
-    for (int i = 0; i < 10000; ++i) {
-        int inst = i;
-        int reg = std::rand() % 32;
-        int bit = std::rand() % 8;
-
-        QJsonArray injection;
-        injection.append(inst);
-        injection.append(reg);
-        injection.append(bit);
-
-        injectionsArr.append(injection);
-    }
+        QString programName =  "campaign_" + currentDay + "_" + currentTime;
 
 
+        int instructions = 0;
 
-    jsonObject["injections"] = injectionsArr;
+        QJsonObject jsonObject;
 
+        jsonObject["program"] = program;
+        jsonObject["expectedResult"] = 0;
+        jsonObject["expectedInstructions"] = 0;
+
+        // JSONARRAY para las inyecciones
+        QJsonArray injectionsArr;
+
+        for (int i = 0; i < 10000; ++i) {
+            int inst = i;
+            int reg = std::rand() % 32;
+            int bit = std::rand() % 8;
+
+            QJsonArray injection;
+            injection.append(inst);
+            injection.append(reg);
+            injection.append(bit);
+
+            injectionsArr.append(injection);
+        }
 
 
 
-    // Convertir el objeto JSON en un documento JSON
-    QJsonDocument jsonDocument(jsonObject);
+        jsonObject["injections"] = injectionsArr;
 
-    // Convertir el documento JSON en una cadena formateada
-    QByteArray jsonData = jsonDocument.toJson(QJsonDocument::Indented);
 
-    // Escribir la cadena JSON en un archivo
-    QFile jsonFile(campaignGeneratorRoute + "/" + programName + ".json");
-    if (jsonFile.open(QFile::WriteOnly | QFile::Truncate)) {
-        jsonFile.write(jsonData);
-        jsonFile.close();
-        qDebug() << "Campaña generada con éxito.";
+
+
+        // Convertir el objeto JSON en un documento JSON
+        QJsonDocument jsonDocument(jsonObject);
+
+        // Convertir el documento JSON en una cadena formateada
+        QByteArray jsonData = jsonDocument.toJson(QJsonDocument::Indented);
+
+        // Escribir la cadena JSON en un archivo
+        QFile jsonFile(campaignGeneratorRoute + "/" + programName + ".json");
+        if (jsonFile.open(QFile::WriteOnly | QFile::Truncate)) {
+            jsonFile.write(jsonData);
+            jsonFile.close();
+            qDebug() << "Campaña generada con éxito.";
+
+            QMessageBox::information(nullptr, "Información", "Campaña generada con éxito en: " + campaignGeneratorRoute);
+        } else {
+            qDebug() << "Error al generar campaña para escritura.";
+        }
+
     } else {
-        qDebug() << "Error al generar campaña para escritura.";
+        qDebug() << "Error al abrir el archivo";
     }
-
 }
 
 
@@ -400,5 +417,30 @@ void MainWindow::on_executeCampaignButton_clicked()
 
     isCampaign = false;
 
+}
+
+
+void MainWindow::on_loadCampaignButton_clicked()
+{
+    loadCampaign();
+}
+
+void MainWindow::loadCampaign(){
+    QString nombreArchivo = QFileDialog::getOpenFileName(this, "Seleccionar archivo", "", "*.json");
+    if (!nombreArchivo.isEmpty()) {
+
+        QFileInfo fileInfo(nombreArchivo);
+        QString filename = fileInfo.fileName();
+
+        qDebug() << "Archivo seleccionado:" << nombreArchivo;
+        computer->reset();
+        computer->LoadCampaign(nombreArchivo.toStdString());
+        ui->campaignNameText->setText(filename);
+
+        QMessageBox::information(nullptr, "Información", "Campaña cargada");
+
+    } else {
+        qDebug() << "Ningún archivo seleccionado.";
+    }
 }
 

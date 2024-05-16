@@ -57,6 +57,8 @@ private slots:
     void on_executeCampaignButton_clicked();
 
     int runLoopIterationCampaign();
+    void on_loadCampaignButton_clicked();
+
 private:
     Ui::MainWindow *ui;
 
@@ -66,5 +68,6 @@ private:
     bool isCampaign;
     void UpdateInterface();
 
+    void loadCampaign();
 };
 #endif // MAINWINDOW_H

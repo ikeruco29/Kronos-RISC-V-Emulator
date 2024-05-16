@@ -2009,7 +2009,7 @@ border: 0px;
       </font>
      </property>
      <property name="text">
-      <string>campaign_01_v03.cpm</string>
+      <string/>
      </property>
      <property name="frame">
       <bool>false</bool>
