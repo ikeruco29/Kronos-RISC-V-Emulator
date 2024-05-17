@@ -23,14 +23,14 @@
    <string>MainWindow</string>
   </property>
   <property name="styleSheet">
-   <string notr="true"/>
+   <string notr="true">background-color: rgb(36, 40, 59);</string>
   </property>
   <property name="tabShape">
    <enum>QTabWidget::Triangular</enum>
   </property>
   <widget class="QWidget" name="centralwidget">
    <property name="styleSheet">
-    <string notr="true">background-color: rgb(36, 40, 59)</string>
+    <string notr="true"/>
    </property>
    <widget class="QPlainTextEdit" name="terminalBox">
     <property name="geometry">

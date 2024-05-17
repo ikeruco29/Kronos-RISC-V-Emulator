@@ -15,19 +15,31 @@ Memory::Memory(uint32_t MEMORY_SIZE){
 Memory::~Memory(){};
 
 void Memory::writeByte(uint32_t addr, int8_t data) {
-    memory[addr] = data;
+
+    if(addr <= iMemorySize && addr >= 0){
+        memory[addr] = data;
+    }
+
 }
 void Memory::writeHalf(uint32_t addr, int16_t data) {
-    memory[addr] = data >> 8;
-    memory[addr + 1] = data;
+
+    if(addr <= iMemorySize && addr >= 0){
+        memory[addr] = data >> 8;
+        memory[addr + 1] = data;
+    }
+
+
 }
 void Memory::writeWord(uint32_t addr, int32_t data){
 
-    // 00 00 00 00
-    memory[addr] = data >> 24;
-    memory[addr + 1] = data >> 16;
-    memory[addr + 2] = data >> 8;
-    memory[addr + 3] = data;
+    if(addr <= iMemorySize && addr >= 0){
+        // 00 00 00 00
+        memory[addr] = data >> 24;
+        memory[addr + 1] = data >> 16;
+        memory[addr + 2] = data >> 8;
+        memory[addr + 3] = data;
+    }
+
 };
 
 uint8_t Memory::readByte(uint32_t addr) {
@@ -72,7 +84,7 @@ void Memory::reset(){
         if (i == numOfThreads - 1) {
             end = iMemorySize - this->pIo;
         }
-        // Crear el hilo y pasarle la función procesarSubArray y los parámetros de inicio y fin
+        // Crear el hilo y pasarle la función resetMemorySection y los parámetros de inicio y fin
         hilos.emplace_back(&Memory::resetMemorySection, this, start, end);
     }
 
@@ -99,6 +111,4 @@ void Memory::resetIOMemory(){
     }
     memory[0xBFFFFCF5] = 'A';
 }
-
-
 

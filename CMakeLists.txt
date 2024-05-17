@@ -29,6 +29,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         config.json
         resources/icons/executePaso.png
 
+
     )
 
     # Copiar el archivo config.json al directorio de salida del ejecutable

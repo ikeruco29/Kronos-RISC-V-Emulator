@@ -32,7 +32,7 @@ private slots:
 
     void on_actionSalir_triggered();
 
-    void on_runButton_clicked();
+    int on_runButton_clicked();
 
     void on_stopButton_clicked();
 
@@ -56,8 +56,12 @@ private slots:
 
     void on_executeCampaignButton_clicked();
 
-    int runLoopIterationCampaign();
+    void runLoopIterationCampaign();
     void on_loadCampaignButton_clicked();
+
+signals:
+    void runProgram();
+    void runProgramCompleted();
 
 private:
     Ui::MainWindow *ui;
@@ -65,9 +69,11 @@ private:
     void resetInterface();
 
     bool stopExec;
-    bool isCampaign;
+    bool isExecutingBeforeCampaign;
+
     void UpdateInterface();
 
     void loadCampaign();
+    void updateCampaignAfterProgramExecution();
 };
 #endif // MAINWINDOW_H

@@ -24,10 +24,6 @@ Computer::~Computer() {}
 void Computer::reset(){
     cpu.reset();
     ram.reset();
-
-    campaign.expectedInstructions = 0;
-    campaign.expectedResult = 0;
-    campaign.programPath = "";
 }
 
 int Computer::LoadProgram(std::string filename) {
@@ -100,10 +96,7 @@ int Computer::LoadCampaign(std::string filename) {
     }
 
     // Imprimir los valores extraídos
-    qDebug() << "Programa:" << programPath;
-    qDebug() << "Resultado Esperado:" << expectedResult;
-    qDebug() << "Instrucciones Esperadas:" << expectedInstructions;
-    qDebug() << "Inyecciones:" << injections;
+    qDebug() << "Campaña cargada";
 
 
     campaign.expectedInstructions = expectedInstructions;

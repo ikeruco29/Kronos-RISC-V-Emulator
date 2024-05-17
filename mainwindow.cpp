@@ -11,15 +11,32 @@
 #include <QInputDialog>
 #include <QMessageBox>
 
+#include <QThread>
+#include <QEventLoop>
+
+// CONSTANTES DE LOCALIZACIÓN DEL RESULTADO DEL PROGRAMA
+const uint32_t RESULT_LOCATION =  0x15000000;
+const uint32_t FINISH_LOCATION = 0X80003020;
+
 MainWindow::MainWindow(QWidget *parent, Computer *comp)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
     , computer(comp)
 {
     ui->setupUi(this);
+    //QCoreApplication::setAttribute(Qt::AA_UseStyleSheetPropagationInWidgetStyles, true);
+    QString stsheet = "QPushButton:disabled {background-color: rgba(255, 255, 255, 0.1); }";
+    ui->centralwidget->setStyleSheet(stsheet);
     ui->runButton->setEnabled(false);
     ui->runPasoButton->setEnabled(false);
-    isCampaign = false;
+    ui->pauseButton->setEnabled(false);
+    ui->executeCampaignButton->setEnabled(false);
+    ui->generateStatsButton->setEnabled(false);
+
+    isExecutingBeforeCampaign = false;
+
+    connect(this, &MainWindow::runProgram, this, &MainWindow::on_runButton_clicked);
+    connect(this, &MainWindow::runProgramCompleted, this, &MainWindow::updateCampaignAfterProgramExecution);
 }
 
 MainWindow::~MainWindow()
@@ -46,6 +63,7 @@ void MainWindow::on_actionCargar_programa_triggered()
 
         ui->runButton->setEnabled(true);
         ui->runPasoButton->setEnabled(true);
+        ui->pauseButton->setEnabled(true);
     } else {
         qDebug() << "Ningún archivo seleccionado.";
     }
@@ -66,7 +84,7 @@ void MainWindow::on_actionSalir_triggered()
 }
 
 
-void MainWindow::on_runButton_clicked()
+int MainWindow::on_runButton_clicked()
 {
     stopExec = false;
 
@@ -84,65 +102,73 @@ void MainWindow::on_runButton_clicked()
 
     QTimer *timer = new QTimer(this);
 
-    if(isCampaign){
-        // Conectar el timeout del QTimer al slot para ejecutar una iteración del bucle
-        connect(timer, &QTimer::timeout, this, &MainWindow::runLoopIterationCampaign);
-    } else {
-        // Conectar el timeout del QTimer al slot para ejecutar una iteración del bucle
-        connect(timer, &QTimer::timeout, this, &MainWindow::runLoopIteration);
-    }
-
-
-    // Configurar el intervalo del timer en milisegundos
-    timer->setInterval(5);
+    // Conectar el timeout del QTimer al slot para ejecutar una iteración del bucle
+    connect(timer, &QTimer::timeout, this, &MainWindow::runLoopIteration);
 
     timer->start();
+
+    return 0;
 }
 
 
 void MainWindow::runLoopIteration()
 {
+    qDebug() << "Iteracion";
+
     // TODO: CAMBIAR CONDICIÓN DEL BUCLE            ESTA VARIABLE NO!!!
-    if (computer->ram.readByte(0x80003020) == 0 || stopExec) {
+    if (computer->ram.readByte(FINISH_LOCATION) == 0 || stopExec) {
 
         sender()->deleteLater(); // Eliminar el QTimer después de terminar el bucle
+
+        // Esto es para que, en caso de que se haya ejecutado por una campaña, siga con la campaña
+        if(this->isExecutingBeforeCampaign)
+            emit runProgramCompleted();
+        else
+            ui->generateStatsButton->setEnabled(true);
+
         return;
     }
 
     // Ejecutar una iteración del bucle
     computer->cpu.clock();
-    this->UpdateInterface();
+
+    if(!this->isExecutingBeforeCampaign)    // Para no mostrar la primera ejecución del programa en una campaña
+        this->UpdateInterface();
 }
 
-int MainWindow::runLoopIterationCampaign()
+void MainWindow::runLoopIterationCampaign()
 {
-    // TODO: CAMBIAR CONDICIÓN DEL BUCLE
-    if (computer->ram.readByte(0x80003020) == 0) {
+    qDebug() << computer->cpu.cycles;
+
+    if (computer->ram.readByte(FINISH_LOCATION) == 0) {
 
         // TODO: COMPARAR EL RESULTADO CON LA POSICIÓN DE MEMORIA CONOCIDA
-
-        if(computer->campaign.expectedInstructions > computer->cpu.cycles){
+        if(computer->ram.readByte(RESULT_LOCATION) != computer->campaign.expectedResult){
+            QMessageBox::information(nullptr, "Información sobre la campaña", "La campaña ha finalizado. Resultado final: Silent Data Corruption (SDC)");
+        }
+        else if(computer->campaign.expectedInstructions > computer->cpu.cycles){
             QMessageBox::information(nullptr, "Información sobre la campaña", "La campaña ha finalizado. Resultado final: Single Event Delay (SED)");
         } else {
             QMessageBox::information(nullptr, "Información sobre la campaña", "La campaña ha finalizado. Resultado final: NO EFFECT");
         }
 
-
         sender()->deleteLater(); // Eliminar el QTimer después de terminar el bucle
-        return 0;
+        ui->generateStatsButton->setEnabled(true);
+        return;
     }
 
 
     // Si aún no ha tardado el doble en ejecuctarse, sigue ejecutándose.
-    if(computer->campaign.expectedInstructions * 2 < computer->cpu.cycles){
+    if(computer->campaign.expectedInstructions * 2 > computer->cpu.cycles){
         int inst = computer->cpu.cycles;    // número de instrucción
         int reg = computer->campaign.injections[inst][1];   // Registro a cambiar
         computer->cpu.registers[reg] ^= (1 << computer->campaign.injections[inst][2]); // invierte el bit
     }else{
-        QMessageBox::information(nullptr, "Información sobre la campaña", "La campaña ha finalizado. Resultado final: Detected Unrecovery Error (DUE)");
+        QMessageBox::information(nullptr, "Información sobre la campaña", "La campaña ha finalizado. Resultado final: Detected Unrecovery Error (DUE).\n Instrucciones esperadas:");
 
         sender()->deleteLater(); // Eliminar el QTimer después de terminar el bucle
-        return 1;
+        ui->generateStatsButton->setEnabled(true);
+        return;
     }
 
     // Ejecutar una iteración del bucle
@@ -302,12 +328,16 @@ void MainWindow::on_exportRamButton_clicked()
 void MainWindow::resetInterface(){
     ui->runButton->setEnabled(false);
     ui->runPasoButton->setEnabled(false);
+    ui->pauseButton->setEnabled(false);
+    ui->executeCampaignButton->setEnabled(false);
+    ui->generateStatsButton->setEnabled(false);
 
     ui->codeDisassemblyText->clear();
-    ui->ramText->clear();
+    ui->ramText->setPlainText(QString::fromStdString(computer->showRam(pageToView)));
     ui->registerText->setPlainText(QString::fromStdString(computer->showRegisters()));
     ui->terminalBox->setPlainText("");
     ui->filenameText->clear();
+    ui->campaignNameText->clear();
 }
 
 
@@ -328,6 +358,8 @@ void MainWindow::on_actionGenerar_campa_a_aleatoria_triggered()
 
     if(!program.isEmpty()){
 
+
+
         QDateTime currentDateTime = QDateTime::currentDateTime();
 
         // Obteniendo el día actual
@@ -347,6 +379,7 @@ void MainWindow::on_actionGenerar_campa_a_aleatoria_triggered()
         QJsonObject jsonObject;
 
         jsonObject["program"] = program;
+
         jsonObject["expectedResult"] = 0;
         jsonObject["expectedInstructions"] = 0;
 
@@ -399,23 +432,62 @@ void MainWindow::on_actionGenerar_campa_a_aleatoria_triggered()
 
 void MainWindow::on_executeCampaignButton_clicked()
 {
-    // Si la campaña ha sido generada, no hay programa introducido...
+    // Si la campaña no tiene un programa configurado...
     if(computer->campaign.expectedInstructions == 0){
+
+        isExecutingBeforeCampaign = true;
+
         // Carga del programa que hay asociado a la campaña
         computer->LoadProgram(computer->campaign.programPath.toStdString());
 
-        // Ejecución del programa
-        on_runButton_clicked();
+        emit runProgram();
 
-        computer->campaign.expectedInstructions = computer->cpu.cycles;
+    } else {
+
+        // Ejecución de la campaña
+        computer->reset();
+        computer->LoadProgram(computer->campaign.programPath.toStdString());
+
+        // Ejecución de la campaña
+        QTimer *timerCampaign = new QTimer(this);
+
+        // Conectar el timeout del QTimer al slot para ejecutar una iteración del bucle
+        connect(timerCampaign, &QTimer::timeout, this, &MainWindow::runLoopIterationCampaign);
+
+        timerCampaign->start();
+
+        computer->reset();
+
     }
 
-    isCampaign = true;  // Indica que es campaña para modificar instrucciones
+
+
+}
+
+void MainWindow::updateCampaignAfterProgramExecution(){
+
+    isExecutingBeforeCampaign = false;
+
+    int instruccionesEsperadas = computer->cpu.cycles;
+    int resultEsperado = computer->ram.readByte(RESULT_LOCATION);
+
+    qDebug() << "Instrucciones:" << instruccionesEsperadas;
+    qDebug() << "Resultado esperado:" << resultEsperado;
+
+    computer->campaign.expectedInstructions = computer->cpu.cycles;
+    computer->campaign.expectedResult = resultEsperado;
+
+    computer->reset();
+    computer->LoadProgram(computer->campaign.programPath.toStdString());
 
     // Ejecución de la campaña
-    on_runButton_clicked();
+    QTimer *timerCampaign = new QTimer(this);
 
-    isCampaign = false;
+    // Conectar el timeout del QTimer al slot para ejecutar una iteración del bucle
+    connect(timerCampaign, &QTimer::timeout, this, &MainWindow::runLoopIterationCampaign);
+
+    timerCampaign->start();
+
 
 }
 
@@ -429,6 +501,8 @@ void MainWindow::loadCampaign(){
     QString nombreArchivo = QFileDialog::getOpenFileName(this, "Seleccionar archivo", "", "*.json");
     if (!nombreArchivo.isEmpty()) {
 
+        resetInterface();
+
         QFileInfo fileInfo(nombreArchivo);
         QString filename = fileInfo.fileName();
 
@@ -437,7 +511,14 @@ void MainWindow::loadCampaign(){
         computer->LoadCampaign(nombreArchivo.toStdString());
         ui->campaignNameText->setText(filename);
 
+        QFileInfo programInfo(computer->campaign.programPath);
+        QString programName = programInfo.fileName();
+
+        ui->filenameText->setText(programName);
+
         QMessageBox::information(nullptr, "Información", "Campaña cargada");
+
+        ui->executeCampaignButton->setEnabled(true);
 
     } else {
         qDebug() << "Ningún archivo seleccionado.";
