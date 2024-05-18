@@ -18,8 +18,12 @@ CPU::CPU(Memory *ram){
     instDecoded.inmediate = 0;
     instDecoded.op = -1;
 
-    for (int i = 0; i < 39; i++) {
+    for (int i = 0; i < 40; i++) {
         ciclosTotales[i] = 0;
+    }
+
+    for (int i = 0; i < 6; i++) {
+        ciclosTipo[i] = 0;
     }
 
 
@@ -107,6 +111,10 @@ void CPU::reset(){
         ciclosTotales[i] = 0;
     }
 
+    for (int i = 0; i < 6; i++) {
+        ciclosTipo[i] = 0;
+    }
+
     disassembly.clear();
 
     pc = 0;
@@ -135,6 +143,7 @@ void CPU::decode() {
         if(instDecoded.op != Operation::NOP){
             instDisassembled << formatDissasembly(instDecoded);
             instDisassembled << instDecoded.registers[0] << ", X" << instDecoded.registers[1] << ", X" << instDecoded.registers[2];
+            ciclosTipo[0]++;
         }
 
         break;
@@ -144,6 +153,7 @@ void CPU::decode() {
         if(instDecoded.op != Operation::NOP){
             instDisassembled << formatDissasembly(instDecoded);
             instDisassembled << instDecoded.registers[0] << ", X" << instDecoded.registers[1] << ", " << instDecoded.inmediate;
+            ciclosTipo[1]++;
         }
 
         break;
@@ -153,6 +163,7 @@ void CPU::decode() {
         if(instDecoded.op != Operation::NOP){
             instDisassembled << formatDissasembly(instDecoded);
             instDisassembled << instDecoded.registers[0] << ", X" << instDecoded.registers[1] << ", " << instDecoded.inmediate;
+            ciclosTipo[1]++;
         }
 
 
@@ -163,6 +174,7 @@ void CPU::decode() {
         if(instDecoded.op != Operation::NOP){
             instDisassembled << formatDissasembly(instDecoded);
             instDisassembled << instDecoded.registers[1] << ", " << instDecoded.inmediate << "(X" << instDecoded.registers[0] << ")";
+            ciclosTipo[2]++;
         }
 
         break;
@@ -172,6 +184,7 @@ void CPU::decode() {
         if(instDecoded.op != Operation::NOP){
             instDisassembled << formatDissasembly(instDecoded);
             instDisassembled << instDecoded.registers[0] << ", X" << instDecoded.registers[1] << ", " << instDecoded.inmediate;
+            ciclosTipo[3]++;
         }
 
         break;
@@ -181,6 +194,7 @@ void CPU::decode() {
         if(instDecoded.op != Operation::NOP){
             instDisassembled << formatDissasembly(instDecoded);
             instDisassembled << instDecoded.registers[0] << ", " << instDecoded.inmediate;
+            ciclosTipo[5]++;
         }
 
 
@@ -191,6 +205,7 @@ void CPU::decode() {
         if(instDecoded.op != Operation::NOP){
             instDisassembled << formatDissasembly(instDecoded);
             instDisassembled << instDecoded.registers[0] << ", X" << instDecoded.registers[1] << ", " << instDecoded.inmediate;
+            ciclosTipo[1]++;
         }
 
         break;
@@ -200,6 +215,7 @@ void CPU::decode() {
         if(instDecoded.op != Operation::NOP){
             instDisassembled << formatDissasembly(instDecoded);
             instDisassembled << instDecoded.registers[0] << ", " << instDecoded.inmediate;
+            ciclosTipo[4]++;
         }
 
         break;
@@ -209,6 +225,7 @@ void CPU::decode() {
         if(instDecoded.op != Operation::NOP){
             instDisassembled << formatDissasembly(instDecoded);
             instDisassembled << instDecoded.registers[0] << ", " << instDecoded.inmediate;
+            ciclosTipo[4]++;
         }
 
         break;
@@ -218,6 +235,7 @@ void CPU::decode() {
         if(instDecoded.op != Operation::NOP){
             instDisassembled << formatDissasembly(instDecoded);
             instDisassembled << instDecoded.registers[0] << ", X" << instDecoded.registers[1] << ", " << instDecoded.inmediate;
+            ciclosTipo[1]++;
         }
 
         break;

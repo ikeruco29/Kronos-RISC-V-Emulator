@@ -12,6 +12,7 @@
 #include <mutex>
 #include <vector>
 
+
 Computer::Computer(int RAM_SIZE) : ram(Memory(RAM_SIZE)), cpu(CPU(&ram)), ram_size(RAM_SIZE) {};
 Computer::Computer(int RAM_SIZE, QTextEdit *termb)
     : ram(Memory(RAM_SIZE)), cpu(CPU(&ram)), ram_size(RAM_SIZE)
@@ -34,6 +35,8 @@ int Computer::LoadProgram(std::string filename) {
         std::cerr << "Error al abrir el archivo: " << filename << std::endl;
         return 1;
     }
+
+    this->programName = filename;
 
     // Leer el archivo byte por byte
     uint8_t byte;

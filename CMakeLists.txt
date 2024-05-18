@@ -28,6 +28,10 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         computer.cpp computer.h cpu.cpp cpu.h decoder.cpp decoder.h endian.cpp endian.h memory.cpp memory.h
         config.json
         resources/icons/executePaso.png
+        statsdialog.h statsdialog.cpp statsdialog.ui
+
+
+
 
 
     )

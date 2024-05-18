@@ -11,12 +11,8 @@
 #include <QInputDialog>
 #include <QMessageBox>
 
-#include <QThread>
-#include <QEventLoop>
 
-// CONSTANTES DE LOCALIZACIÓN DEL RESULTADO DEL PROGRAMA
-const uint32_t RESULT_LOCATION =  0x15000000;
-const uint32_t FINISH_LOCATION = 0X80003020;
+
 
 MainWindow::MainWindow(QWidget *parent, Computer *comp)
     : QMainWindow(parent)
@@ -249,7 +245,8 @@ void MainWindow::on_openConfigButton_clicked()
 
 void MainWindow::on_generateStatsButton_clicked()
 {
-
+    statsDialog = new StatsDialog(nullptr, computer, RESULT_LOCATION);
+    statsDialog->exec();
 }
 
 

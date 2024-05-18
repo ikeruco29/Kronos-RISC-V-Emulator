@@ -70,7 +70,7 @@ public:
 
 
     // Para los ciclos
-    uint64_t ciclosTotales[40];
+    uint64_t ciclosTotales[40], ciclosTipo[6];
 };
 
 #endif // CPU_H

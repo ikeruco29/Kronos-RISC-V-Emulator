@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include "computer.h"
+#include "statsdialog.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -24,6 +25,8 @@ public:
     QString disassemblyFileRoute;
     QString ramFileRoute;
     QString campaignGeneratorRoute;
+
+    uint32_t FINISH_LOCATION, RESULT_LOCATION;
 
 private slots:
     void on_actionCargar_programa_triggered();
@@ -65,6 +68,7 @@ signals:
 
 private:
     Ui::MainWindow *ui;
+    StatsDialog *statsDialog;
 
     void resetInterface();
 
@@ -75,5 +79,6 @@ private:
 
     void loadCampaign();
     void updateCampaignAfterProgramExecution();
+
 };
 #endif // MAINWINDOW_H

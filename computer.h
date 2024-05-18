@@ -24,6 +24,7 @@ public:
 
     // Variables para las campañas
     Campaign campaign;
+    std::string programName;
 
     QTextEdit *terminalBox;
     QPlainTextEdit *ramBox;

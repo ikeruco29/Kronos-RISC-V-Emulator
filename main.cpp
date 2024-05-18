@@ -8,7 +8,7 @@
 
 const QString CONFIG_FILE = "./config.json";
 
-uint ramSize;
+uint ramSize, finish_location, result_location;
 QString disassemblyRouteFile, ramRouteFile, campaignRoute;
 
 int readConfigFile();
@@ -27,6 +27,9 @@ int main(int argc, char *argv[])
     w.disassemblyFileRoute = disassemblyRouteFile;
     w.ramFileRoute = ramRouteFile;
     w.campaignGeneratorRoute = campaignRoute;
+
+    w.RESULT_LOCATION = result_location;
+    w.FINISH_LOCATION = finish_location;
 
     return a.exec();
 }
@@ -69,6 +72,8 @@ int readConfigFile(){
     disassemblyRouteFile = jsonObj["disassemblyFileRoute"].toString();
     ramRouteFile = jsonObj["ramFileRoute"].toString();
     campaignRoute = jsonObj["campaignGeneratorRoute"].toString();
+    result_location = jsonObj["resultRamLocation"].toString().toUInt(nullptr, 16);
+    finish_location = jsonObj["finishRamLocation"].toString().toUInt(nullptr, 16);
 
 
     // Imprimir los valores extraídos
@@ -76,6 +81,8 @@ int readConfigFile(){
     qDebug() << "Ram file:" << ramRouteFile;
     qDebug() << "disassembly file:" << disassemblyRouteFile;
     qDebug() << "campaign route:" << campaignRoute;
+    qDebug() << "Result location:" << result_location;
+    qDebug() << "Finish location:" << finish_location;
 
     return 0;
 }
