@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include "computer.h"
+#include "instructionsdialog.h"
 
 namespace Ui {
 class StatsDialog;
@@ -19,9 +20,11 @@ public:
 private:
     Ui::StatsDialog *ui;
     Computer *pComputer;
+    InstructionsDialog *pInstDialog;
 
 public:
     uint32_t resLocation;
+
 private slots:
     void on_pushButton_clicked();
 };

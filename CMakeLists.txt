@@ -29,6 +29,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         config.json
         resources/icons/executePaso.png
         statsdialog.h statsdialog.cpp statsdialog.ui
+        instructionsdialog.h instructionsdialog.cpp instructionsdialog.ui
 
 
 
