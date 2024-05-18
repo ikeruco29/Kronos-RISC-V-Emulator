@@ -34,5 +34,6 @@ StatsDialog::~StatsDialog()
 
 void StatsDialog::on_pushButton_clicked()
 {
-
+    pInstDialog = new InstructionsDialog(nullptr, pComputer);
+    pInstDialog->exec();
 }

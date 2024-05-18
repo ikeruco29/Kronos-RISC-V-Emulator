@@ -5,6 +5,36 @@
 #include "computer.h"
 
 namespace Ui {
+
+enum Operation
+{
+    // Formato R
+    ADD, SUB, XOR, OR, AND, SLL, SRL, SRA, SLT, SLTU,
+
+    // Formato I
+    ADDI, XORI, ORI, ANDI,
+    SLLI, SRLI, SRAI, SLTI, SLTIU,
+    LB, LH, LW, LBU, LHU,
+
+    JALR,
+    ECALL, EBREAK,
+
+    // Formato S
+    SB, SH, SW,
+
+    // Formato B
+    BEQ, BNE, BLT, BGE, BLTU,
+    BGEU,
+
+    // Formato J
+    JAL,
+
+    // Formato U
+    LUI, AUIPC,
+
+    NOP
+};
+
 class InstructionsDialog;
 }
 

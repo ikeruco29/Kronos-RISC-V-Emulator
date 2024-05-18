@@ -119,9 +119,13 @@ void MainWindow::runLoopIteration()
         // Esto es para que, en caso de que se haya ejecutado por una campaña, siga con la campaña
         if(this->isExecutingBeforeCampaign)
             emit runProgramCompleted();
-        else
-            ui->generateStatsButton->setEnabled(true);
 
+        else if(computer->ram.readByte(FINISH_LOCATION) == 0){
+
+            ui->generateStatsButton->setEnabled(true);
+            QMessageBox::information(nullptr, "Programa finalizado", "La ejecución del programa ha finalizado");
+
+        }
         return;
     }
 
@@ -189,8 +193,13 @@ void MainWindow::on_pauseButton_clicked()
 
 void MainWindow::on_runPasoButton_clicked()
 {
-    computer->cpu.clock();
-    this->UpdateInterface();
+    if (computer->ram.readByte(FINISH_LOCATION) != 0) {
+        computer->cpu.clock();
+        this->UpdateInterface();
+    } else {
+        QMessageBox::information(nullptr, "Programa finalizado", "La ejecución del programa ha finalizado");
+        ui->generateStatsButton->setEnabled(true);  // Se habilita el botón para generar estadísticas del emulador
+    }
 }
 
 

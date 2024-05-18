@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>777</width>
-    <height>490</height>
+    <height>556</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -640,7 +640,7 @@
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QLineEdit" name="tipoRText_42">
+  <widget class="QLineEdit" name="andiNumText">
    <property name="geometry">
     <rect>
      <x>380</x>
@@ -726,7 +726,7 @@
     <string>SH</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="tipoRText_43">
+  <widget class="QLineEdit" name="shNumText">
    <property name="geometry">
     <rect>
      <x>380</x>
@@ -755,7 +755,7 @@
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QLineEdit" name="tipoRText_44">
+  <widget class="QLineEdit" name="slliNumText">
    <property name="geometry">
     <rect>
      <x>380</x>
@@ -860,7 +860,7 @@
     <string>SRLI</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="tipoRText_45">
+  <widget class="QLineEdit" name="sltiNumText">
    <property name="geometry">
     <rect>
      <x>380</x>
@@ -927,7 +927,7 @@
     <string>LW</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="tipoRText_46">
+  <widget class="QLineEdit" name="lhuNumText">
    <property name="geometry">
     <rect>
      <x>380</x>
@@ -994,7 +994,7 @@
     <string>SLLI</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="tipoRText_47">
+  <widget class="QLineEdit" name="srliNumText">
    <property name="geometry">
     <rect>
      <x>380</x>
@@ -1023,7 +1023,7 @@
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QLineEdit" name="tipoRText_48">
+  <widget class="QLineEdit" name="lbuNumText">
    <property name="geometry">
     <rect>
      <x>380</x>
@@ -1052,7 +1052,7 @@
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QLineEdit" name="tipoRText_49">
+  <widget class="QLineEdit" name="lbNumText">
    <property name="geometry">
     <rect>
      <x>380</x>
@@ -1081,7 +1081,7 @@
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QLineEdit" name="tipoRText_50">
+  <widget class="QLineEdit" name="sbNumText">
    <property name="geometry">
     <rect>
      <x>380</x>
@@ -1110,7 +1110,7 @@
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QLineEdit" name="tipoRText_51">
+  <widget class="QLineEdit" name="lwNumText">
    <property name="geometry">
     <rect>
      <x>380</x>
@@ -1158,7 +1158,7 @@
     <string>SLTI</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="tipoRText_52">
+  <widget class="QLineEdit" name="sltiuNumText">
    <property name="geometry">
     <rect>
      <x>380</x>
@@ -1187,7 +1187,7 @@
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QLineEdit" name="tipoRText_53">
+  <widget class="QLineEdit" name="sraiNumText">
    <property name="geometry">
     <rect>
      <x>380</x>
@@ -1235,7 +1235,7 @@
     <string>SB</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="tipoRText_54">
+  <widget class="QLineEdit" name="lhNumText">
    <property name="geometry">
     <rect>
      <x>380</x>
@@ -1264,7 +1264,7 @@
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QLineEdit" name="tipoRText_55">
+  <widget class="QLineEdit" name="swNumText">
    <property name="geometry">
     <rect>
      <x>650</x>
@@ -1350,7 +1350,7 @@
     <string>EBREAK</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="tipoRText_56">
+  <widget class="QLineEdit" name="ebreakNumText">
    <property name="geometry">
     <rect>
      <x>650</x>
@@ -1379,7 +1379,7 @@
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QLineEdit" name="tipoRText_57">
+  <widget class="QLineEdit" name="beqNumText">
    <property name="geometry">
     <rect>
      <x>650</x>
@@ -1484,7 +1484,7 @@
     <string>BNE</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="tipoRText_58">
+  <widget class="QLineEdit" name="bgeNumText">
    <property name="geometry">
     <rect>
      <x>650</x>
@@ -1551,7 +1551,7 @@
     <string>JALR</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="tipoRText_59">
+  <widget class="QLineEdit" name="auipcNumText">
    <property name="geometry">
     <rect>
      <x>650</x>
@@ -1618,7 +1618,7 @@
     <string>BEQ</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="tipoRText_60">
+  <widget class="QLineEdit" name="bneNumText">
    <property name="geometry">
     <rect>
      <x>650</x>
@@ -1647,7 +1647,7 @@
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QLineEdit" name="tipoRText_61">
+  <widget class="QLineEdit" name="luiNumText">
    <property name="geometry">
     <rect>
      <x>650</x>
@@ -1676,7 +1676,7 @@
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QLineEdit" name="tipoRText_62">
+  <widget class="QLineEdit" name="bgeuNumText">
    <property name="geometry">
     <rect>
      <x>650</x>
@@ -1705,7 +1705,7 @@
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QLineEdit" name="tipoRText_63">
+  <widget class="QLineEdit" name="ecallNumText">
    <property name="geometry">
     <rect>
      <x>650</x>
@@ -1734,7 +1734,7 @@
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QLineEdit" name="tipoRText_64">
+  <widget class="QLineEdit" name="jalrNumText">
    <property name="geometry">
     <rect>
      <x>650</x>
@@ -1782,7 +1782,7 @@
     <string>BGE</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="tipoRText_65">
+  <widget class="QLineEdit" name="bltuNumText">
    <property name="geometry">
     <rect>
      <x>650</x>
@@ -1811,7 +1811,7 @@
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QLineEdit" name="tipoRText_66">
+  <widget class="QLineEdit" name="bltNumText">
    <property name="geometry">
     <rect>
      <x>650</x>
@@ -1859,7 +1859,7 @@
     <string>ECALL</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="tipoRText_67">
+  <widget class="QLineEdit" name="jalNumText">
    <property name="geometry">
     <rect>
      <x>650</x>
@@ -1942,7 +1942,37 @@
     <string>Número de ejecuciones por instrucción</string>
    </property>
   </widget>
+  <widget class="QPushButton" name="okPushButton">
+   <property name="geometry">
+    <rect>
+     <x>350</x>
+     <y>510</y>
+     <width>80</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Ok</string>
+   </property>
+  </widget>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>okPushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>InstructionsDialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>389</x>
+     <y>521</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>388</x>
+     <y>277</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>
