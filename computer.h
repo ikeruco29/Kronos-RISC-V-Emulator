@@ -29,7 +29,7 @@ public:
     QTextEdit *terminalBox;
     QPlainTextEdit *ramBox;
 
-    int ram_size;
+    uint32_t ram_size;
 
     void reset();
     int LoadProgram(std::string filename);
