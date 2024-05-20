@@ -165,38 +165,19 @@ std::string Computer::exportDisassembly(){
     return ss.str();
 }
 
-QString Computer::showVRAM()
+QString Computer::showVRAMLine(int line)
 {
-    QString text2;
-    std::mutex mtx;
+    QString lineString;
+    uint start = (line * 75) + (ram.iMemorySize - ram.pIo);
+    uint end = start + 75;
 
-    auto workerFunction = [&text2, &mtx](int start) {
-        std::string chunk;
-        int end = start + CHUNK_SIZE;
 
-        // Simulando el procesamiento de datos en lugar de acceder a la VRAM
-        for (int i = start; i < end; ++i) {
-            // Simulación de datos
-            chunk += std::to_string(i);
-        }
-
-        // Proteger la operación de escritura con un mutex
-        std::lock_guard<std::mutex> lock(mtx);
-        text2 += chunk;
-    };
-
-    // Crear y ejecutar los hilos
-    std::vector<std::thread> threads;
-    //                  Saca el número de hilos
-    //                          |
-    for (int i = 0; i < (ram.pIo / CHUNK_SIZE); i += CHUNK_SIZE) {
-        threads.emplace_back(workerFunction, i);
+    // Simulando el procesamiento de datos en lugar de acceder a la VRAM
+    for (uint i = start; i < end; ++i) {
+        // Simulación de datos
+        lineString += QChar(ram.readByte(i));
     }
 
-    // Esperar a que todos los hilos terminen
-    for (auto& thread : threads) {
-        thread.join();
-    }
 
-    return text2;
+    return lineString;
 }

@@ -54,7 +54,8 @@ void MainWindow::on_actionCargar_programa_triggered()
 
         resetInterface();
 
-        ui->ramText->setPlainText(QString::fromStdString(computer->showRam()));
+        pageToView = computer->ram.iRomStartAddr;
+        ui->ramText->setPlainText(QString::fromStdString(computer->showRam(pageToView)));
         ui->filenameText->setText(filename);
 
         ui->runButton->setEnabled(true);
@@ -350,10 +351,16 @@ void MainWindow::resetInterface(){
 
 void MainWindow::UpdateInterface()
 {
-    ui->terminalBox->setPlainText(computer->showVRAM());    // Update terminalBox
+    UpdateTerminal();    // Update terminalBox
     ui->ramText->setPlainText(QString::fromStdString(computer->showRam(pageToView)));   // Update ramBox
     ui->registerText->setPlainText(QString::fromStdString(computer->showRegisters()));  // Update registerBox
     ui->codeDisassemblyText->appendPlainText(QString::fromStdString(computer->showDisassembly()));  // Update disassembly
+}
+
+void MainWindow::UpdateTerminal(){
+    for(int i = 0; i < 20; i++){
+        ui->terminalBox->appendPlainText(computer->showVRAMLine(i));
+    }
 }
 
 

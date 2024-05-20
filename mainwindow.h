@@ -80,5 +80,6 @@ private:
     void loadCampaign();
     void updateCampaignAfterProgramExecution();
 
+    void UpdateTerminal();
 };
 #endif // MAINWINDOW_H

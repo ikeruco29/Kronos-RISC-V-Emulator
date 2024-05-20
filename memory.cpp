@@ -109,6 +109,5 @@ void Memory::resetIOMemory(){
     for (uint32_t i = this->iMemorySize - this->pIo; i < this->iMemorySize; ++i) {
         this->memory[i] = 0x20; // Caracter de espacio en utf8
     }
-    // memory[0xBFFFFCF5] = 'A';
 }
 

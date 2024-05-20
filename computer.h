@@ -40,10 +40,8 @@ public:
     std::string showDisassembly();
     std::string exportDisassembly();
 
-    QString showVRAM();
+    QString showVRAMLine(int line);
 
-private:
-    static constexpr int CHUNK_SIZE = 1024;    // 16 hilos
 
 };
 
