@@ -31,10 +31,6 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         statsdialog.h statsdialog.cpp statsdialog.ui
         instructionsdialog.h instructionsdialog.cpp instructionsdialog.ui
 
-
-
-
-
     )
 
     # Copiar el archivo config.json al directorio de salida del ejecutable

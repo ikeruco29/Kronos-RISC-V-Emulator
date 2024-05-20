@@ -1,10 +1,12 @@
 {
     "ramSize": 3,
 
-    "disassemblyFileRoute": "C:/Users/ikeru/Desktop/Universidad/TFG/statistics",
-    "ramFileRoute": "C:/Users/ikeru/Desktop/Universidad/TFG/statistics",
-    "campaignGeneratorRoute": "C:/Users/ikeru/Desktop/Universidad/TFG/campaigns",
+    "romAddressAllocation": "0x10000000",
 
     "resultRamLocation": "0x15000000",
-    "finishRamLocation": "0x80003020"
+    "finishRamLocation": "0x80003020",
+
+    "disassemblyFileRoute": "C:/Users/ikeru/Desktop/Universidad/TFG/statistics",
+    "ramFileRoute": "C:/Users/ikeru/Desktop/Universidad/TFG/statistics",
+    "campaignGeneratorRoute": "C:/Users/ikeru/Desktop/Universidad/TFG/campaigns"
 }

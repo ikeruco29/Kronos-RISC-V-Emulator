@@ -8,7 +8,7 @@
 
 const QString CONFIG_FILE = "./config.json";
 
-uint ramSize, finish_location, result_location;
+uint ramSize, finish_location, result_location, romAddrAlloc;
 QString disassemblyRouteFile, ramRouteFile, campaignRoute;
 
 int readConfigFile();
@@ -19,9 +19,10 @@ int main(int argc, char *argv[])
 
     QApplication a(argc, argv);
     MainWindow w;
-    w.show();
 
     Computer computer = Computer(ramSize);
+
+    computer.ram.iRomStartAddr = romAddrAlloc;
 
     w.computer = &computer;
     w.disassemblyFileRoute = disassemblyRouteFile;
@@ -30,6 +31,8 @@ int main(int argc, char *argv[])
 
     w.RESULT_LOCATION = result_location;
     w.FINISH_LOCATION = finish_location;
+
+    w.show();
 
     return a.exec();
 }
@@ -74,6 +77,7 @@ int readConfigFile(){
     campaignRoute = jsonObj["campaignGeneratorRoute"].toString();
     result_location = jsonObj["resultRamLocation"].toString().toUInt(nullptr, 16);
     finish_location = jsonObj["finishRamLocation"].toString().toUInt(nullptr, 16);
+    romAddrAlloc = jsonObj["romAddressAllocation"].toString().toUInt(nullptr, 16);
 
 
     // Imprimir los valores extraídos

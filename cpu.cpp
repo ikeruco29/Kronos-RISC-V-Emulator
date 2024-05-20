@@ -117,7 +117,7 @@ void CPU::reset(){
 
     disassembly.clear();
 
-    pc = 0;
+    pc = ram->iRomStartAddr;
     ir = 0;
 
     cycles = 0;

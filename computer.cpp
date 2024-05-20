@@ -40,7 +40,7 @@ int Computer::LoadProgram(std::string filename) {
 
     // Leer el archivo byte por byte
     uint8_t byte;
-    int i = 0;
+    int i = ram.iRomStartAddr;
     while (file.read(reinterpret_cast<char*>(&byte), sizeof(uint8_t))) {
         ram.writeByte(i, byte);
         i++;

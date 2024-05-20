@@ -311,6 +311,7 @@ void MainWindow::on_exportRamButton_clicked()
 
     // Intentar abrir el archivo en modo de escritura de texto
     if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+
         // Crear un objeto QTextStream para escribir en el archivo
         QDataStream out(&file);
 
