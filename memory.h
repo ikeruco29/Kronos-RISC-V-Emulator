@@ -9,7 +9,7 @@ public:
     ~Memory();
 
     uint32_t iMemorySize;
-    uint32_t iRomSize, iRomStartAddr;
+    uint32_t iRomStartAddr;
     int iDataSize;
 
     uint8_t *memory;

@@ -12,6 +12,12 @@
 #include <QMessageBox>
 
 
+enum CampaignResult{
+    NO_EFFECT,
+    SDC,
+    SED,
+    DUE
+};
 
 
 MainWindow::MainWindow(QWidget *parent, Computer *comp)
@@ -29,10 +35,15 @@ MainWindow::MainWindow(QWidget *parent, Computer *comp)
     ui->executeCampaignButton->setEnabled(false);
     ui->generateStatsButton->setEnabled(false);
 
+    ui->executingCampaignBox->hide();
+
     isExecutingBeforeCampaign = false;
 
     connect(this, &MainWindow::runProgram, this, &MainWindow::on_runButton_clicked);
     connect(this, &MainWindow::runProgramCompleted, this, &MainWindow::updateCampaignAfterProgramExecution);
+    connect(this, &MainWindow::runCampaignIter, this, &MainWindow::iterationCampaign);
+    connect(this, &MainWindow::campaignComplete, this, &MainWindow::onCampaignComplete);
+    connect(this, &MainWindow::campaignIterComplete, this, &MainWindow::onFinishIter);
 }
 
 MainWindow::~MainWindow()
@@ -145,36 +156,50 @@ void MainWindow::runLoopIterationCampaign()
 
         // TODO: COMPARAR EL RESULTADO CON LA POSICIÓN DE MEMORIA CONOCIDA
         if(computer->ram.readByte(RESULT_LOCATION) != computer->campaign.expectedResult){
-            QMessageBox::information(nullptr, "Información sobre la campaña", "La campaña ha finalizado. Resultado final: Silent Data Corruption (SDC)");
+            //QMessageBox::information(nullptr, "Información sobre la campaña", "La campaña ha finalizado. Resultado final: Silent Data Corruption (SDC)");
+            this->campaignResults.push_back(SDC);
         }
         else if(computer->campaign.expectedInstructions > computer->cpu.cycles){
-            QMessageBox::information(nullptr, "Información sobre la campaña", "La campaña ha finalizado. Resultado final: Single Event Delay (SED)");
+            //QMessageBox::information(nullptr, "Información sobre la campaña", "La campaña ha finalizado. Resultado final: Single Event Delay (SED)");
+            this->campaignResults.push_back(SED);
         } else {
-            QMessageBox::information(nullptr, "Información sobre la campaña", "La campaña ha finalizado. Resultado final: NO EFFECT");
+            //QMessageBox::information(nullptr, "Información sobre la campaña", "La campaña ha finalizado. Resultado final: NO EFFECT");
+            this->campaignResults.push_back(NO_EFFECT);
         }
 
+        //ui->generateStatsButton->setEnabled(true);
+
+        this->injectionNumber++;
+
         sender()->deleteLater(); // Eliminar el QTimer después de terminar el bucle
-        ui->generateStatsButton->setEnabled(true);
+        emit campaignIterComplete();
         return;
     }
 
 
     // Si aún no ha tardado el doble en ejecuctarse, sigue ejecutándose.
     if(computer->campaign.expectedInstructions * 2 > computer->cpu.cycles){
-        int inst = computer->cpu.cycles;    // número de instrucción
-        int reg = computer->campaign.injections[inst][1];   // Registro a cambiar
-        computer->cpu.registers[reg] ^= (1 << computer->campaign.injections[inst][2]); // invierte el bit
+
+        if(computer->cpu.cycles == this->injectionNumber){
+            int inst = computer->cpu.cycles;    // número de instrucción
+            int reg = computer->campaign.injections[inst][1];   // Registro a cambiar
+            computer->cpu.registers[reg] ^= (1 << computer->campaign.injections[inst][2]); // invierte el bit
+        }
+
     }else{
-        QMessageBox::information(nullptr, "Información sobre la campaña", "La campaña ha finalizado. Resultado final: Detected Unrecovery Error (DUE).\n Instrucciones esperadas:");
+        //QMessageBox::information(nullptr, "Información sobre la campaña", "La campaña ha finalizado. Resultado final: Detected Unrecovery Error (DUE).\n Instrucciones esperadas:");
+        this->campaignResults.push_back(DUE);
+
+        this->injectionNumber++;
 
         sender()->deleteLater(); // Eliminar el QTimer después de terminar el bucle
-        ui->generateStatsButton->setEnabled(true);
+        //ui->generateStatsButton->setEnabled(true);
+        emit campaignIterComplete();
         return;
     }
 
     // Ejecutar una iteración del bucle
     computer->cpu.clock();
-    this->UpdateInterface();
 }
 
 
@@ -367,7 +392,7 @@ void MainWindow::UpdateTerminal(){
 
 void MainWindow::on_actionGenerar_campa_a_aleatoria_triggered()
 {
-
+    QMessageBox::information(nullptr, "Indique un archivo", "Por favor, indique el programa al que se le asignará la campaña");
     QString program = QFileDialog::getOpenFileName(nullptr, "Seleccionar archivo", "", "Archivos (*.bin *.o)");
 
     if(!program.isEmpty()){
@@ -400,7 +425,7 @@ void MainWindow::on_actionGenerar_campa_a_aleatoria_triggered()
         // JSONARRAY para las inyecciones
         QJsonArray injectionsArr;
 
-        for (int i = 0; i < 10000; ++i) {
+        for (int i = 0; i < 1000; ++i) {
             int inst = i;
             int reg = std::rand() % 32;
             int bit = std::rand() % 8;
@@ -457,25 +482,83 @@ void MainWindow::on_executeCampaignButton_clicked()
         emit runProgram();
 
     } else {
+        ui->progressBar->setMaximum(computer->campaign.injections.size());
+        ui->executingCampaignBox->setVisible(true);
 
-        // Ejecución de la campaña
-        computer->reset();
-        computer->LoadProgram(computer->campaign.programPath.toStdString());
-
-        // Ejecución de la campaña
-        QTimer *timerCampaign = new QTimer(this);
-
-        // Conectar el timeout del QTimer al slot para ejecutar una iteración del bucle
-        connect(timerCampaign, &QTimer::timeout, this, &MainWindow::runLoopIterationCampaign);
-
-        timerCampaign->start();
-
-        computer->reset();
+        emit runCampaignIter();
 
     }
 
+}
+
+void MainWindow::iterationCampaign(){
+    // Ejecución de la campaña
+    computer->reset();
+    computer->LoadProgram(computer->campaign.programPath.toStdString());
+
+    // Ejecución de la campaña
+    QTimer *timerCampaign = new QTimer(this);
+
+    // Conectar el timeout del QTimer al slot para ejecutar una iteración del bucle
+    // Usar un lambda para capturar y pasar el parámetro
+    connect(timerCampaign, &QTimer::timeout, this, &MainWindow::runLoopIterationCampaign);
+
+    timerCampaign->start();
+
+    qDebug() << "fin";
+
+    //computer->reset();
+}
+
+void MainWindow::onFinishIter(){
+    ui->progressBar->setValue(injectionNumber);
+
+    if(this->injectionNumber == computer->campaign.injections.size()-1)
+        emit campaignComplete();
+    else
+        emit runCampaignIter();
+}
+
+void MainWindow::onCampaignComplete(){
+
+    QString str = "";
+    int noeffect = 0, sdc = 0, sed = 0, due = 0;
+
+    int hundred = campaignResults.size();
+
+    foreach (int res, campaignResults) {
+        switch (res) {
+        case NO_EFFECT:
+            noeffect++;
+            break;
+        case SDC:
+            sdc++;
+            break;
+        case SED:
+            sed++;
+            break;
+        case DUE:
+            due++;
+            break;
+        }
+    }
+
+    noeffect = (noeffect * 100) / hundred;
+    sdc = (sdc * 100) / hundred;
+    sed = (sed * 100) / hundred;
+    due = (due * 100) / hundred;
+
+    str = QString("Resultados de la campaña:\nNo effect: %1%\nSDC: %2%\nSED: %3%\nDUE: %4%")
+                      .arg(noeffect)
+                      .arg(sdc)
+                      .arg(sed)
+                      .arg(due);
 
 
+    ui->executingCampaignBox->setVisible(false);
+
+    QMessageBox::information(nullptr, "Información sobre la campaña", str);
+    return;
 }
 
 void MainWindow::updateCampaignAfterProgramExecution(){
@@ -491,17 +574,10 @@ void MainWindow::updateCampaignAfterProgramExecution(){
     computer->campaign.expectedInstructions = computer->cpu.cycles;
     computer->campaign.expectedResult = resultEsperado;
 
-    computer->reset();
-    computer->LoadProgram(computer->campaign.programPath.toStdString());
+    ui->progressBar->setMaximum(computer->campaign.injections.size());
+    ui->executingCampaignBox->setVisible(true);
 
-    // Ejecución de la campaña
-    QTimer *timerCampaign = new QTimer(this);
-
-    // Conectar el timeout del QTimer al slot para ejecutar una iteración del bucle
-    connect(timerCampaign, &QTimer::timeout, this, &MainWindow::runLoopIterationCampaign);
-
-    timerCampaign->start();
-
+    emit runCampaignIter();
 
 }
 

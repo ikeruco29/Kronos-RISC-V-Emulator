@@ -26,6 +26,9 @@ public:
     QString ramFileRoute;
     QString campaignGeneratorRoute;
 
+    std::vector<int> campaignResults;
+    int injectionNumber = 0;
+
     uint32_t FINISH_LOCATION, RESULT_LOCATION;
 
 private slots:
@@ -58,13 +61,21 @@ private slots:
     void on_actionGenerar_campa_a_aleatoria_triggered();
 
     void on_executeCampaignButton_clicked();
+    void iterationCampaign();
 
     void runLoopIterationCampaign();
     void on_loadCampaignButton_clicked();
 
+    void onCampaignComplete();
+    void onFinishIter();
 signals:
     void runProgram();
     void runProgramCompleted();
+
+    void runCampaignIter();
+
+    void campaignIterComplete();
+    void campaignComplete();
 
 private:
     Ui::MainWindow *ui;
