@@ -72,7 +72,7 @@ void Memory::reset(){
                             // consumo de recursos y velocidad
 
 
-    uint32_t subSectionSize = (iMemorySize - pIo) / numOfThreads;
+    uint32_t subSectionSize = iMemorySize / numOfThreads;
 
     // Crear un vector para almacenar los hilos
     std::vector<std::thread> hilos;
@@ -83,7 +83,7 @@ void Memory::reset(){
         uint32_t end = (i + 1) * subSectionSize;
         // Si es el último hilo, el rango final será el tamaño total del array
         if (i == numOfThreads - 1) {
-            end = iMemorySize - this->pIo;
+            end = iMemorySize;
         }
         // Crear el hilo y pasarle la función resetMemorySection y los parámetros de inicio y fin
         hilos.emplace_back(&Memory::resetMemorySection, this, start, end);
