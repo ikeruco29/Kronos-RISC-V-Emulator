@@ -5,5 +5,18 @@
         <file>resources/icons/executePaso.png</file>
         <file>resources/icons/pause.png</file>
     </qresource>
-    <qresource prefix="/"/>
+    <qresource prefix="/">
+        <file>resources/fonts/mononoki Bold Nerd Font Complete Mono Windows Compatible.ttf</file>
+        <file>resources/fonts/mononoki Bold Nerd Font Complete Mono.ttf</file>
+        <file>resources/fonts/mononoki Bold Nerd Font Complete Windows Compatible.ttf</file>
+        <file>resources/fonts/mononoki Bold Nerd Font Complete.ttf</file>
+        <file>resources/fonts/mononoki Italic Nerd Font Complete Mono Windows Compatible.ttf</file>
+        <file>resources/fonts/mononoki Italic Nerd Font Complete Mono.ttf</file>
+        <file>resources/fonts/mononoki Italic Nerd Font Complete Windows Compatible.ttf</file>
+        <file>resources/fonts/mononoki Italic Nerd Font Complete.ttf</file>
+        <file>resources/fonts/mononoki-Regular Nerd Font Complete Mono Windows Compatible.ttf</file>
+        <file>resources/fonts/mononoki-Regular Nerd Font Complete Mono.ttf</file>
+        <file>resources/fonts/mononoki-Regular Nerd Font Complete Windows Compatible.ttf</file>
+        <file>resources/fonts/mononoki-Regular Nerd Font Complete.ttf</file>
+    </qresource>
 </RCC>

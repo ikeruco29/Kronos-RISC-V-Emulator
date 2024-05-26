@@ -1,5 +1,13 @@
+/*
+    ESTE ARCHIVO CONTIENE TODAS LAS FUNCIONES QUE SE ENCARGAN DE DECODIFICAR
+    CADA TIPO DE INSTRUCCIÓN.
+
+    HAY UNA FUNCIÓN PARA CADA TIPO, DE FORMA QUE SEA MÁS LEGIBLE
+*/
+
 #include "decoder.h"
 
+// Para el desensamblado
 std::vector<std::string> mnemonics = {
     // Formato R
     "ADD", "SUB", "XOR", "OR", "AND", "SLL", "SRL", "SRA", "SLT", "SLTU",
@@ -29,7 +37,14 @@ std::vector<std::string> mnemonics = {
 };
 
 Decoded decode_R(uint32_t ir) {
-    //funct7 rs2 rs1 funct3 rd opcode
+
+    // Esta es la estructura de este tipo de instrucciones:
+    //
+    //      funct7 | rs2 | rs1 | funct3 | rd | opcode
+    //
+    // Por lo que se mueven los bits para sacar cada uno de los
+    // datos.
+
     uint32_t rd = (ir >> 7) & 0x1F;
     uint8_t funct3 = (ir >> 12) & 0x7;
     uint32_t rs1 = (ir >> 15) & 0x1F;
@@ -96,7 +111,14 @@ Decoded decode_R(uint32_t ir) {
 
 
 Decoded decode_I(uint32_t ir, uint8_t op) {
-    // inm rs1 funct3 rd opcode
+
+    // Esta es la estructura de este tipo de instrucciones:
+    //
+    //      inm | rs1 | funct3 | rd | opcode
+    //
+    // Por lo que se mueven los bits para sacar cada uno de los
+    // datos.
+
     uint32_t rd = (ir >> 7) & 0x1F;
     uint8_t funct3 = (ir >> 12) & 0x7;
     uint32_t rs1 = (ir >> 15) & 0x1F;
@@ -104,10 +126,13 @@ Decoded decode_I(uint32_t ir, uint8_t op) {
     uint32_t funct7 = (ir >> 25) & 0x7F;
     int nOperation = -1;
 
-    // 1000 0101 1100
+
     if (inm & 0x800) { // Si el bit más significativo está establecido
         inm |= 0xFFFFF000; // Extensión del signo
     }
+    //           1000 0101 1100
+    //                  |
+    //                  |
     // 1111 1111 1111 1111 1111 1000 0101 1100
 
     if (op == 0) {
@@ -191,7 +216,14 @@ Decoded decode_I(uint32_t ir, uint8_t op) {
 }
 
 Decoded decode_S(uint32_t ir) {
-    // inm[11:5] rs2 rs1 funct3 inm[4:0] opcode
+
+    // Esta es la estructura de este tipo de instrucciones:
+    //
+    //      inm[11:5] | rs2 | rs1 | funct3 | inm[4:0] | opcode
+    //
+    // Por lo que se mueven los bits para sacar cada uno de los
+    // datos.
+
     uint32_t inm_1 = (ir >> 7) & 0x1F;
     uint8_t funct3 = (ir >> 12) & 0x7;
     uint32_t rs1 = (ir >> 15) & 0x1F;
@@ -211,7 +243,7 @@ Decoded decode_S(uint32_t ir) {
     else
         nOperation = SW;
 
-    // Devuelve la operaci�n y los registros
+    // Devuelve la operación y los registros
     Decoded dec;
     dec.mnemonic = mnemonics[nOperation];
     dec.op = nOperation;
@@ -221,6 +253,9 @@ Decoded decode_S(uint32_t ir) {
 }
 
 Decoded decode_B(uint32_t ir) {
+
+
+
     uint32_t inm_1 = (ir >> 7) & 0x1F;
     uint8_t funct3 = (ir >> 12) & 0x7;
     uint32_t rs1 = (ir >> 15) & 0x1F;
@@ -256,10 +291,10 @@ Decoded decode_B(uint32_t ir) {
 
     // inm_1 tiene los bits 4:1|11
     // inm_2 tiene los bits 12|10:5
-    // Esto con la extensi�n de signo hecha, es decir,
+    // Esto con la extensión de signo hecha, es decir,
     // con el complemento a 2 si es necesario
 
-    // el primer bit ser� el �ltimo del n�mero
+    // el primer bit será el último del número
     uint8_t bit11 = inm_1 & 0x01;
     uint8_t bit12 = inm_2 >> 6;
     int32_t inmediate = 0;
@@ -275,7 +310,7 @@ Decoded decode_B(uint32_t ir) {
         inmediate = inmediate | 0xFFFFF000;
     }
 
-    // Devuelve la operaci�n y los registros
+    // Devuelve la operación y los registros
     Decoded dec;
     dec.mnemonic = mnemonics[nOperation];
     dec.op = nOperation;
@@ -308,22 +343,22 @@ Decoded decode_J(uint32_t ir) {
     uint32_t rd = (ir >> 7) & 0x1F;
     int32_t inm = (ir >> 12);
 
-    // Bit 20 en la posici�n 19 (empezando en 0)
+    // Bit 20 en la posición 19 (empezando en 0)
     uint32_t bit20 = inm & 0b10000000000000000000;
 
-    // Bit 11 en la posici�n 8 (empezando en 0)
+    // Bit 11 en la posición 8 (empezando en 0)
     uint16_t bit11 = inm & 0b100000000;
 
     uint32_t inm_2 = (inm & 0xFF) << 12;
     uint16_t inm_1 = (inm >> 8) & 0x7FE; // 0111 1111 1110
 
     int32_t inm_fin = inm_2 | inm_1;
-    if (bit11 != 0)	// Si el bit 11 est� en 1, lo a�ade
+    if (bit11 != 0)	// Si el bit 11 está en 1, lo añade
         inm_fin = inm_fin | 0b100000000000;
 
-    // Si el bit 20 est� en 1, significa que es
-    // un n�mero negativo, por lo que hay que rellenar todo
-    // lo dem�s con 1.
+    // Si el bit 20 está en 1, significa que es
+    // un número negativo, por lo que hay que rellenar todo
+    // lo demás con 1.
     if (bit20 != 0)
         inm_fin = inm_fin | 0xfff00000;
 

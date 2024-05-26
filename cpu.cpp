@@ -3,7 +3,7 @@
 #include <iostream>
 #include <sstream>
 
-
+// Constructor
 CPU::CPU(Memory *ram){
     // Inicialización de los registros
     for (int i = 0; i < 32; i++)
@@ -13,7 +13,7 @@ CPU::CPU(Memory *ram){
 
     registers[2] = ram->iMemorySize - ram->pIo - 1; // Puntero stack
 
-    this->ram = ram;
+    this->ram = ram;    // Puntero a la RAM
 
     instDecoded.inmediate = 0;
     instDecoded.op = -1;
@@ -84,17 +84,20 @@ CPU::CPU(Memory *ram){
 
 CPU::~CPU(){}
 
+// Función que se encarga de realizar un ciclo de reloj
 void CPU::clock(){
-    fetch();
+    fetch();    // Extracción de la instrucción
 
-    decode();
+    decode();   // Decodificación de la instrucción
 
-    if(execute() == 0)
-        pc += 4;
+    if(execute() == 0)  // Ejecución de la instrucción
+        pc += 4;        // Si no es un salto, PC + 4
 
-    cycles++;
+    cycles++;   // Sumamos uno al contador de ciclos
 }
 
+
+// Función que resetea la CPU
 void CPU::reset(){
     // Inicialización de los registros
     for (int i = 0; i < 32; i++)
@@ -115,22 +118,25 @@ void CPU::reset(){
         ciclosTipo[i] = 0;
     }
 
-    disassembly.clear();
+    disassembly.clear();    // Vacía todo el registro de desensamblado
 
-    pc = ram->iRomStartAddr;
-    ir = 0;
+    pc = ram->iRomStartAddr;    // PC apunta al inicio del programa (memoria ROM)
+    ir = 0; // Reset del registro IR
 
     cycles = 0;
 
     bEbreak = 0;
 }
 
+// Captura de la instrucción
 void CPU::fetch(){
     ir = FlipWord(ram->readWord(pc));
 }
 
+// Decodificación de la instrucción
 void CPU::decode() {
     std::stringstream instDisassembled;
+
     // Recoge el opcode (últimos 7 bits)
     uint32_t opcode = ir & 0x7F;
 
@@ -139,7 +145,7 @@ void CPU::decode() {
     case 0b00110011:    // R
         instDecoded = decode_R(ir); // Recoge la instrucción decodificada y la guarda en la variable global de la clase
 
-
+        // Esto es para que, si es una operación no registrada, no imprima los registros
         if(instDecoded.op != Operation::NOP){
             instDisassembled << formatDissasembly(instDecoded);
             instDisassembled << instDecoded.registers[0] << ", X" << instDecoded.registers[1] << ", X" << instDecoded.registers[2];
@@ -246,11 +252,12 @@ void CPU::decode() {
         break;
     }
 
-    disassembly.push_back(instDisassembled.str());
+    disassembly.push_back(instDisassembled.str());  // Guarda el desensamblado de la instrucción
 
     instDisassembled.clear();
 }
 
+// Ejecuta un ciclo de instrucción
 int CPU::execute() {
 
     // Se ejecuta la función almacenada en instDecoded
@@ -270,6 +277,7 @@ int CPU::execute() {
 
 // R format
 int CPU::ADD(){
+    // Suma dos variables y lo guarda en RD
     uint8_t rd = instDecoded.registers[0];
     uint8_t rs1 = instDecoded.registers[1];
     uint8_t rs2 = instDecoded.registers[2];
@@ -278,6 +286,7 @@ int CPU::ADD(){
     return 0;
 }
 int CPU::SUB() {
+    // resta dos variables y lo guarda en RD
     uint8_t rd = instDecoded.registers[0];
     uint8_t rs1 = instDecoded.registers[1];
     uint8_t rs2 = instDecoded.registers[2];
@@ -430,9 +439,7 @@ int CPU::SLTIU() {
 
     return 0;
 }
-// TODO: PENSAR SI, POR EJEMPLO, EN LA POSICIÓN 1 HAY EL NUMERO 0X0000FFFF,
-//       SI RECOJO UN BYTE, ES DECIR FF, QUÉ SUCEDE CON LOS OTROS 3 BYTES,
-//       SE RELLENAN A 1 PORQUE TOMA COMO SIGNO EL BIT NÚMERO 8 O NO?
+
 int CPU::LB() {
     uint8_t rd = instDecoded.registers[0];
     uint8_t rs1 = instDecoded.registers[1];
@@ -623,7 +630,7 @@ int CPU::BGEU() {
     uint8_t rs2 = instDecoded.registers[1];
     uint32_t inmediate = instDecoded.inmediate;
 
-    if (static_cast<uint32_t>(registers[rs1]) >= static_cast<uint32_t>(registers[rs2])){ // estaba <=
+    if (static_cast<uint32_t>(registers[rs1]) >= static_cast<uint32_t>(registers[rs2])){
         pc += inmediate;
         return 1;
     } else
@@ -667,6 +674,8 @@ int CPU::NOP(){
 }
 
 
+// Formatea el desensamblado para imprimirlo y que queden
+// todos los registros a la misma altura
 std::string CPU::formatDissasembly(Decoded inst){
     std::stringstream st;
     st << inst.mnemonic;

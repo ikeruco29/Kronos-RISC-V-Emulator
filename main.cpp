@@ -15,20 +15,34 @@ int readConfigFile();
 
 int main(int argc, char *argv[])
 {
-    readConfigFile();
+    readConfigFile();   // Lee el contenido del archivo
 
     QApplication a(argc, argv);
+
+
+    int fontId = QFontDatabase::addApplicationFont(":/resources/fonts/mononoki Bold Nerd Font Complete.ttf");
+    if (fontId == -1) {
+        qWarning() << "No se pudo cargar la fuente";
+    } else {
+        QString fontFamily = QFontDatabase::applicationFontFamilies(fontId).at(0);
+        QFont font(fontFamily);
+        a.setFont(font);
+    }
+
+
     MainWindow w;
 
     Computer computer = Computer(ramSize);
 
-    computer.ram.iRomStartAddr = romAddrAlloc;
+    computer.ram.iRomStartAddr = romAddrAlloc;  // Localización de la ROM
 
     w.computer = &computer;
     w.disassemblyFileRoute = disassemblyRouteFile;
     w.ramFileRoute = ramRouteFile;
     w.campaignGeneratorRoute = campaignRoute;
 
+    // Direcciones de control, tanto para resultado como para finalizar
+    // la ejecución del programa
     w.RESULT_LOCATION = result_location;
     w.FINISH_LOCATION = finish_location;
 
@@ -80,7 +94,7 @@ int readConfigFile(){
     romAddrAlloc = jsonObj["romAddressAllocation"].toString().toUInt(nullptr, 16);
 
 
-    // Imprimir los valores extraídos
+    // Imprimir los valores extraídos (solo para debug)
     qDebug() << "Ram Size:" << ramSize / 1024 / 1024 / 1024 << "GB";
     qDebug() << "Ram file:" << ramRouteFile;
     qDebug() << "disassembly file:" << disassemblyRouteFile;

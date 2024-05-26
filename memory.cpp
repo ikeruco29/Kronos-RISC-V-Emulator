@@ -68,7 +68,8 @@ uint32_t Memory::readWord(uint32_t addr){
 
 void Memory::reset(){
 
-    int numOfThreads = 16;  // Número de hilos. PREGUNTAR A DANI SI HAY UN LÍMITE O UN ÓPTIMO
+    int numOfThreads = 16;  // Número de hilos. Con 16 va bien, y es un buen rendimiento entre
+                            // consumo de recursos y velocidad
 
 
     uint32_t subSectionSize = (iMemorySize - pIo) / numOfThreads;

@@ -25,8 +25,10 @@ MainWindow::MainWindow(QWidget *parent, Computer *comp)
     , ui(new Ui::MainWindow)
     , computer(comp)
 {
+    // Esto es para establecer ciertos valores de la interfaz
+    // Ejemplo: hasta que no cargue un programa, no puede usar el botón
+    //          "ejecutar"
     ui->setupUi(this);
-    //QCoreApplication::setAttribute(Qt::AA_UseStyleSheetPropagationInWidgetStyles, true);
     QString stsheet = "QPushButton:disabled {background-color: rgba(255, 255, 255, 0.1); }";
     ui->centralwidget->setStyleSheet(stsheet);
     ui->runButton->setEnabled(false);
@@ -39,6 +41,11 @@ MainWindow::MainWindow(QWidget *parent, Computer *comp)
 
     isExecutingBeforeCampaign = false;
 
+    // En QT, puedes vincular un método a otro. Este otro método se llama "signal"
+    // y no tienen implementación. Al emitirlos mediante "emit nombreSignal()"
+    // se llama al método conectado en un hilo a parte, lo que hace que el hilo principal
+    // (que es el que contiene la interfaz) no se bloquee, y el usuario pueda pulsar otros
+    // botones como el botón de pausa.
     connect(this, &MainWindow::runProgram, this, &MainWindow::on_runButton_clicked);
     connect(this, &MainWindow::runProgramCompleted, this, &MainWindow::updateCampaignAfterProgramExecution);
     connect(this, &MainWindow::runCampaignIter, this, &MainWindow::iterationCampaign);
@@ -51,27 +58,37 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+// Carga el programa seleccionado en memoria
 void MainWindow::on_actionCargar_programa_triggered()
 {
+
+    // Esto abre el explorador de archivos para seleccionar un programa binario
     QString nombreArchivo = QFileDialog::getOpenFileName(this, "Seleccionar archivo", "", "*.bin *.o");
     if (!nombreArchivo.isEmpty()) {
-        // Aquí puedes cargar el archivo seleccionado
-        qDebug() << "Archivo seleccionado:" << nombreArchivo;
+
+        qDebug() << "Archivo seleccionado:" << nombreArchivo;   // debug
         QFileInfo fileInfo(nombreArchivo);
-        QString filename = fileInfo.fileName();
+        QString filename = fileInfo.fileName(); // Para sacar solo el nombre
 
-        computer->reset();
-        computer->LoadProgram(nombreArchivo.toStdString());
+        computer->reset();  // Reset del ordenador
+        computer->LoadProgram(nombreArchivo.toStdString()); // Carga el programa en memoria
 
-        resetInterface();
+        resetInterface();   // Reestablece la interfaz
 
-        pageToView = computer->ram.iRomStartAddr;
+        pageToView = computer->ram.iRomStartAddr;   // Esto es para el buscador de la RAM.
+                                                    // No quiero se muestre la RAM al completo,
+                                                    // si no solo 8 filas que es lo que cabe
+                                                    // en la caja de texto.
+
         ui->ramText->setPlainText(QString::fromStdString(computer->showRam(pageToView)));
         ui->filenameText->setText(filename);
 
+
+        // Al cargar el programa, se habilitan los botones de control de ejecución
         ui->runButton->setEnabled(true);
         ui->runPasoButton->setEnabled(true);
         ui->pauseButton->setEnabled(true);
+
     } else {
         qDebug() << "Ningún archivo seleccionado.";
     }
@@ -79,19 +96,19 @@ void MainWindow::on_actionCargar_programa_triggered()
     stopExec = false;
 }
 
-
+// Botón para cargar una campaña
 void MainWindow::on_actionCargar_campa_a_triggered()
 {
     loadCampaign();
 }
 
-
+// Cerrar la aplicación
 void MainWindow::on_actionSalir_triggered()
 {
     qApp->quit();
 }
 
-
+// Botón para realizar la ejecución completa del programa en memoria
 int MainWindow::on_runButton_clicked()
 {
     stopExec = false;
@@ -104,8 +121,9 @@ int MainWindow::on_runButton_clicked()
     //      ui->registerText->setPlainText(QString::fromStdString(computer->showRegisters()));
     //      ui->codeDisassemblyText->appendPlainText(QString::fromStdString(computer->showDisassembly()));
     //
-    // No le da tiempo a renderizar, así que necesito que tenga cierto delay.
-    // Realmente no pasa nada porque el procesador no tenga una velocidad vertiginosa
+    // No le da tiempo a renderizar, así que necesito que espere a que termine la iteración
+    // con el renderizado.
+    // Realmente no pasa nada porque el emulador no tenga una velocidad vertiginosa
     // (que la tiene), ya que lo importante es que lleve bien el número de instrucciones
 
     QTimer *timer = new QTimer(this);
@@ -119,11 +137,11 @@ int MainWindow::on_runButton_clicked()
 }
 
 
+// Realiza un ciclo de ejecución (fetch, decode y execute)
 void MainWindow::runLoopIteration()
 {
-    qDebug() << "Iteracion";
 
-    // TODO: CAMBIAR CONDICIÓN DEL BUCLE            ESTA VARIABLE NO!!!
+    // Al escribir en la posición FINISH_LOCATION un 0, para la ejecución del programa
     if (computer->ram.readByte(FINISH_LOCATION) == 0 || stopExec) {
 
         sender()->deleteLater(); // Eliminar el QTimer después de terminar el bucle
@@ -148,28 +166,33 @@ void MainWindow::runLoopIteration()
         this->UpdateInterface();
 }
 
+// Realiza un ciclo de ejecución de la campaña
 void MainWindow::runLoopIterationCampaign()
 {
     qDebug() << computer->cpu.cycles;
 
     if (computer->ram.readByte(FINISH_LOCATION) == 0) {
 
-        // TODO: COMPARAR EL RESULTADO CON LA POSICIÓN DE MEMORIA CONOCIDA
+        // Al escribir en la posición FINISH_LOCATION un 0, para la ejecución del programa
         if(computer->ram.readByte(RESULT_LOCATION) != computer->campaign.expectedResult){
-            //QMessageBox::information(nullptr, "Información sobre la campaña", "La campaña ha finalizado. Resultado final: Silent Data Corruption (SDC)");
+
+            // Resultado final: Silent Data Corruption (SDC)
             this->campaignResults.push_back(SDC);
+
         }
         else if(computer->campaign.expectedInstructions > computer->cpu.cycles){
-            //QMessageBox::information(nullptr, "Información sobre la campaña", "La campaña ha finalizado. Resultado final: Single Event Delay (SED)");
+
+            // Resultado final: Single Event Delay (SED)
             this->campaignResults.push_back(SED);
+
         } else {
-            //QMessageBox::information(nullptr, "Información sobre la campaña", "La campaña ha finalizado. Resultado final: NO EFFECT");
+
+            // Resultado final: NO EFFECT
             this->campaignResults.push_back(NO_EFFECT);
+
         }
 
-        //ui->generateStatsButton->setEnabled(true);
-
-        this->injectionNumber++;
+        this->injectionNumber++;    // Inyección por la que va
 
         sender()->deleteLater(); // Eliminar el QTimer después de terminar el bucle
         emit campaignIterComplete();
@@ -183,17 +206,17 @@ void MainWindow::runLoopIterationCampaign()
         if(computer->cpu.cycles == this->injectionNumber){
             int inst = computer->cpu.cycles;    // número de instrucción
             int reg = computer->campaign.injections[inst][1];   // Registro a cambiar
-            computer->cpu.registers[reg] ^= (1 << computer->campaign.injections[inst][2]); // invierte el bit
+            computer->cpu.registers[reg] ^= (1 << computer->campaign.injections[inst][2]); // invierte el bit utilizando XOR
         }
 
     }else{
-        //QMessageBox::information(nullptr, "Información sobre la campaña", "La campaña ha finalizado. Resultado final: Detected Unrecovery Error (DUE).\n Instrucciones esperadas:");
+        // Resultado final: Detected Unrecovery Error (DUE)
         this->campaignResults.push_back(DUE);
 
         this->injectionNumber++;
 
         sender()->deleteLater(); // Eliminar el QTimer después de terminar el bucle
-        //ui->generateStatsButton->setEnabled(true);
+
         emit campaignIterComplete();
         return;
     }
@@ -204,19 +227,21 @@ void MainWindow::runLoopIterationCampaign()
 
 
 
-
+// Botón de reset
 void MainWindow::on_stopButton_clicked()
 {
-    stopExec = true;
-    computer->reset();
-    resetInterface();
+    stopExec = true;    // Si hay una ejecución en marcha, se detiene
+    computer->reset();  // Se resetea el ordenador
+    resetInterface();   // Se resetea la interfaz
 }
 
+// Botón para parar la ejecución
 void MainWindow::on_pauseButton_clicked()
 {
     stopExec = true;
 }
 
+// Botón para ejecutar solo un paso del programa
 void MainWindow::on_runPasoButton_clicked()
 {
     if (computer->ram.readByte(FINISH_LOCATION) != 0) {
@@ -228,7 +253,7 @@ void MainWindow::on_runPasoButton_clicked()
     }
 }
 
-
+// Método que gestiona cuando se escribe algo para buscar en la memoria
 void MainWindow::on_searchBox_editingFinished()
 {
     QString memoryToView = ui->searchBox->text();
@@ -519,6 +544,8 @@ void MainWindow::onFinishIter(){
         emit runCampaignIter();
 }
 
+// Cuando se completa la ejecución de la campaña
+// se llama a este método para imprimir las estadísticas
 void MainWindow::onCampaignComplete(){
 
     QString str = "";
@@ -543,6 +570,7 @@ void MainWindow::onCampaignComplete(){
         }
     }
 
+    // Cálculo de porcentajes
     noeffect = (noeffect * 100) / hundred;
     sdc = (sdc * 100) / hundred;
     sed = (sed * 100) / hundred;
@@ -555,12 +583,14 @@ void MainWindow::onCampaignComplete(){
                       .arg(due);
 
 
-    ui->executingCampaignBox->setVisible(false);
+    ui->executingCampaignBox->setVisible(false);    // Dejamos de renderizar la barra de carga
 
     QMessageBox::information(nullptr, "Información sobre la campaña", str);
     return;
 }
 
+// Este método guarda las estadísticas de ejecución de un programa
+// que necesita la campaña para ejecutarla
 void MainWindow::updateCampaignAfterProgramExecution(){
 
     isExecutingBeforeCampaign = false;
@@ -587,8 +617,12 @@ void MainWindow::on_loadCampaignButton_clicked()
     loadCampaign();
 }
 
+// Este método carga una campaña en memoria
 void MainWindow::loadCampaign(){
+
+    // Abre un explorador de archivos para que seleccione el usuario el json específico
     QString nombreArchivo = QFileDialog::getOpenFileName(this, "Seleccionar archivo", "", "*.json");
+
     if (!nombreArchivo.isEmpty()) {
 
         resetInterface();
