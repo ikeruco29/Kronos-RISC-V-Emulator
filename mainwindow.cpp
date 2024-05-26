@@ -408,6 +408,7 @@ void MainWindow::UpdateInterface()
 }
 
 void MainWindow::UpdateTerminal(){
+    ui->terminalBox->setPlainText("");
     for(int i = 0; i < 20; i++){
         ui->terminalBox->appendPlainText(computer->showVRAMLine(i));
     }
