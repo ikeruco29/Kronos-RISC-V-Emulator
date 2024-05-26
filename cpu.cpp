@@ -516,7 +516,8 @@ int CPU::JALR() {
     // La dirección que tocaría si no se hiciera el salto se guarda en rd
     // para saltar más adelante de vuelta
 
-    registers[rd] = pc + 4;
+    if(rd != 0)
+        registers[rd] = pc + 4;
     pc = registers[rs1] + inmediate;
 
     return 1;
@@ -644,8 +645,8 @@ int CPU::JAL() {
 
     // La dirección que tocaría si no se hiciera el salto se guarda en rd
     // para saltar más adelante de vuelta
-
-    registers[rd] = pc + 4;
+    if(rd != 0)
+        registers[rd] = pc + 4;
     pc += inmediate;
 
     return 1;
