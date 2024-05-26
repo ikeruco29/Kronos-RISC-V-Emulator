@@ -4,6 +4,7 @@
         <file>resources/icons/stopExe.png</file>
         <file>resources/icons/executePaso.png</file>
         <file>resources/icons/pause.png</file>
+        <file>resources/icons/icono_kronos.jpg</file>
     </qresource>
     <qresource prefix="/">
         <file>resources/fonts/mononoki Bold Nerd Font Complete Mono Windows Compatible.ttf</file>
