@@ -1,35 +1,27 @@
 
-# Proyecto de fin de grado
-## Emulador RISC-V "Kronos"
+# Final Degree Project
+## "Kronos" RISC-V Emulator
 
-Este repositorio contiene el código fuente de mi proyecto de fin de grado
-llamado "kronos", el cual consiste en un emulador para un procesador RISC-V que implementa una ISA rv32i.
-
+This repository contains the source code of "Kronos", which consists of a rv32i RISC-V ISA implementation
 
 
-# Instalación
-Para compilar el proyecto, es necesario la herramienta "Qt Creator",
-aunque al haber un archivo cmake, si tienes las librerías puedes
-compilarlo manualmente.
-
+# Instalation
+Install the "Qt Creator" and use it to compile the project. Also you can use CMake with the libraries installed to compile it from source too.
 
 ## Documentation
-En primer lugar, la aplicación cuenta con un menú de navegación superior con varias opciones: 
-- Archivo: Permite cargar un programa, campaña o cerrar la aplicación.
-- Generar: Permite generar una campaña para un programa específico.
+In first place, this application features a top navigation menu with the following options:
+- Archivo: Allows uploading a program, a campaign or close the application.
+- Generar: Allows generating a campaign for an specific program.
 
-El emulador tiene varios paneles para realizar diferentes acciones:
+The emulator has several panels to perform different actions. Additionally, there are 4 buttons on top of the terminal (black canvas):
+- Stop button: Stops the execution and resets the emulator.
+- Pause button: Stops the execution without resetting the emulator.
+- Execute button: Executes the program loaded in memory.
+- Step-by-step execution button: Execute 1 clock cycle.
 
-En la parte superior de la terminal (panel negro) hay cuatro botones:
-- Botón stop: Para la ejecución y resetea el emulador.
-- Botón pausa: Detiene la ejecución sin reiniciar el emulador.
-- Botón ejecutar: Ejecuta el programa cargado en memoria.
-- Botón ejecutar paso a paso: Ejecuta un ciclo de reloj.
+In addition, below the RAM canvas, there is a search box that allows you to look up to a specific memory location. The search format is in hexadecimal without specifying "0x":
+- Correct: 80003020
+- Incorrect: 0x80003020
 
-Los demás botones son autoexplicativos.
-Además, debajo del panel de la RAM, hay una caja de búsqueda. El formato para buscar es en hexadecimal, sin especificar el tipo al principio:
-- Correcto: 80003020
-- Incorrecto: 0x80003020
-## Autor
-- Iker Rodríguez Hernández
-
+## Author
+- [@ikeruco29](https://www.github.com/ikeruco29)
