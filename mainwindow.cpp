@@ -550,7 +550,7 @@ void MainWindow::onFinishIter(){
 void MainWindow::onCampaignComplete(){
 
     QString str = "";
-    int noeffect = 0, sdc = 0, sed = 0, due = 0;
+    float noeffect = 0, sdc = 0, sed = 0, due = 0;
 
     int hundred = campaignResults.size();
 
@@ -578,10 +578,10 @@ void MainWindow::onCampaignComplete(){
     due = (due * 100) / hundred;
 
     str = QString("Resultados de la campaña:\nNo effect: %1%\nSDC: %2%\nSED: %3%\nDUE: %4%")
-                      .arg(noeffect)
-                      .arg(sdc)
-                      .arg(sed)
-                      .arg(due);
+                  .arg(noeffect, 0, 'f', 2)
+                  .arg(sdc, 0, 'f', 2)
+                  .arg(sed, 0, 'f', 2)
+                  .arg(due, 0, 'f', 2);
 
 
     ui->executingCampaignBox->setVisible(false);    // Dejamos de renderizar la barra de carga
