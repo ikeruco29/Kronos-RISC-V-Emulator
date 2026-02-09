@@ -25,7 +25,7 @@ enum CampaignResult{
 };
 
 CodeEditor *editor;
-QString programFileName;
+QString programFileName = "";
 
 MainWindow::MainWindow(QWidget *parent, Computer *comp)
     : QMainWindow(parent)
@@ -423,9 +423,10 @@ void MainWindow::resetInterface(){
     ui->codeDisassemblyText->clear();
     ui->ramText->setPlainText(QString::fromStdString(computer->showRam(pageToView)));
     ui->registerText->setPlainText(QString::fromStdString(computer->showRegisters()));
-    //ui->terminalBox->setPlainText("");
     ui->filenameText->clear();
     ui->campaignNameText->clear();
+
+    editor->clear();
 }
 
 
@@ -717,18 +718,31 @@ void MainWindow::on_actionOpen_File_triggered()
     } else {
         qDebug() << "No file selected....";
     }
-
-    stopExec = false;
 }
 
 
 void MainWindow::on_actionSave_file_triggered()
 {
+    // In case there wasn't any program loaded (he is programming in a new file)
+    if(programFileName == ""){
+
+        programFileName = QFileDialog::getSaveFileName(this);
+        programFileName.append(".c");
+
+        if (!programFileName.isEmpty()) {
+            qDebug() << "File saving as:" << programFileName;   // debug
+        }
+        else {
+            qDebug() << "No file selected...";
+            return;
+        }
+    }
+
     QFile file(programFileName);
 
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
         QMessageBox::warning(this, "Error",
-                             "No se pudo guardar el archivo");
+                             "Couldn't save the file");
         return;
     }
 
@@ -737,6 +751,17 @@ void MainWindow::on_actionSave_file_triggered()
 
     out << editor->toPlainText();
 
+    if(ui->filenameText->text().isEmpty()){
+        QFileInfo fileinfo(programFileName);
+        ui->filenameText->setText(fileinfo.fileName());
+    }
+
     file.close();
+}
+
+
+void MainWindow::on_actionNew_triggered()
+{
+    resetInterface();
 }
 

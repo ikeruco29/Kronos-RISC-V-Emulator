@@ -1462,7 +1462,7 @@ border: 0px;</string>
            <property name="minimumSize">
             <size>
              <width>0</width>
-             <height>350</height>
+             <height>250</height>
             </size>
            </property>
            <property name="palette">
@@ -1582,6 +1582,9 @@ border: 0px;</string>
            </property>
            <property name="verticalScrollBarPolicy">
             <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
+           </property>
+           <property name="lineWrapMode">
+            <enum>QPlainTextEdit::LineWrapMode::NoWrap</enum>
            </property>
            <property name="readOnly">
             <bool>true</bool>
@@ -3177,9 +3180,12 @@ border: 0px;
      <addaction name="actionCargar_campa_a"/>
     </widget>
     <addaction name="separator"/>
+    <addaction name="actionNew"/>
     <addaction name="actionOpen_File"/>
     <addaction name="actionSave_file"/>
+    <addaction name="separator"/>
     <addaction name="menuLoad"/>
+    <addaction name="separator"/>
     <addaction name="actionSalir"/>
    </widget>
    <widget class="QMenu" name="menuGenerar">
@@ -3240,6 +3246,11 @@ border: 0px;
   <action name="actionSave_file">
    <property name="text">
     <string>Save file</string>
+   </property>
+  </action>
+  <action name="actionNew">
+   <property name="text">
+    <string>New file</string>
    </property>
   </action>
  </widget>

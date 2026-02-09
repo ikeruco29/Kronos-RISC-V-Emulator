@@ -72,6 +72,8 @@ private slots:
 
     void on_actionSave_file_triggered();
 
+    void on_actionNew_triggered();
+
 signals:
     void runProgram();
     void runProgramCompleted();
