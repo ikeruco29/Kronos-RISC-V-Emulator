@@ -393,7 +393,7 @@ void MainWindow::resetInterface(){
     ui->codeDisassemblyText->clear();
     ui->ramText->setPlainText(QString::fromStdString(computer->showRam(pageToView)));
     ui->registerText->setPlainText(QString::fromStdString(computer->showRegisters()));
-    ui->terminalBox->setPlainText("");
+    //ui->terminalBox->setPlainText("");
     ui->filenameText->clear();
     ui->campaignNameText->clear();
 }
@@ -408,10 +408,10 @@ void MainWindow::UpdateInterface()
 }
 
 void MainWindow::UpdateTerminal(){
-    ui->terminalBox->setPlainText("");
+    /*ui->terminalBox->setPlainText("");
     for(int i = 0; i < 20; i++){
         ui->terminalBox->appendPlainText(computer->showVRAMLine(i));
-    }
+    }*/
 }
 
 
