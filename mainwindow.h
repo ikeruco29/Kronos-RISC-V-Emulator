@@ -30,6 +30,7 @@ public:
     int injectionNumber = 0;
 
     uint32_t FINISH_LOCATION, RESULT_LOCATION;
+    bool updateRamInRealTime;
 
 private slots:
     void on_actionCargar_programa_triggered();

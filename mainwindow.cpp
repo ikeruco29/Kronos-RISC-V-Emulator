@@ -182,6 +182,7 @@ void MainWindow::runLoopIteration()
 
         else if(computer->ram.readByte(FINISH_LOCATION) == 0){
 
+            ui->ramText->setPlainText(QString::fromStdString(computer->showRam(pageToView)));   // Update ramBox
             ui->generateStatsButton->setEnabled(true);
             QMessageBox::information(nullptr, "Execution completed", "The program execution has finished");
 
@@ -278,6 +279,7 @@ void MainWindow::on_runPasoButton_clicked()
         computer->cpu.clock();
         this->UpdateInterface();
     } else {
+        ui->ramText->setPlainText(QString::fromStdString(computer->showRam(pageToView)));   // Update ramBox
         QMessageBox::information(nullptr, "Execution completed", "The program execution has finished");
         ui->generateStatsButton->setEnabled(true);  // Se habilita el botón para generar estadísticas del emulador
     }
@@ -433,7 +435,8 @@ void MainWindow::resetInterface(){
 void MainWindow::UpdateInterface()
 {
     UpdateTerminal();    // Update terminalBox
-    ui->ramText->setPlainText(QString::fromStdString(computer->showRam(pageToView)));   // Update ramBox
+    if(updateRamInRealTime)
+        ui->ramText->setPlainText(QString::fromStdString(computer->showRam(pageToView)));   // Update ramBox
     ui->registerText->setPlainText(QString::fromStdString(computer->showRegisters()));  // Update registerBox
     ui->codeDisassemblyText->appendPlainText(QString::fromStdString(computer->showDisassembly()));  // Update disassembly
 }
