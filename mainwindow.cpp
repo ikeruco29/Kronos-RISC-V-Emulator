@@ -37,13 +37,15 @@ MainWindow::MainWindow(QWidget *parent, Computer *comp)
     ui->executeCampaignButton->setEnabled(false);
     ui->generateStatsButton->setEnabled(false);
 
-    // CODE EDITOR SETUP
+    // ================ CODE EDITOR SETUP ==================
     QFont font ("Cascaydia Mono");
     font.setStyleHint(QFont::Monospace);
     font.setPointSize(11);
 
     ui->CodeEditor->setFont((font));
     ui->CodeEditor->setTabStopDistance(QFontMetrics(font).horizontalAdvance(' ') * 4);
+
+    // =====================================================
 
     ui->executingCampaignBox->hide();
 
