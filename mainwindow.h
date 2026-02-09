@@ -68,6 +68,10 @@ private slots:
 
     void onCampaignComplete();
     void onFinishIter();
+    void on_actionOpen_File_triggered();
+
+    void on_actionSave_file_triggered();
+
 signals:
     void runProgram();
     void runProgramCompleted();

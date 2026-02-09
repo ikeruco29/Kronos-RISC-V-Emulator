@@ -10,6 +10,10 @@
 #include <QDateTime>
 #include <QInputDialog>
 #include <QMessageBox>
+#include <QFile>
+#include <QTextStream>
+
+#include "codeeditor.h"
 
 
 enum CampaignResult{
@@ -19,6 +23,7 @@ enum CampaignResult{
     DUE
 };
 
+CodeEditor *editor;
 
 MainWindow::MainWindow(QWidget *parent, Computer *comp)
     : QMainWindow(parent)
@@ -38,12 +43,23 @@ MainWindow::MainWindow(QWidget *parent, Computer *comp)
     ui->generateStatsButton->setEnabled(false);
 
     // ================ CODE EDITOR SETUP ==================
-    QFont font ("Cascaydia Mono");
+
+    editor = new CodeEditor(ui->CodeEditor->parentWidget());
+
+    // Copiar geometría y políticas
+    editor->setGeometry(ui->CodeEditor->geometry());
+    editor->setSizePolicy(ui->CodeEditor->sizePolicy());
+
+    QLayout *layout = ui->CodeEditor->parentWidget()->layout();
+    layout->replaceWidget(ui->CodeEditor, editor);
+
+    ui->CodeEditor->deleteLater();
+
+    QFont font ("Consolas");
     font.setStyleHint(QFont::Monospace);
     font.setPointSize(11);
 
-    ui->CodeEditor->setFont((font));
-    ui->CodeEditor->setTabStopDistance(QFontMetrics(font).horizontalAdvance(' ') * 4);
+    editor->setTabStopDistance(QFontMetrics(font).horizontalAdvance(' ') * 4);
 
     // =====================================================
 
@@ -658,5 +674,52 @@ void MainWindow::loadCampaign(){
     } else {
         qDebug() << "No file selected.";
     }
+}
+
+
+void MainWindow::on_actionOpen_File_triggered()
+{
+    // Esto abre el explorador de archivos para seleccionar un programa binario
+    QString nombreArchivo = QFileDialog::getOpenFileName(this, "Select file", "", "*.c *.asm");
+    if (!nombreArchivo.isEmpty()) {
+
+        qDebug() << "File selected:" << nombreArchivo;   // debug
+        QFileInfo fileInfo(nombreArchivo);
+        QString filename = fileInfo.fileName(); // Para sacar solo el nombre
+
+        //resetInterface();   // Reestablece la interfaz
+
+        QFile file(nombreArchivo);
+
+        if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+            QMessageBox::warning(this, "Error",
+                                 "No se pudo abrir el archivo");
+            return;
+        }
+
+        QTextStream in(&file);
+        editor->setPlainText(in.readAll());
+
+        file.close();
+
+        ui->filenameText->setText(filename);
+
+
+        // Al cargar el programa, se habilitan los botones de control de ejecución
+        ui->runButton->setEnabled(true);
+        ui->runPasoButton->setEnabled(true);
+        ui->pauseButton->setEnabled(true);
+
+    } else {
+        qDebug() << "No file selected....";
+    }
+
+    stopExec = false;
+}
+
+
+void MainWindow::on_actionSave_file_triggered()
+{
+
 }
 

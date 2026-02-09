@@ -1,5 +1,16 @@
 #pragma once
-#include <qplaintextedit.h>
+#include <QPlainTextEdit>
+
+QT_BEGIN_NAMESPACE
+class QPaintEvent;
+class QResizeEvent;
+class QSize;
+class QWidget;
+QT_END_NAMESPACE
+
+class LineNumberArea;
+
+//![codeeditordefinition]
 
 class CodeEditor : public QPlainTextEdit
 {
@@ -21,4 +32,28 @@ private slots:
 
 private:
     QWidget *lineNumberArea;
+};
+
+//![codeeditordefinition]
+//![extraarea]
+
+class LineNumberArea : public QWidget
+{
+public:
+    LineNumberArea(CodeEditor *editor) : QWidget(editor), codeEditor(editor)
+    {}
+
+    QSize sizeHint() const override
+    {
+        return QSize(codeEditor->lineNumberAreaWidth(), 0);
+    }
+
+protected:
+    void paintEvent(QPaintEvent *event) override
+    {
+        codeEditor->lineNumberAreaPaintEvent(event);
+    }
+
+private:
+    CodeEditor *codeEditor;
 };
