@@ -33,6 +33,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
 
 
         codeeditor.h codeeditor.cpp
+        highlighter.h highlighter.cpp
 
 
 

@@ -12,12 +12,15 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     connect(this, &CodeEditor::blockCountChanged, this, &CodeEditor::updateLineNumberAreaWidth);
     connect(this, &CodeEditor::updateRequest, this, &CodeEditor::updateLineNumberArea);
     connect(this, &CodeEditor::cursorPositionChanged, this, &CodeEditor::highlightCurrentLine);
+    connect(this, &CodeEditor::textChanged, this, &CodeEditor::putEndPairs);
 
     updateLineNumberAreaWidth(0);
     highlightCurrentLine();
 }
 
-//![constructor]
+void CodeEditor::putEndPairs(){
+    //textCursor().insertText(QString(")"));
+}
 
 //![extraAreaWidth]
 

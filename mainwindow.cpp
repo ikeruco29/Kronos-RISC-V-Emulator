@@ -14,6 +14,7 @@
 #include <QTextStream>
 
 #include "codeeditor.h"
+#include "highlighter.h"
 
 
 enum CampaignResult{
@@ -24,6 +25,7 @@ enum CampaignResult{
 };
 
 CodeEditor *editor;
+QString programFileName;
 
 MainWindow::MainWindow(QWidget *parent, Computer *comp)
     : QMainWindow(parent)
@@ -60,6 +62,8 @@ MainWindow::MainWindow(QWidget *parent, Computer *comp)
     font.setPointSize(11);
 
     editor->setTabStopDistance(QFontMetrics(font).horizontalAdvance(' ') * 4);
+
+    Highlighter *highlighter = new Highlighter(editor->document());
 
     // =====================================================
 
@@ -648,18 +652,18 @@ void MainWindow::on_loadCampaignButton_clicked()
 void MainWindow::loadCampaign(){
 
     // Abre un explorador de archivos para que seleccione el usuario el json específico
-    QString nombreArchivo = QFileDialog::getOpenFileName(this, "Select file", "", "*.json");
+    QString campaignFileName = QFileDialog::getOpenFileName(this, "Select file", "", "*.json");
 
-    if (!nombreArchivo.isEmpty()) {
+    if (!campaignFileName.isEmpty()) {
 
         resetInterface();
 
-        QFileInfo fileInfo(nombreArchivo);
+        QFileInfo fileInfo(campaignFileName);
         QString filename = fileInfo.fileName();
 
-        qDebug() << "Selected file:" << nombreArchivo;
+        qDebug() << "Selected file:" << campaignFileName;
         computer->reset();
-        computer->LoadCampaign(nombreArchivo.toStdString());
+        computer->LoadCampaign(campaignFileName.toStdString());
         ui->campaignNameText->setText(filename);
 
         QFileInfo programInfo(computer->campaign.programPath);
@@ -680,16 +684,16 @@ void MainWindow::loadCampaign(){
 void MainWindow::on_actionOpen_File_triggered()
 {
     // Esto abre el explorador de archivos para seleccionar un programa binario
-    QString nombreArchivo = QFileDialog::getOpenFileName(this, "Select file", "", "*.c *.asm");
-    if (!nombreArchivo.isEmpty()) {
+    programFileName = QFileDialog::getOpenFileName(this, "Select file", "", "*.c *.asm");
+    if (!programFileName.isEmpty()) {
 
-        qDebug() << "File selected:" << nombreArchivo;   // debug
-        QFileInfo fileInfo(nombreArchivo);
+        qDebug() << "File selected:" << programFileName;   // debug
+        QFileInfo fileInfo(programFileName);
         QString filename = fileInfo.fileName(); // Para sacar solo el nombre
 
         //resetInterface();   // Reestablece la interfaz
 
-        QFile file(nombreArchivo);
+        QFile file(programFileName);
 
         if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
             QMessageBox::warning(this, "Error",
@@ -720,6 +724,19 @@ void MainWindow::on_actionOpen_File_triggered()
 
 void MainWindow::on_actionSave_file_triggered()
 {
+    QFile file(programFileName);
 
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QMessageBox::warning(this, "Error",
+                             "No se pudo guardar el archivo");
+        return;
+    }
+
+    QTextStream out(&file);
+    out.setEncoding(QStringConverter::Utf8);
+
+    out << editor->toPlainText();
+
+    file.close();
 }
 
