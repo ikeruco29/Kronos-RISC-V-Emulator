@@ -1247,6 +1247,12 @@ border: 0px;
       </item>
       <item>
        <widget class="QPlainTextEdit" name="CodeEditor">
+        <property name="font">
+         <font>
+          <family>Cascadia Mono</family>
+          <pointsize>11</pointsize>
+         </font>
+        </property>
         <property name="autoFillBackground">
          <bool>false</bool>
         </property>
@@ -1259,6 +1265,9 @@ border: none;</string>
         </property>
         <property name="lineWrapMode">
          <enum>QPlainTextEdit::LineWrapMode::NoWrap</enum>
+        </property>
+        <property name="tabStopDistance">
+         <double>30.000000000000000</double>
         </property>
        </widget>
       </item>

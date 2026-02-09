@@ -31,6 +31,9 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         statsdialog.h statsdialog.cpp statsdialog.ui
         instructionsdialog.h instructionsdialog.cpp instructionsdialog.ui
 
+        linenumberarea.h
+        codeeditor.h codeeditor.cpp
+
 
 
 

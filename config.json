@@ -8,5 +8,11 @@
 
     "disassemblyFileRoute": "C:/Users/ikeru/Desktop/Universidad/TFG/statistics",
     "ramFileRoute": "C:/Users/ikeru/Desktop/Universidad/TFG/statistics",
-    "campaignGeneratorRoute": "C:/Users/ikeru/Desktop/Universidad/TFG/campaigns"
+    "campaignGeneratorRoute": "C:/Users/ikeru/Desktop/Universidad/TFG/campaigns",
+
+    "editor": {
+        "tabSize": 4,
+        "font": "",
+        "fontSize": 11
+    }
 }
