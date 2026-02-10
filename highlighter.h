@@ -15,12 +15,13 @@ class Highlighter : public QSyntaxHighlighter
     Q_OBJECT
 
 public:
-    Highlighter(QTextDocument *parent = 0);
+    Highlighter(QTextDocument *parent = 0, int language_param = 0);
 
 protected:
     void highlightBlock(const QString &text) override;
 
 private:
+    int language;
     struct HighlightingRule
     {
         QRegularExpression pattern;
@@ -31,6 +32,7 @@ private:
     QRegularExpression commentStartExpression;
     QRegularExpression commentEndExpression;
 
+    // ======= C SYNTAX VARIABLES ========
     QTextCharFormat keywordFormat;
     QTextCharFormat classFormat;
     QTextCharFormat singleLineCommentFormat;
@@ -40,6 +42,14 @@ private:
     QTextCharFormat valuesFormat;
     QTextCharFormat gtltFormat;
     QTextCharFormat hashtagFormat;
+
+    // ======= ASM SYNTAX VARIABLES ========
+    QTextCharFormat dollarFormat;
+    QTextCharFormat numberFormat;
+    QTextCharFormat instructionFormat;
+    QTextCharFormat registerNumFormat;
+    QTextCharFormat directivesFormat;
+    QTextCharFormat labelsFormat;
 };
 
 #endif // HIGHLIGHTER_H

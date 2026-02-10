@@ -14,7 +14,6 @@
 #include <QTextStream>
 
 #include "codeeditor.h"
-#include "highlighter.h"
 
 
 enum CampaignResult{
@@ -63,7 +62,7 @@ MainWindow::MainWindow(QWidget *parent, Computer *comp)
 
     editor->setTabStopDistance(QFontMetrics(font).horizontalAdvance(' ') * 4);
 
-    Highlighter *highlighter = new Highlighter(editor->document());
+    highlighter = new Highlighter(editor->document());
 
     // =====================================================
 
@@ -770,5 +769,12 @@ void MainWindow::on_actionSave_file_triggered()
 void MainWindow::on_actionNew_triggered()
 {
     resetInterface();
+}
+
+
+void MainWindow::on_languageSelector_currentIndexChanged(int index)
+{
+    qDebug() << "Language: " << index;
+    highlighter = new Highlighter(editor->document(), index);
 }
 
