@@ -426,6 +426,7 @@ void MainWindow::resetInterface(){
     ui->ramText->setPlainText(QString::fromStdString(computer->showRam(pageToView)));
     ui->registerText->setPlainText(QString::fromStdString(computer->showRegisters()));
     ui->filenameText->clear();
+    programFileName = "";
     ui->campaignNameText->clear();
 
     editor->clear();
@@ -652,10 +653,10 @@ void MainWindow::on_loadCampaignButton_clicked()
     loadCampaign();
 }
 
-// Este método carga una campaña en memoria
+// Loads a campaign into memory
 void MainWindow::loadCampaign(){
 
-    // Abre un explorador de archivos para que seleccione el usuario el json específico
+    // Opens file explorer so the user can select a specific json file
     QString campaignFileName = QFileDialog::getOpenFileName(this, "Select file", "", "*.json");
 
     if (!campaignFileName.isEmpty()) {
@@ -688,7 +689,7 @@ void MainWindow::loadCampaign(){
 void MainWindow::on_actionOpen_File_triggered()
 {
     // Esto abre el explorador de archivos para seleccionar un programa binario
-    programFileName = QFileDialog::getOpenFileName(this, "Select file", "", "*.c *.asm");
+    programFileName = QFileDialog::getOpenFileName(this, "Select file", "", "*.c *.s");
     if (!programFileName.isEmpty()) {
 
         qDebug() << "File selected:" << programFileName;   // debug
@@ -701,7 +702,7 @@ void MainWindow::on_actionOpen_File_triggered()
 
         if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
             QMessageBox::warning(this, "Error",
-                                 "No se pudo abrir el archivo");
+                                 "Could not open the file");
             return;
         }
 
@@ -712,7 +713,7 @@ void MainWindow::on_actionOpen_File_triggered()
 
         ui->filenameText->setText(filename);
 
-
+        ui->languageSelector->setCurrentIndex(programFileName.contains(".c") ? 1 : 0);
         // Al cargar el programa, se habilitan los botones de control de ejecución
         ui->runButton->setEnabled(true);
         ui->runPasoButton->setEnabled(true);
@@ -730,7 +731,10 @@ void MainWindow::on_actionSave_file_triggered()
     if(programFileName == ""){
 
         programFileName = QFileDialog::getSaveFileName(this);
-        programFileName.append(".c");
+        if(!programFileName.contains(".c") && ui->languageSelector->currentText() == "C")
+            programFileName.append(".c");
+        else if(!programFileName.contains(".s") && ui->languageSelector->currentText() == "Assembly")
+            programFileName.append(".s");
 
         if (!programFileName.isEmpty()) {
             qDebug() << "File saving as:" << programFileName;   // debug
