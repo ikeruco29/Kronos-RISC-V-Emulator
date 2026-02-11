@@ -34,6 +34,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
 
         codeeditor.h codeeditor.cpp
         highlighter.h highlighter.cpp
+        executioncampigndialog.h executioncampigndialog.cpp executioncampigndialog.ui
+        compilingprocessdialog.h compilingprocessdialog.cpp compilingprocessdialog.ui
 
 
 

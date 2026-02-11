@@ -18,6 +18,7 @@ public:
 
     Memory* ram;
     bool bEbreak = false;
+    bool bEcall = false;
     uint32_t cycles = 0;
 
     // Fetch siguiente instrucción

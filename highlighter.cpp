@@ -25,7 +25,7 @@ Highlighter::Highlighter(QTextDocument *parent, int language_param)
     const QString keywordPatternsAssembly[] = {
 
     /* ===== RV32I base ===== */
-    QStringLiteral("\\badd\\b"), QStringLiteral("\\bsub\\b"),
+        QStringLiteral("\\badd\\b"), QStringLiteral("\\bsub\\b"),
         QStringLiteral("\\bsll\\b"), QStringLiteral("\\bslt\\b"), QStringLiteral("\\bsltu\\b"),
         QStringLiteral("\\bxor\\b"), QStringLiteral("\\bsrl\\b"), QStringLiteral("\\bsra\\b"),
         QStringLiteral("\\bor\\b"),  QStringLiteral("\\band\\b"),
@@ -40,6 +40,7 @@ Highlighter::Highlighter(QTextDocument *parent, int language_param)
         QStringLiteral("\\bsb\\b"), QStringLiteral("\\bsh\\b"), QStringLiteral("\\bsw\\b"),
 
         QStringLiteral("\\bbeq\\b"), QStringLiteral("\\bbne\\b"),
+        QStringLiteral("\\bble\\b"),
         QStringLiteral("\\bblt\\b"), QStringLiteral("\\bbge\\b"),
         QStringLiteral("\\bbltu\\b"), QStringLiteral("\\bbgeu\\b"),
 
@@ -101,16 +102,48 @@ Highlighter::Highlighter(QTextDocument *parent, int language_param)
         QStringLiteral("\\bret\\b"), QStringLiteral("\\bcall\\b"),
         QStringLiteral("\\btail\\b")
 };
+    const QString abiRegisterPatterns[] = {
+        QStringLiteral("\\bzero\\b"),
+
+        QStringLiteral("\\bra\\b"),
+
+        QStringLiteral("\\bsp\\b"), QStringLiteral("\\bgp\\b"), QStringLiteral("\\btp\\b"),
+
+        QStringLiteral("\\bt0\\b"), QStringLiteral("\\bt1\\b"), QStringLiteral("\\bt2\\b"),
+        QStringLiteral("\\bt3\\b"), QStringLiteral("\\bt4\\b"), QStringLiteral("\\bt5\\b"),
+        QStringLiteral("\\bt6\\b"),
+
+        QStringLiteral("\\bs0\\b"), QStringLiteral("\\bs1\\b"),
+        QStringLiteral("\\bs2\\b"), QStringLiteral("\\bs3\\b"),
+        QStringLiteral("\\bs4\\b"), QStringLiteral("\\bs5\\b"),
+        QStringLiteral("\\bs6\\b"), QStringLiteral("\\bs7\\b"),
+        QStringLiteral("\\bs8\\b"), QStringLiteral("\\bs9\\b"),
+        QStringLiteral("\\bs10\\b"), QStringLiteral("\\bs11\\b"),
+
+        QStringLiteral("\\ba0\\b"), QStringLiteral("\\ba1\\b"),
+        QStringLiteral("\\ba2\\b"), QStringLiteral("\\ba3\\b"),
+        QStringLiteral("\\ba4\\b"), QStringLiteral("\\ba5\\b"),
+        QStringLiteral("\\ba6\\b"), QStringLiteral("\\ba7\\b")
+};
 
 
     if(language == 0 /*assembly*/){
+        // ===================== RULES FOR HIGHLIGHTING ASSEMBLY ======================
+
+        registerNumFormat.setForeground(QColor(47, 108, 150).lighter());    // REGISTERS
+
         for (const QString &pattern : keywordPatternsAssembly) {
             rule.pattern = QRegularExpression(pattern);
             rule.format = keywordFormat;
             highlightingRules.append(rule);
         }
 
-        // ===================== RULES FOR HIGHLIGHTING ASSEMBLY ======================
+        for (const QString &pattern : abiRegisterPatterns){
+            rule.pattern = QRegularExpression(pattern);
+            rule.format = registerNumFormat;
+            highlightingRules.append(rule);
+        }
+
 
         // REGEX FOR REGISTER NUMBER
         registerNumFormat.setForeground(QColor(47, 108, 150).lighter());

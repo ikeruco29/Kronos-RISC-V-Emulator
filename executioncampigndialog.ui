@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ExecutionCampignDialog</class>
+ <widget class="QDialog" name="ExecutionCampignDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>707</width>
+    <height>101</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string/>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">background-color: rgb(36, 40, 59);</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QGroupBox" name="executingCampaignBox">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgb(36, 40, 59);</string>
+     </property>
+     <property name="title">
+      <string>Executing campaign...</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <widget class="QProgressBar" name="progressBar">
+        <property name="value">
+         <number>0</number>
+        </property>
+        <property name="textVisible">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

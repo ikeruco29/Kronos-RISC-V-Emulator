@@ -66,8 +66,6 @@ MainWindow::MainWindow(QWidget *parent, Computer *comp)
 
     // =====================================================
 
-    ui->executingCampaignBox->hide();
-
     isExecutingBeforeCampaign = false;
 
     // En QT, puedes vincular un método a otro. Este otro método se llama "signal"
@@ -140,6 +138,49 @@ void MainWindow::on_actionSalir_triggered()
 // Botón para realizar la ejecución completa del programa en memoria
 int MainWindow::on_runButton_clicked()
 {
+    // If the program loaded is not an executable program...
+    if(!ui->filenameText->text().contains(".bin")){
+        QFileInfo fileinfo = QFileInfo(programFileName);
+        std::stringstream cmd;
+
+        std::stringstream binPath;
+
+        // If its an assembly file...
+        if(ui->filenameText->text().contains(".s")){
+            binPath << fileinfo.path().toStdString() << "/a.bin";
+            cmd << "clang --target=riscv32 -march=rv32i -mabi=ilp32 -x assembler -c " << programFileName.toStdString() << " -o " << binPath.str();
+
+        // If its a C file...
+        }else if(ui->filenameText->text().contains(".c")){
+            binPath << fileinfo.path().toStdString() << "/a.bin";
+            cmd << "clang --target=riscv32 -march=rv32i -mabi=ilp32 -O0 -g -nostdlib -nostartfiles -fuse-ld=lld -Wl,-T,linker.ld " << programFileName.toStdString() << " -o " << binPath.str();
+
+        }
+
+        compilingDialog = new compilingProcessDialog(nullptr, cmd.str().c_str());
+        compilingDialog->show();
+
+        qDebug() << "Absolute path" << fileinfo.path();
+        qDebug() << "CLANG Command: " << cmd.str().c_str();
+        qDebug() << "Compiling...";
+
+        int commandCode = std::system(cmd.str().c_str());
+
+        compilingDialog->close();
+
+        if( commandCode != 0) {
+            QMessageBox::critical(nullptr, "Error: Could not compile the file", "An error ocurred while trying to compile the file");
+            return 1;
+        }
+
+
+        computer->reset();  // Reset computer
+        computer->LoadProgram(binPath.str()); // Load program to computer's memory
+
+        pageToView = computer->ram.iRomStartAddr;
+        ui->ramText->setPlainText(QString::fromStdString(computer->showRam(pageToView)));
+    }
+
     stopExec = false;
 
     // Todo esto del QTimer es porque si utilizo un bucle que haga
@@ -170,8 +211,8 @@ int MainWindow::on_runButton_clicked()
 void MainWindow::runLoopIteration()
 {
 
-    // Al escribir en la posición FINISH_LOCATION un 0, para la ejecución del programa
-    if (computer->ram.readByte(FINISH_LOCATION) == 0 || stopExec) {
+    // When ECALL instruction is called, it means the program has finished
+    if (computer->cpu.bEcall == true || stopExec) {
 
         sender()->deleteLater(); // Eliminar el QTimer después de terminar el bucle
 
@@ -179,7 +220,7 @@ void MainWindow::runLoopIteration()
         if(this->isExecutingBeforeCampaign)
             emit runProgramCompleted();
 
-        else if(computer->ram.readByte(FINISH_LOCATION) == 0){
+        else if(computer->cpu.bEcall == true){
 
             ui->ramText->setPlainText(QString::fromStdString(computer->showRam(pageToView)));   // Update ramBox
             ui->generateStatsButton->setEnabled(true);
@@ -201,7 +242,7 @@ void MainWindow::runLoopIterationCampaign()
 {
     qDebug() << computer->cpu.cycles;
 
-    if (computer->ram.readByte(FINISH_LOCATION) == 0) {
+    if (computer->cpu.bEcall == true) {
 
         // Al escribir en la posición FINISH_LOCATION un 0, para la ejecución del programa
         if(computer->ram.readByte(RESULT_LOCATION) != computer->campaign.expectedResult){
@@ -542,11 +583,10 @@ void MainWindow::on_executeCampaignButton_clicked()
         emit runProgram();
 
     } else {
-        ui->progressBar->setMaximum(computer->campaign.injections.size());
-        ui->executingCampaignBox->setVisible(true);
+        campaignDialog = new ExecutionCampignDialog(nullptr, computer->campaign.injections.size());
+        campaignDialog->show();
 
         emit runCampaignIter();
-
     }
 
 }
@@ -571,7 +611,7 @@ void MainWindow::iterationCampaign(){
 }
 
 void MainWindow::onFinishIter(){
-    ui->progressBar->setValue(injectionNumber);
+    campaignDialog->updateProgressBar(injectionNumber);
 
     if(this->injectionNumber == computer->campaign.injections.size()-1)
         emit campaignComplete();
@@ -618,7 +658,7 @@ void MainWindow::onCampaignComplete(){
                   .arg(due, 0, 'f', 2);
 
 
-    ui->executingCampaignBox->setVisible(false);    // Dejamos de renderizar la barra de carga
+    campaignDialog->close();
 
     QMessageBox::information(nullptr, "Information about campaign", str);
     return;
@@ -639,8 +679,8 @@ void MainWindow::updateCampaignAfterProgramExecution(){
     computer->campaign.expectedInstructions = computer->cpu.cycles;
     computer->campaign.expectedResult = resultEsperado;
 
-    ui->progressBar->setMaximum(computer->campaign.injections.size());
-    ui->executingCampaignBox->setVisible(true);
+    campaignDialog = new ExecutionCampignDialog(nullptr, computer->campaign.injections.size());
+    campaignDialog->show();
 
     emit runCampaignIter();
 
