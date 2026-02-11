@@ -32,6 +32,10 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         instructionsdialog.h instructionsdialog.cpp instructionsdialog.ui
 
 
+        codeeditor.h codeeditor.cpp
+        highlighter.h highlighter.cpp
+
+
 
 
 

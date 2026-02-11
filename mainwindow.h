@@ -5,6 +5,8 @@
 #include "computer.h"
 #include "statsdialog.h"
 
+#include "highlighter.h"
+
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
@@ -30,6 +32,9 @@ public:
     int injectionNumber = 0;
 
     uint32_t FINISH_LOCATION, RESULT_LOCATION;
+    bool updateRamInRealTime;
+
+    Highlighter *highlighter;
 
 private slots:
     void on_actionCargar_programa_triggered();
@@ -68,6 +73,14 @@ private slots:
 
     void onCampaignComplete();
     void onFinishIter();
+    void on_actionOpen_File_triggered();
+
+    void on_actionSave_file_triggered();
+
+    void on_actionNew_triggered();
+
+    void on_languageSelector_currentIndexChanged(int index);
+
 signals:
     void runProgram();
     void runProgramCompleted();

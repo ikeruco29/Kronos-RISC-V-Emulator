@@ -9,6 +9,7 @@
 const QString CONFIG_FILE = "./config.json";
 
 uint ramSize, finish_location, result_location, romAddrAlloc;
+bool updateRamInRealTime;
 QString disassemblyRouteFile, ramRouteFile, campaignRoute;
 
 int readConfigFile();
@@ -45,6 +46,8 @@ int main(int argc, char *argv[])
     // la ejecución del programa
     w.RESULT_LOCATION = result_location;
     w.FINISH_LOCATION = finish_location;
+
+    w.updateRamInRealTime = updateRamInRealTime;
 
     w.show();
 
@@ -92,6 +95,7 @@ int readConfigFile(){
     result_location = jsonObj["resultRamLocation"].toString().toUInt(nullptr, 16);
     finish_location = jsonObj["finishRamLocation"].toString().toUInt(nullptr, 16);
     romAddrAlloc = jsonObj["romAddressAllocation"].toString().toUInt(nullptr, 16);
+    updateRamInRealTime = jsonObj["updateRamInRealTime"].toBool();
 
 
     // Imprimir los valores extraídos (solo para debug)
@@ -101,6 +105,7 @@ int readConfigFile(){
     qDebug() << "campaign route:" << campaignRoute;
     qDebug() << "Result location:" << result_location;
     qDebug() << "Finish location:" << finish_location;
+    qDebug() << "Update RAM in real time: " << updateRamInRealTime;
 
     return 0;
 }

@@ -10,6 +10,10 @@
 #include <QDateTime>
 #include <QInputDialog>
 #include <QMessageBox>
+#include <QFile>
+#include <QTextStream>
+
+#include "codeeditor.h"
 
 
 enum CampaignResult{
@@ -19,6 +23,8 @@ enum CampaignResult{
     DUE
 };
 
+CodeEditor *editor;
+QString programFileName = "";
 
 MainWindow::MainWindow(QWidget *parent, Computer *comp)
     : QMainWindow(parent)
@@ -36,6 +42,29 @@ MainWindow::MainWindow(QWidget *parent, Computer *comp)
     ui->pauseButton->setEnabled(false);
     ui->executeCampaignButton->setEnabled(false);
     ui->generateStatsButton->setEnabled(false);
+
+    // ================ CODE EDITOR SETUP ==================
+
+    editor = new CodeEditor(ui->CodeEditor->parentWidget());
+
+    // Copiar geometría y políticas
+    editor->setGeometry(ui->CodeEditor->geometry());
+    editor->setSizePolicy(ui->CodeEditor->sizePolicy());
+
+    QLayout *layout = ui->CodeEditor->parentWidget()->layout();
+    layout->replaceWidget(ui->CodeEditor, editor);
+
+    ui->CodeEditor->deleteLater();
+
+    QFont font ("Consolas");
+    font.setStyleHint(QFont::Monospace);
+    font.setPointSize(11);
+
+    editor->setTabStopDistance(QFontMetrics(font).horizontalAdvance(' ') * 4);
+
+    highlighter = new Highlighter(editor->document());
+
+    // =====================================================
 
     ui->executingCampaignBox->hide();
 
@@ -63,10 +92,10 @@ void MainWindow::on_actionCargar_programa_triggered()
 {
 
     // Esto abre el explorador de archivos para seleccionar un programa binario
-    QString nombreArchivo = QFileDialog::getOpenFileName(this, "Seleccionar archivo", "", "*.bin *.o");
+    QString nombreArchivo = QFileDialog::getOpenFileName(this, "Select file", "", "*.bin *.o");
     if (!nombreArchivo.isEmpty()) {
 
-        qDebug() << "Archivo seleccionado:" << nombreArchivo;   // debug
+        qDebug() << "File selected:" << nombreArchivo;   // debug
         QFileInfo fileInfo(nombreArchivo);
         QString filename = fileInfo.fileName(); // Para sacar solo el nombre
 
@@ -90,7 +119,7 @@ void MainWindow::on_actionCargar_programa_triggered()
         ui->pauseButton->setEnabled(true);
 
     } else {
-        qDebug() << "Ningún archivo seleccionado.";
+        qDebug() << "No file selected....";
     }
 
     stopExec = false;
@@ -152,8 +181,9 @@ void MainWindow::runLoopIteration()
 
         else if(computer->ram.readByte(FINISH_LOCATION) == 0){
 
+            ui->ramText->setPlainText(QString::fromStdString(computer->showRam(pageToView)));   // Update ramBox
             ui->generateStatsButton->setEnabled(true);
-            QMessageBox::information(nullptr, "Programa finalizado", "La ejecución del programa ha finalizado");
+            QMessageBox::information(nullptr, "Execution completed", "The program execution has finished");
 
         }
         return;
@@ -248,7 +278,8 @@ void MainWindow::on_runPasoButton_clicked()
         computer->cpu.clock();
         this->UpdateInterface();
     } else {
-        QMessageBox::information(nullptr, "Programa finalizado", "La ejecución del programa ha finalizado");
+        ui->ramText->setPlainText(QString::fromStdString(computer->showRam(pageToView)));   // Update ramBox
+        QMessageBox::information(nullptr, "Execution completed", "The program execution has finished");
         ui->generateStatsButton->setEnabled(true);  // Se habilita el botón para generar estadísticas del emulador
     }
 }
@@ -341,10 +372,10 @@ void MainWindow::on_exportDisButton_clicked()
         // Cerrar el archivo
         file.close();
 
-        QMessageBox::information(nullptr, "Exportación satisfactoria", "Desencamblado exportado. Archivo en: " + disassemblyFileRoute);
+        QMessageBox::information(nullptr, "Export completed", "Disassembly exported. File in: " + disassemblyFileRoute);
     } else {
         // Si no se pudo abrir el archivo, mostrar un mensaje de error
-        qDebug() << "No se pudo abrir el archivo:" << file.errorString();
+        qDebug() << "Cannot open the file:" << file.errorString();
     }
 }
 
@@ -374,11 +405,11 @@ void MainWindow::on_exportRamButton_clicked()
         // Cerrar el archivo
         file.close();
 
-        QMessageBox::information(nullptr, "Exportación satisfactoria", "RAM exportado. Archivo en: " + ramFileRoute);
+        QMessageBox::information(nullptr, "Export completed", "RAM exported. file in: " + ramFileRoute);
     } else {
         // Si no se pudo abrir el archivo, mostrar un mensaje de error
-        qDebug() << "No se pudo abrir el archivo:" << file.errorString();
-        QMessageBox::critical(nullptr, "Fallo en la exportación", "Ha habido un fallo inesperado al exportar la RAM");
+        qDebug() << "Cannot open the file:" << file.errorString();
+        QMessageBox::critical(nullptr, "Export failed", "An error has ocurred while trying to export RAM");
     }
 }
 
@@ -393,33 +424,36 @@ void MainWindow::resetInterface(){
     ui->codeDisassemblyText->clear();
     ui->ramText->setPlainText(QString::fromStdString(computer->showRam(pageToView)));
     ui->registerText->setPlainText(QString::fromStdString(computer->showRegisters()));
-    ui->terminalBox->setPlainText("");
     ui->filenameText->clear();
+    programFileName = "";
     ui->campaignNameText->clear();
+
+    editor->clear();
 }
 
 
 void MainWindow::UpdateInterface()
 {
     UpdateTerminal();    // Update terminalBox
-    ui->ramText->setPlainText(QString::fromStdString(computer->showRam(pageToView)));   // Update ramBox
+    if(updateRamInRealTime)
+        ui->ramText->setPlainText(QString::fromStdString(computer->showRam(pageToView)));   // Update ramBox
     ui->registerText->setPlainText(QString::fromStdString(computer->showRegisters()));  // Update registerBox
     ui->codeDisassemblyText->appendPlainText(QString::fromStdString(computer->showDisassembly()));  // Update disassembly
 }
 
 void MainWindow::UpdateTerminal(){
-    ui->terminalBox->setPlainText("");
+    /*ui->terminalBox->setPlainText("");
     for(int i = 0; i < 20; i++){
         ui->terminalBox->appendPlainText(computer->showVRAMLine(i));
-    }
+    }*/
 }
 
 
 
 void MainWindow::on_actionGenerar_campa_a_aleatoria_triggered()
 {
-    QMessageBox::information(nullptr, "Indique un archivo", "Por favor, indique el programa al que se le asignará la campaña");
-    QString program = QFileDialog::getOpenFileName(nullptr, "Seleccionar archivo", "", "Archivos (*.bin *.o)");
+    QMessageBox::information(nullptr, "Select a file", "Please, select the file that will be bounded to the campaign");
+    QString program = QFileDialog::getOpenFileName(nullptr, "Select file", "", "Files (*.bin *.o)");
 
     if(!program.isEmpty()){
 
@@ -482,15 +516,15 @@ void MainWindow::on_actionGenerar_campa_a_aleatoria_triggered()
         if (jsonFile.open(QFile::WriteOnly | QFile::Truncate)) {
             jsonFile.write(jsonData);
             jsonFile.close();
-            qDebug() << "Campaña generada con éxito.";
+            qDebug() << "Campaign generated successfully.";
 
-            QMessageBox::information(nullptr, "Información", "Campaña generada con éxito en: " + campaignGeneratorRoute);
+            QMessageBox::information(nullptr, "Info", "Campaign successfully generated in: " + campaignGeneratorRoute);
         } else {
-            qDebug() << "Error al generar campaña para escritura.";
+            qDebug() << "Error while trying to generate campaign.";
         }
 
     } else {
-        qDebug() << "Error al abrir el archivo";
+        qDebug() << "Error opening the file";
     }
 }
 
@@ -531,7 +565,7 @@ void MainWindow::iterationCampaign(){
 
     timerCampaign->start();
 
-    qDebug() << "fin";
+    qDebug() << "end";
 
     //computer->reset();
 }
@@ -577,7 +611,7 @@ void MainWindow::onCampaignComplete(){
     sed = (sed * 100) / hundred;
     due = (due * 100) / hundred;
 
-    str = QString("Resultados de la campaña:\nNo effect: %1%\nSDC: %2%\nSED: %3%\nDUE: %4%")
+    str = QString("Results of the campaign:\nNo effect: %1%\nSDC: %2%\nSED: %3%\nDUE: %4%")
                   .arg(noeffect, 0, 'f', 2)
                   .arg(sdc, 0, 'f', 2)
                   .arg(sed, 0, 'f', 2)
@@ -586,7 +620,7 @@ void MainWindow::onCampaignComplete(){
 
     ui->executingCampaignBox->setVisible(false);    // Dejamos de renderizar la barra de carga
 
-    QMessageBox::information(nullptr, "Información sobre la campaña", str);
+    QMessageBox::information(nullptr, "Information about campaign", str);
     return;
 }
 
@@ -599,8 +633,8 @@ void MainWindow::updateCampaignAfterProgramExecution(){
     int instruccionesEsperadas = computer->cpu.cycles;
     int resultEsperado = computer->ram.readByte(RESULT_LOCATION);
 
-    qDebug() << "Instrucciones:" << instruccionesEsperadas;
-    qDebug() << "Resultado esperado:" << resultEsperado;
+    qDebug() << "Instructions:" << instruccionesEsperadas;
+    qDebug() << "Expected result:" << resultEsperado;
 
     computer->campaign.expectedInstructions = computer->cpu.cycles;
     computer->campaign.expectedResult = resultEsperado;
@@ -618,22 +652,22 @@ void MainWindow::on_loadCampaignButton_clicked()
     loadCampaign();
 }
 
-// Este método carga una campaña en memoria
+// Loads a campaign into memory
 void MainWindow::loadCampaign(){
 
-    // Abre un explorador de archivos para que seleccione el usuario el json específico
-    QString nombreArchivo = QFileDialog::getOpenFileName(this, "Seleccionar archivo", "", "*.json");
+    // Opens file explorer so the user can select a specific json file
+    QString campaignFileName = QFileDialog::getOpenFileName(this, "Select file", "", "*.json");
 
-    if (!nombreArchivo.isEmpty()) {
+    if (!campaignFileName.isEmpty()) {
 
         resetInterface();
 
-        QFileInfo fileInfo(nombreArchivo);
+        QFileInfo fileInfo(campaignFileName);
         QString filename = fileInfo.fileName();
 
-        qDebug() << "Archivo seleccionado:" << nombreArchivo;
+        qDebug() << "Selected file:" << campaignFileName;
         computer->reset();
-        computer->LoadCampaign(nombreArchivo.toStdString());
+        computer->LoadCampaign(campaignFileName.toStdString());
         ui->campaignNameText->setText(filename);
 
         QFileInfo programInfo(computer->campaign.programPath);
@@ -641,12 +675,106 @@ void MainWindow::loadCampaign(){
 
         ui->filenameText->setText(programName);
 
-        QMessageBox::information(nullptr, "Información", "Campaña cargada");
+        QMessageBox::information(nullptr, "Info", "Campaign loaded");
 
         ui->executeCampaignButton->setEnabled(true);
 
     } else {
-        qDebug() << "Ningún archivo seleccionado.";
+        qDebug() << "No file selected.";
     }
+}
+
+
+void MainWindow::on_actionOpen_File_triggered()
+{
+    // Esto abre el explorador de archivos para seleccionar un programa binario
+    programFileName = QFileDialog::getOpenFileName(this, "Select file", "", "*.c *.s");
+    if (!programFileName.isEmpty()) {
+
+        qDebug() << "File selected:" << programFileName;   // debug
+        QFileInfo fileInfo(programFileName);
+        QString filename = fileInfo.fileName(); // Para sacar solo el nombre
+
+        //resetInterface();   // Reestablece la interfaz
+
+        QFile file(programFileName);
+
+        if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+            QMessageBox::warning(this, "Error",
+                                 "Could not open the file");
+            return;
+        }
+
+        QTextStream in(&file);
+        editor->setPlainText(in.readAll());
+
+        file.close();
+
+        ui->filenameText->setText(filename);
+
+        ui->languageSelector->setCurrentIndex(programFileName.contains(".c") ? 1 : 0);
+        // Al cargar el programa, se habilitan los botones de control de ejecución
+        ui->runButton->setEnabled(true);
+        ui->runPasoButton->setEnabled(true);
+        ui->pauseButton->setEnabled(true);
+
+    } else {
+        qDebug() << "No file selected....";
+    }
+}
+
+
+void MainWindow::on_actionSave_file_triggered()
+{
+    // In case there wasn't any program loaded (he is programming in a new file)
+    if(programFileName == ""){
+
+        programFileName = QFileDialog::getSaveFileName(this);
+        if(!programFileName.contains(".c") && ui->languageSelector->currentText() == "C")
+            programFileName.append(".c");
+        else if(!programFileName.contains(".s") && ui->languageSelector->currentText() == "Assembly")
+            programFileName.append(".s");
+
+        if (!programFileName.isEmpty()) {
+            qDebug() << "File saving as:" << programFileName;   // debug
+        }
+        else {
+            qDebug() << "No file selected...";
+            return;
+        }
+    }
+
+    QFile file(programFileName);
+
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QMessageBox::warning(this, "Error",
+                             "Couldn't save the file");
+        return;
+    }
+
+    QTextStream out(&file);
+    out.setEncoding(QStringConverter::Utf8);
+
+    out << editor->toPlainText();
+
+    if(ui->filenameText->text().isEmpty()){
+        QFileInfo fileinfo(programFileName);
+        ui->filenameText->setText(fileinfo.fileName());
+    }
+
+    file.close();
+}
+
+
+void MainWindow::on_actionNew_triggered()
+{
+    resetInterface();
+}
+
+
+void MainWindow::on_languageSelector_currentIndexChanged(int index)
+{
+    qDebug() << "Language: " << index;
+    highlighter = new Highlighter(editor->document(), index);
 }
 
