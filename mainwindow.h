@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include "compilingprocessdialog.h"
 #include "computer.h"
 #include "executioncampigndialog.h"
 #include "statsdialog.h"
@@ -95,6 +96,7 @@ private:
     Ui::MainWindow *ui;
     StatsDialog *statsDialog;
     ExecutionCampignDialog *campaignDialog;
+    compilingProcessDialog *compilingDialog;
 
     void resetInterface();
 

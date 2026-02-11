@@ -138,6 +138,41 @@ void MainWindow::on_actionSalir_triggered()
 // Botón para realizar la ejecución completa del programa en memoria
 int MainWindow::on_runButton_clicked()
 {
+    // If the program loaded is not an executable program...
+    if(!ui->filenameText->text().contains(".bin")){
+        QFileInfo fileinfo = QFileInfo(programFileName);
+        std::stringstream cmd;
+
+        std::stringstream binPath;
+
+        // If its an assembly file...
+        if(ui->filenameText->text().contains(".s")){
+            binPath << fileinfo.path().toStdString() << "/a.bin";
+            cmd << "clang --target=riscv32 -march=rv32i -mabi=ilp32 -x assembler -c " << programFileName.toStdString() << " -o " << binPath.str();
+
+        // If its a C file...
+        }else if(ui->filenameText->text().contains(".c")){
+
+        }
+
+        qDebug() << "Absolute path" << fileinfo.path();
+        qDebug() << "CLANG Command: " << cmd.str().c_str();
+        qDebug() << "Compiling...";
+
+        compilingDialog = new compilingProcessDialog(nullptr, cmd.str().c_str());
+        compilingDialog->show();
+
+        std::system(cmd.str().c_str());
+
+        compilingDialog->close();
+
+        computer->reset();  // Reset computer
+        computer->LoadProgram(binPath.str()); // Load program to computer's memory
+
+        pageToView = computer->ram.iRomStartAddr;
+        ui->ramText->setPlainText(QString::fromStdString(computer->showRam(pageToView)));
+    }
+
     stopExec = false;
 
     // Todo esto del QTimer es porque si utilizo un bucle que haga

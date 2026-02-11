@@ -23,5 +23,17 @@ In addition, below the RAM canvas, there is a search box that allows you to look
 - Correct: 80003020
 - Incorrect: 0x80003020
 
+# Dependencies
+As this emulator supports code editting with syntax highlight of C and Assembly, you must have installed CLang in order to compile code directly. 
+
+## Install CLang on Windows
+Go to [LLVM Official Webpage](https://llvm.org/builds/) and download from there the windows installer.
+
+Make sure you have risc-v available as a target
+```
+clang --print-targets | Select-String risc
+```
+You should have 2: riscv32 and riscv64. This emulator currently supports riscv32.
+
 ## Author
 - [@ikeruco29](https://www.github.com/ikeruco29)
