@@ -157,16 +157,22 @@ int MainWindow::on_runButton_clicked()
 
         }
 
+        compilingDialog = new compilingProcessDialog(nullptr, cmd.str().c_str());
+        compilingDialog->show();
+
         qDebug() << "Absolute path" << fileinfo.path();
         qDebug() << "CLANG Command: " << cmd.str().c_str();
         qDebug() << "Compiling...";
 
-        compilingDialog = new compilingProcessDialog(nullptr, cmd.str().c_str());
-        compilingDialog->show();
-
-        std::system(cmd.str().c_str());
+        int commandCode = std::system(cmd.str().c_str());
 
         compilingDialog->close();
+
+        if( commandCode != 0) {
+            QMessageBox::critical(nullptr, "Error: Could not compile the file", "An error ocurred while trying to compile the file");
+            return 1;
+        }
+
 
         computer->reset();  // Reset computer
         computer->LoadProgram(binPath.str()); // Load program to computer's memory
