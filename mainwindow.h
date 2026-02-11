@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include "computer.h"
+#include "executioncampigndialog.h"
 #include "statsdialog.h"
 
 #include "highlighter.h"
@@ -93,6 +94,7 @@ signals:
 private:
     Ui::MainWindow *ui;
     StatsDialog *statsDialog;
+    ExecutionCampignDialog *campaignDialog;
 
     void resetInterface();
 

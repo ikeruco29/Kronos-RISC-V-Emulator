@@ -66,8 +66,6 @@ MainWindow::MainWindow(QWidget *parent, Computer *comp)
 
     // =====================================================
 
-    ui->executingCampaignBox->hide();
-
     isExecutingBeforeCampaign = false;
 
     // En QT, puedes vincular un método a otro. Este otro método se llama "signal"
@@ -542,11 +540,10 @@ void MainWindow::on_executeCampaignButton_clicked()
         emit runProgram();
 
     } else {
-        ui->progressBar->setMaximum(computer->campaign.injections.size());
-        ui->executingCampaignBox->setVisible(true);
+        campaignDialog = new ExecutionCampignDialog(nullptr, computer->campaign.injections.size());
+        campaignDialog->show();
 
         emit runCampaignIter();
-
     }
 
 }
@@ -571,7 +568,7 @@ void MainWindow::iterationCampaign(){
 }
 
 void MainWindow::onFinishIter(){
-    ui->progressBar->setValue(injectionNumber);
+    campaignDialog->updateProgressBar(injectionNumber);
 
     if(this->injectionNumber == computer->campaign.injections.size()-1)
         emit campaignComplete();
@@ -618,7 +615,7 @@ void MainWindow::onCampaignComplete(){
                   .arg(due, 0, 'f', 2);
 
 
-    ui->executingCampaignBox->setVisible(false);    // Dejamos de renderizar la barra de carga
+    campaignDialog->close();
 
     QMessageBox::information(nullptr, "Information about campaign", str);
     return;
@@ -639,8 +636,8 @@ void MainWindow::updateCampaignAfterProgramExecution(){
     computer->campaign.expectedInstructions = computer->cpu.cycles;
     computer->campaign.expectedResult = resultEsperado;
 
-    ui->progressBar->setMaximum(computer->campaign.injections.size());
-    ui->executingCampaignBox->setVisible(true);
+    campaignDialog = new ExecutionCampignDialog(nullptr, computer->campaign.injections.size());
+    campaignDialog->show();
 
     emit runCampaignIter();
 
