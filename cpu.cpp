@@ -126,6 +126,7 @@ void CPU::reset(){
     cycles = 0;
 
     bEbreak = 0;
+    bEcall = false;
 }
 
 // Captura de la instrucción
@@ -525,7 +526,7 @@ int CPU::JALR() {
 
 int CPU::ECALL() {
     // Detener ejecución de programa
-
+    bEcall = true;
     return 0;
 }
 int CPU::EBREAK() {

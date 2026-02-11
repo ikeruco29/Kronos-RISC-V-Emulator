@@ -152,6 +152,8 @@ int MainWindow::on_runButton_clicked()
 
         // If its a C file...
         }else if(ui->filenameText->text().contains(".c")){
+            binPath << fileinfo.path().toStdString() << "/a.bin";
+            cmd << "clang --target=riscv32 -march=rv32i -mabi=ilp32 -O0 -g -nostdlib -nostartfiles -fuse-ld=lld -Wl,-T,linker.ld " << programFileName.toStdString() << " -o " << binPath.str();
 
         }
 
@@ -203,8 +205,8 @@ int MainWindow::on_runButton_clicked()
 void MainWindow::runLoopIteration()
 {
 
-    // Al escribir en la posición FINISH_LOCATION un 0, para la ejecución del programa
-    if (computer->ram.readByte(FINISH_LOCATION) == 0 || stopExec) {
+    // When ECALL instruction is called, it means the program has finished
+    if (computer->cpu.bEcall == true || stopExec) {
 
         sender()->deleteLater(); // Eliminar el QTimer después de terminar el bucle
 
@@ -212,7 +214,7 @@ void MainWindow::runLoopIteration()
         if(this->isExecutingBeforeCampaign)
             emit runProgramCompleted();
 
-        else if(computer->ram.readByte(FINISH_LOCATION) == 0){
+        else if(computer->cpu.bEcall == true){
 
             ui->ramText->setPlainText(QString::fromStdString(computer->showRam(pageToView)));   // Update ramBox
             ui->generateStatsButton->setEnabled(true);
@@ -234,7 +236,7 @@ void MainWindow::runLoopIterationCampaign()
 {
     qDebug() << computer->cpu.cycles;
 
-    if (computer->ram.readByte(FINISH_LOCATION) == 0) {
+    if (computer->cpu.bEcall == true) {
 
         // Al escribir en la posición FINISH_LOCATION un 0, para la ejecución del programa
         if(computer->ram.readByte(RESULT_LOCATION) != computer->campaign.expectedResult){
