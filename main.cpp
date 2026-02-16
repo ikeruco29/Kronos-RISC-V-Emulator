@@ -12,6 +12,11 @@ uint ramSize, finish_location, result_location, romAddrAlloc;
 bool updateRamInRealTime;
 QString disassemblyRouteFile, ramRouteFile, campaignRoute;
 
+// EDITOR CONFIG
+int tabsize, fontsize;
+QString font;
+
+
 int readConfigFile();
 
 int main(int argc, char *argv[])
@@ -31,7 +36,7 @@ int main(int argc, char *argv[])
     }
 
 
-    MainWindow w;
+    MainWindow w = MainWindow(nullptr, nullptr, {tabsize, font, fontsize});
 
     Computer computer = Computer(ramSize);
 
@@ -97,6 +102,11 @@ int readConfigFile(){
     romAddrAlloc = jsonObj["romAddressAllocation"].toString().toUInt(nullptr, 16);
     updateRamInRealTime = jsonObj["updateRamInRealTime"].toBool();
 
+    QJsonObject editorObj = jsonObj["editor"].toObject();
+    tabsize = editorObj["tabsize"].toInt();
+    font = editorObj["font"].toString();
+    fontsize = editorObj["fontSize"].toInt();
+
 
     // Imprimir los valores extraídos (solo para debug)
     qDebug() << "Ram Size:" << ramSize / 1024 / 1024 / 1024 << "GB";
@@ -106,6 +116,7 @@ int readConfigFile(){
     qDebug() << "Result location:" << result_location;
     qDebug() << "Finish location:" << finish_location;
     qDebug() << "Update RAM in real time: " << updateRamInRealTime;
+    qDebug() << "\n" << "Font size: " << editorObj;
 
     return 0;
 }

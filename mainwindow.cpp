@@ -26,10 +26,11 @@ enum CampaignResult{
 CodeEditor *editor;
 QString programFileName = "";
 
-MainWindow::MainWindow(QWidget *parent, Computer *comp)
+MainWindow::MainWindow(QWidget *parent, Computer *comp, struct EditorConfig sEditorConfig)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
     , computer(comp)
+    , editorConfig(sEditorConfig)
 {
     // Esto es para establecer ciertos valores de la interfaz
     // Ejemplo: hasta que no cargue un programa, no puede usar el botón
@@ -45,7 +46,7 @@ MainWindow::MainWindow(QWidget *parent, Computer *comp)
 
     // ================ CODE EDITOR SETUP ==================
 
-    editor = new CodeEditor(ui->CodeEditor->parentWidget());
+    editor = new CodeEditor(ui->CodeEditor->parentWidget(), sEditorConfig.tabsize);
 
     // Copiar geometría y políticas
     editor->setGeometry(ui->CodeEditor->geometry());
@@ -58,9 +59,10 @@ MainWindow::MainWindow(QWidget *parent, Computer *comp)
 
     QFont font ("Consolas");
     font.setStyleHint(QFont::Monospace);
-    font.setPointSize(11);
+    font.setPointSize(sEditorConfig.fontsize);
 
-    editor->setTabStopDistance(QFontMetrics(font).horizontalAdvance(' ') * 4);
+    editor->setTabStopDistance(QFontMetrics(font).horizontalAdvance(' ') * sEditorConfig.tabsize);
+    editor->setFont(font);
 
     highlighter = new Highlighter(editor->document());
 
@@ -817,4 +819,6 @@ void MainWindow::on_languageSelector_currentIndexChanged(int index)
     qDebug() << "Language: " << index;
     highlighter = new Highlighter(editor->document(), index);
 }
+
+
 

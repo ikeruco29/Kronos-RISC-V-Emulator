@@ -5,7 +5,8 @@
 
 //![constructor]
 
-CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
+CodeEditor::CodeEditor(QWidget *parent, int pSpaces) : QPlainTextEdit(parent)
+    , spaces(pSpaces)
 {
     lineNumberArea = new LineNumberArea(this);
 
@@ -33,7 +34,7 @@ int CodeEditor::lineNumberAreaWidth()
         ++digits;
     }
 
-    int space = 3 + fontMetrics().horizontalAdvance(QLatin1Char('9')) * digits;
+    int space = 10 + fontMetrics().horizontalAdvance(QLatin1Char('9')) * digits;
 
     return space;
 }
@@ -62,6 +63,11 @@ void CodeEditor::updateLineNumberArea(const QRect &rect, int dy)
         updateLineNumberAreaWidth(0);
 }
 
+void CodeEditor::updateTabSize(){
+    QFontMetrics metrics(font());
+    setTabStopDistance(spaces * metrics.horizontalAdvance(' '));
+}
+
 //![slotUpdateRequest]
 
 //![resizeEvent]
@@ -72,6 +78,28 @@ void CodeEditor::resizeEvent(QResizeEvent *e)
 
     QRect cr = contentsRect();
     lineNumberArea->setGeometry(QRect(cr.left(), cr.top(), lineNumberAreaWidth(), cr.height()));
+}
+
+void CodeEditor::wheelEvent(QWheelEvent *event)
+{
+    // Check if ctrl is pressed
+    if (event->modifiers() & Qt::ControlModifier) {
+        if (event->angleDelta().y() > 0) {
+            zoomIn(1);
+        } else {
+            zoomOut(1);
+        }
+
+        // IMPORTANT!
+        // update line number area width as the font size has changed
+        updateLineNumberAreaWidth(0);
+        updateTabSize();
+
+        event->accept(); // Stop the event so it doesnt do vertical scroll
+    } else {
+        // If there's no control, act normal
+        QPlainTextEdit::wheelEvent(event);
+    }
 }
 
 //![resizeEvent]
@@ -105,7 +133,7 @@ void CodeEditor::highlightCurrentLine()
 void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event)
 {
     QPainter painter(lineNumberArea);
-    //painter.fillRect(event->rect(), Qt::lightGray);
+    painter.setFont(this->font());
 
     //![extraAreaPaintEvent_0]
 
@@ -120,8 +148,10 @@ void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event)
     while (block.isValid() && top <= event->rect().bottom()) {
         if (block.isVisible() && bottom >= event->rect().top()) {
             QString number = QString::number(blockNumber + 1);
-            painter.setPen(Qt::white);
-            painter.drawText(0, top, lineNumberArea->width(), fontMetrics().height(),
+            painter.setPen(Qt::gray);
+            int paddingRight = 5;
+
+            painter.drawText(2, top, lineNumberArea->width() - paddingRight, fontMetrics().height(),
                              Qt::AlignRight, number);
         }
 

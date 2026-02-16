@@ -15,8 +15,8 @@
     "updateRamInRealTime": false,
 
     "editor": {
-        "tabSize": 4,
-        "font": "",
+        "tabsize": 4,
+        "font": "Consolas",
         "fontSize": 11
     }
 }

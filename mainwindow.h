@@ -15,12 +15,18 @@ class MainWindow;
 }
 QT_END_NAMESPACE
 
+struct EditorConfig {
+    int tabsize;
+    QString font;
+    int fontsize;
+};
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    MainWindow(QWidget *parent = nullptr, Computer *comp = nullptr);
+    MainWindow(QWidget *parent = nullptr, Computer *comp = nullptr, EditorConfig sEditorConfig = {});
     ~MainWindow();
     Computer *computer;
     uint pageToView = 0;
@@ -36,7 +42,10 @@ public:
     uint32_t FINISH_LOCATION, RESULT_LOCATION;
     bool updateRamInRealTime;
 
+    struct EditorConfig editorConfig;
+
     Highlighter *highlighter;
+
 
 private slots:
     void on_actionCargar_programa_triggered();
