@@ -107,6 +107,8 @@ private:
     ExecutionCampignDialog *campaignDialog;
     compilingProcessDialog *compilingDialog;
 
+    QString programFileName = "";
+
     void resetInterface();
 
     bool stopExec;
@@ -118,5 +120,8 @@ private:
     void updateCampaignAfterProgramExecution();
 
     void UpdateTerminal();
+
+    void updateFilenameText(bool isChanged = false);
+    void resetFilenameText(QString text = "");
 };
 #endif // MAINWINDOW_H

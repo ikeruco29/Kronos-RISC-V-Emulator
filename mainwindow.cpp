@@ -24,7 +24,6 @@ enum CampaignResult{
 };
 
 CodeEditor *editor;
-QString programFileName = "";
 
 MainWindow::MainWindow(QWidget *parent, Computer *comp, struct EditorConfig sEditorConfig)
     : QMainWindow(parent)
@@ -80,11 +79,33 @@ MainWindow::MainWindow(QWidget *parent, Computer *comp, struct EditorConfig sEdi
     connect(this, &MainWindow::runCampaignIter, this, &MainWindow::iterationCampaign);
     connect(this, &MainWindow::campaignComplete, this, &MainWindow::onCampaignComplete);
     connect(this, &MainWindow::campaignIterComplete, this, &MainWindow::onFinishIter);
+    connect(editor->document(), &QTextDocument::modificationChanged, this, &MainWindow::updateFilenameText);
+
+    QAction *saveAction = new QAction("Save", this);
+    saveAction->setShortcut(QKeySequence("Ctrl+S"));
+    connect(saveAction, &QAction::triggered, this, &MainWindow::on_actionSave_file_triggered);
+    this->addAction(saveAction);
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+// adds an '*' if the text has been modified
+void MainWindow::updateFilenameText(bool isChanged){
+    QString pfn = QFileInfo(programFileName).fileName();
+
+    if(isChanged && !ui->filenameText->text().contains("*")){
+        pfn += " *";
+        ui->filenameText->setText(pfn);
+    } else if(ui->filenameText->text().contains("*")) {
+        resetFilenameText(pfn);
+    }
+}
+
+void MainWindow::resetFilenameText(QString text){
+    ui->filenameText->setText(text.isEmpty() ? QFileInfo(programFileName).fileName() : text);
 }
 
 // Carga el programa seleccionado en memoria
@@ -110,7 +131,7 @@ void MainWindow::on_actionCargar_programa_triggered()
                                                     // en la caja de texto.
 
         ui->ramText->setPlainText(QString::fromStdString(computer->showRam(pageToView)));
-        ui->filenameText->setText(filename);
+        resetFilenameText(filename);
 
 
         // Al cargar el programa, se habilitan los botones de control de ejecución
@@ -801,7 +822,9 @@ void MainWindow::on_actionSave_file_triggered()
 
     if(ui->filenameText->text().isEmpty()){
         QFileInfo fileinfo(programFileName);
-        ui->filenameText->setText(fileinfo.fileName());
+        resetFilenameText(fileinfo.fileName());
+    } else {
+        updateFilenameText(false);
     }
 
     file.close();
