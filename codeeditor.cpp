@@ -16,6 +16,10 @@ CodeEditor::CodeEditor(QWidget *parent, int pSpaces) : QPlainTextEdit(parent)
 
     updateLineNumberAreaWidth(0);
     highlightCurrentLine();
+
+    tabspaces = "";
+    for (int i = 0; i < spaces; i++)
+        tabspaces += " ";
 }
 
 void CodeEditor::putEndPairs(){
@@ -179,7 +183,7 @@ void CodeEditor::keyPressEvent(QKeyEvent *event){
             cursor.beginEditBlock();
             // New line + previous indent + 4 extra spaces + new line + previous indent
             // TODO: use spaces as tabsize
-            cursor.insertText("\n" + leadingWhitespace + "    " + "\n" + leadingWhitespace);
+            cursor.insertText("\n" + leadingWhitespace + tabspaces + "\n" + leadingWhitespace);
             cursor.movePosition(QTextCursor::Up);
             cursor.movePosition(QTextCursor::EndOfLine);
             cursor.endEditBlock();

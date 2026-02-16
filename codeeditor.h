@@ -39,6 +39,7 @@ private slots:
 
 private:
     QWidget *lineNumberArea;
+    QString tabspaces;
 };
 
 //![codeeditordefinition]
