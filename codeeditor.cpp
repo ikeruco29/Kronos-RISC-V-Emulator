@@ -22,19 +22,6 @@ CodeEditor::CodeEditor(QWidget *parent, int pSpaces) : QPlainTextEdit(parent)
         tabspaces += " ";
 }
 
-void CodeEditor::putEndPairs(){
-    // It is necessary to block the signals. if not:
-    //  shot: textChanged
-    //  Add ")" --> text changed
-    //  Add ")" --> text changed
-    //  ...
-    this->blockSignals(true);
-
-    textCursor().insertText(QString(")"));
-
-    this->blockSignals(false);
-}
-
 //![extraAreaWidth]
 
 int CodeEditor::lineNumberAreaWidth()
@@ -155,6 +142,59 @@ void CodeEditor::keyPressEvent(QKeyEvent *event){
             return;
         }
     }
+
+
+    bool isTab = (event->key() == Qt::Key_Tab && event->modifiers() == Qt::NoModifier);
+
+    // in some platforms, Shift + Tab is called "backtab"
+    bool isBacktab = (event->key() == Qt::Key_Backtab ||
+                      (event->key() == Qt::Key_Tab && (event->modifiers() & Qt::ShiftModifier)));
+
+    if (isTab || isBacktab) {
+        QTextCursor cursor = textCursor();
+
+        // If there's no selection, tab insert normal tabs
+        if (!cursor.hasSelection() && isTab) {
+            cursor.insertText(tabspaces);
+            return;
+        }
+
+        // If there's selection or backtab, process by lines
+        int start = cursor.selectionStart();
+        int end = cursor.selectionEnd();
+
+        // Create a cursor to select all lines without lossing the selection
+        QTextCursor editCursor(document());
+        editCursor.setPosition(start);
+        int startBlock = editCursor.blockNumber();
+        editCursor.setPosition(end, QTextCursor::KeepAnchor);
+        int endBlock = editCursor.blockNumber();
+
+        editCursor.beginEditBlock(); // To make it like a unique "undo" for Ctrl + Z
+
+        for (int i = startBlock; i <= endBlock; ++i) {
+            editCursor.setPosition(document()->findBlockByNumber(i).position());
+
+            if (isTab) {
+                // indent
+                editCursor.insertText(tabspaces);
+            } else {
+                // De-indent
+                for (int j = 0; j < spaces; ++j) {
+                    editCursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor);
+                    if (editCursor.selectedText() == " ") {
+                        editCursor.removeSelectedText();
+                    } else {
+                        break; // if there's no space, stop ereasing
+                    }
+                }
+            }
+        }
+        editCursor.endEditBlock();
+        return;
+    }
+
+
 
     // PRESSED RETURN
     // This part handles when tabs should be placed automatically, when to open brackets when enter...
