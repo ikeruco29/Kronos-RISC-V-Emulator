@@ -13,14 +13,22 @@ CodeEditor::CodeEditor(QWidget *parent, int pSpaces) : QPlainTextEdit(parent)
     connect(this, &CodeEditor::blockCountChanged, this, &CodeEditor::updateLineNumberAreaWidth);
     connect(this, &CodeEditor::updateRequest, this, &CodeEditor::updateLineNumberArea);
     connect(this, &CodeEditor::cursorPositionChanged, this, &CodeEditor::highlightCurrentLine);
-    connect(this, &CodeEditor::textChanged, this, &CodeEditor::putEndPairs);
 
     updateLineNumberAreaWidth(0);
     highlightCurrentLine();
 }
 
 void CodeEditor::putEndPairs(){
-    //textCursor().insertText(QString(")"));
+    // It is necessary to block the signals. if not:
+    //  shot: textChanged
+    //  Add ")" --> text changed
+    //  Add ")" --> text changed
+    //  ...
+    this->blockSignals(true);
+
+    textCursor().insertText(QString(")"));
+
+    this->blockSignals(false);
 }
 
 //![extraAreaWidth]
@@ -80,6 +88,8 @@ void CodeEditor::resizeEvent(QResizeEvent *e)
     lineNumberArea->setGeometry(QRect(cr.left(), cr.top(), lineNumberAreaWidth(), cr.height()));
 }
 
+//![resizeEvent]
+
 void CodeEditor::wheelEvent(QWheelEvent *event)
 {
     // Check if ctrl is pressed
@@ -102,7 +112,90 @@ void CodeEditor::wheelEvent(QWheelEvent *event)
     }
 }
 
-//![resizeEvent]
+void CodeEditor::keyPressEvent(QKeyEvent *event){
+    // PRESSED "("
+    if (event->text() == "(") {
+        QTextCursor cursor = textCursor();
+        cursor.insertText("()"); // Insert the complete pair
+        cursor.movePosition(QTextCursor::Left); // Move cursor between both brackets
+        setTextCursor(cursor);
+        return; // Return so the editor doesn't insert another
+    }
+
+    // PRESSED "{"
+    if (event->text() == "{") {
+        QTextCursor cursor = textCursor();
+        cursor.insertText("{}");
+        cursor.movePosition(QTextCursor::Left);
+        setTextCursor(cursor);
+        return;
+    }
+
+    // PRESSED "
+    if(event->text() == "\""){
+        QTextCursor cursor = textCursor();
+        cursor.insertText("\"\"");
+        cursor.movePosition(QTextCursor::Left);
+        setTextCursor(cursor);
+        return;
+    }
+
+    // PRESSED <
+    if(event->text() == "<"){
+        QTextCursor cursor = textCursor();
+        QString lineText = cursor.block().text(); // Current line text
+        if(lineText.contains("#include")){
+            cursor.insertText("<>");
+            cursor.movePosition(QTextCursor::Left);
+            setTextCursor(cursor);
+            return;
+        }
+    }
+
+    // PRESSED RETURN
+    // This part handles when tabs should be placed automatically, when to open brackets when enter...
+    if (event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter) {
+        QTextCursor cursor = textCursor();
+        QString lineText = cursor.block().text(); // Current line text
+
+        // 1. Calculate current spaces
+        QString leadingWhitespace = "";
+        for (QChar c : lineText) {
+            if (c.isSpace()) leadingWhitespace += c;
+            else break;
+        }
+
+        // 2. Return between brackets {|}
+        cursor.movePosition(QTextCursor::Left, QTextCursor::KeepAnchor);
+        QString leftChar = cursor.selectedText();
+        cursor.movePosition(QTextCursor::Right);    // back to center
+        cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor);
+        QString rightChar = cursor.selectedText();
+
+        if (!rightChar.isEmpty())   // In case it was the last character of the line, it shouldn't jump to the left
+            cursor.movePosition(QTextCursor::Left); // back to center
+
+        if (leftChar == "{" && rightChar == "}") {
+            cursor.beginEditBlock();
+            // New line + previous indent + 4 extra spaces + new line + previous indent
+            // TODO: use spaces as tabsize
+            cursor.insertText("\n" + leadingWhitespace + "    " + "\n" + leadingWhitespace);
+            cursor.movePosition(QTextCursor::Up);
+            cursor.movePosition(QTextCursor::EndOfLine);
+            cursor.endEditBlock();
+            setTextCursor(cursor);
+            return;
+        }
+
+        // 3. Inherit previous line tabs
+        cursor.insertText("\n" + leadingWhitespace);
+        setTextCursor(cursor);
+        return;
+    }
+
+    // If its not an special key, let editor handle.
+    QPlainTextEdit::keyPressEvent(event);
+}
 
 //![cursorPositionChanged]
 
@@ -149,7 +242,7 @@ void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event)
         if (block.isVisible() && bottom >= event->rect().top()) {
             QString number = QString::number(blockNumber + 1);
             painter.setPen(Qt::gray);
-            int paddingRight = 5;
+            int paddingRight = 5;   // padding between number and the codeline
 
             painter.drawText(2, top, lineNumberArea->width() - paddingRight, fontMetrics().height(),
                              Qt::AlignRight, number);
