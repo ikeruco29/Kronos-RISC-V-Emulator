@@ -2,12 +2,12 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include "compilingprocessdialog.h"
+#include "gui/dialog/compilingprocessdialog.h"
 #include "computer.h"
-#include "executioncampigndialog.h"
-#include "statsdialog.h"
+#include "gui/dialog/executioncampigndialog.h"
+#include "gui/dialog/statsdialog.h"
 
-#include "highlighter.h"
+#include "gui/editor/highlighter.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {

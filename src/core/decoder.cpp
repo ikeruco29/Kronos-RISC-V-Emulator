@@ -5,7 +5,7 @@
     HAY UNA FUNCIÓN PARA CADA TIPO, DE FORMA QUE SEA MÁS LEGIBLE
 */
 
-#include "decoder.h"
+#include "core/decoder.h"
 
 // Para el desensamblado
 std::vector<std::string> mnemonics = {

@@ -1,5 +1,5 @@
-#include "compilingprocessdialog.h"
-#include "ui_compilingprocessdialog.h"
+#include "gui/dialog/compilingprocessdialog.h"
+#include "ui/dialog/ui_compilingprocessdialog.h"
 
 compilingProcessDialog::compilingProcessDialog(QWidget *parent, const char *cmdString)
     : QDialog(parent)

@@ -1,4 +1,4 @@
-#include "highlighter.h"
+#include "gui/editor/highlighter.h"
 
 Highlighter::Highlighter(QTextDocument *parent, int language_param)
     : QSyntaxHighlighter(parent), language(language_param)

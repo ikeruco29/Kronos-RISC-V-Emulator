@@ -1,5 +1,5 @@
-#include "mainwindow.h"
-#include "./ui_mainwindow.h"
+#include "gui/mainwindow.h"
+#include "ui/ui_mainwindow.h"
 #include <cstdlib>
 #include <QFileDialog>
 #include <QJsonDocument>
@@ -13,7 +13,7 @@
 #include <QFile>
 #include <QTextStream>
 
-#include "codeeditor.h"
+#include "gui/editor/codeeditor.h"
 
 
 enum CampaignResult{

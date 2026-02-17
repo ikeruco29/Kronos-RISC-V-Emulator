@@ -6,8 +6,8 @@
 #include <vector>
 #include <unordered_map>
 #include <string>
-#include "decoder.h"
-#include "memory.h"
+#include "core/decoder.h"
+#include "memory/memory.h"
 
 using reg = int32_t;
 

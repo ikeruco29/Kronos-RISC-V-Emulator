@@ -1,5 +1,5 @@
-#include "statsdialog.h"
-#include "ui_statsdialog.h"
+#include "gui/dialog/statsdialog.h"
+#include "ui/dialog/ui_statsdialog.h"
 #include <QFileInfo>
 
 StatsDialog::StatsDialog(QWidget *parent, Computer *pComputer, uint32_t resultLocation)

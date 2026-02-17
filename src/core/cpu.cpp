@@ -1,5 +1,5 @@
-#include "cpu.h"
-#include "endian.h"
+#include "core/cpu.h"
+#include "core/endian.h"
 #include <iostream>
 #include <sstream>
 

@@ -1,5 +1,5 @@
-#include "executioncampigndialog.h"
-#include "ui_executioncampigndialog.h"
+#include "gui/dialog/executioncampigndialog.h"
+#include "ui/dialog/ui_executioncampigndialog.h"
 
 ExecutionCampignDialog::ExecutionCampignDialog(QWidget *parent, int maxInstructions)
     : QDialog(parent)

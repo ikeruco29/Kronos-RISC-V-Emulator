@@ -1,8 +1,8 @@
 #ifndef COMPUTER_H
 #define COMPUTER_H
 
-#include "cpu.h"
-#include "memory.h"
+#include "core/cpu.h"
+#include "memory/memory.h"
 #include <QTextEdit>
 #include <QPlainTextEdit>
 
