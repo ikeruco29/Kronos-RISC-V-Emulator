@@ -2,8 +2,7 @@
 #define DECODER_H
 
 /*
-    Este programa contendra todas las funciones de decodificacion
-    para tenerlo ordenado
+    This file contains all the decoding functions
 */
 #include <cstdint>
 #include <string>

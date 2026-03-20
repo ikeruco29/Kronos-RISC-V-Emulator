@@ -13,17 +13,18 @@ public:
     int iDataSize;
 
     uint8_t *memory;
-    uint32_t pIo = 1500; // 1500 son los caracteres que caben en la pantalla
+    uint32_t pIo = 1500; // 1500 characters that can be loaded in the interface
 
     void writeByte(uint32_t addr, int8_t data);
     void writeHalf(uint32_t addr, int16_t data);
     void writeWord(uint32_t addr, int32_t data);
 
-    // Lee un byte de memoria
     uint8_t readByte(uint32_t addr);
-    // Lee 16 bits de la memoria y lo devuelve
+
+    // 16 bits read
     uint16_t readHalf(uint32_t addr);
-    // Lee 32 bits de la memoria y lo devuelve como uint32_t
+
+    // 32 bits read
     uint32_t readWord(uint32_t addr);
 
     void reset();

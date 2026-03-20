@@ -8,10 +8,10 @@ namespace Ui {
 
 enum Operation
 {
-    // Formato R
+    // R format
     ADD, SUB, XOR, OR, AND, SLL, SRL, SRA, SLT, SLTU,
 
-    // Formato I
+    // I format
     ADDI, XORI, ORI, ANDI,
     SLLI, SRLI, SRAI, SLTI, SLTIU,
     LB, LH, LW, LBU, LHU,
@@ -19,17 +19,17 @@ enum Operation
     JALR,
     ECALL, EBREAK,
 
-    // Formato S
+    // S format
     SB, SH, SW,
 
-    // Formato B
+    // B format
     BEQ, BNE, BLT, BGE, BLTU,
     BGEU,
 
-    // Formato J
+    // J format
     JAL,
 
-    // Formato U
+    // U format
     LUI, AUIPC,
 
     NOP

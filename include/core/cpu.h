@@ -21,15 +21,14 @@ public:
     bool bEcall = false;
     uint32_t cycles = 0;
 
-    // Fetch siguiente instrucción
     void fetch();
     void decode();
     int execute();
 
     reg registers[32];
 
-    uint32_t pc = 0x00000000;  // Program counter
-    uint32_t ir = 0x00000000;       // Instruction register
+    uint32_t pc = 0x00000000;
+    uint32_t ir = 0x00000000;
 
     std::unordered_map<int, int (CPU::*)()> vFunctionMap;
 
@@ -69,8 +68,6 @@ public:
 
     int NOP();
 
-
-    // Para los ciclos
     uint64_t ciclosTotales[40], ciclosTipo[6];
 };
 

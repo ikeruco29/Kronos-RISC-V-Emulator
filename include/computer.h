@@ -22,7 +22,7 @@ public:
     CPU cpu;
     Memory ram;
 
-    // Variables para las campañas
+    // Campaign vars
     Campaign campaign;
     std::string programName;
 

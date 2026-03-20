@@ -31,7 +31,7 @@ public:
     Computer *computer;
     uint pageToView = 0;
 
-    // Variables de configuración
+    // Config vars
     QString disassemblyFileRoute;
     QString ramFileRoute;
     QString campaignGeneratorRoute;
