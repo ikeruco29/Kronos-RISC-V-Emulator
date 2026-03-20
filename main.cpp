@@ -21,14 +21,14 @@ int readConfigFile();
 
 int main(int argc, char *argv[])
 {
-    readConfigFile();   // Lee el contenido del archivo
+    readConfigFile();
 
     QApplication a(argc, argv);
 
 
     int fontId = QFontDatabase::addApplicationFont(":/resources/fonts/mononoki Bold Nerd Font Complete.ttf");
     if (fontId == -1) {
-        qWarning() << "No se pudo cargar la fuente";
+        qWarning() << "Font could not be loaded";
     } else {
         QString fontFamily = QFontDatabase::applicationFontFamilies(fontId).at(0);
         QFont font(fontFamily);
@@ -40,15 +40,14 @@ int main(int argc, char *argv[])
 
     Computer computer = Computer(ramSize);
 
-    computer.ram.iRomStartAddr = romAddrAlloc;  // Localización de la ROM
+    computer.ram.iRomStartAddr = romAddrAlloc;  // Location of ROM
 
     w.computer = &computer;
     w.disassemblyFileRoute = disassemblyRouteFile;
     w.ramFileRoute = ramRouteFile;
     w.campaignGeneratorRoute = campaignRoute;
 
-    // Direcciones de control, tanto para resultado como para finalizar
-    // la ejecución del programa
+    // Control locations to the final result and to finish the program execution
     w.RESULT_LOCATION = result_location;
     w.FINISH_LOCATION = finish_location;
 
@@ -60,39 +59,34 @@ int main(int argc, char *argv[])
 }
 
 int readConfigFile(){
-    // Abrir el archivo JSON
+
     QFile file(CONFIG_FILE);
     if (!file.open(QIODevice::ReadOnly)) {
         qWarning() << "No se pudo abrir el archivo JSON";
         return 1;
     }
 
-    // Leer todo el contenido del archivo JSON
     QByteArray jsonData = file.readAll();
 
-    // Cerrar el archivo
     file.close();
 
-    // Crear un QJsonDocument a partir de los datos leídos
+    // Create a JSON document with all extracted data
     QJsonParseError error;
     QJsonDocument jsonDoc = QJsonDocument::fromJson(jsonData, &error);
 
-    // Verificar errores de parseo
     if (jsonDoc.isNull()) {
-        qWarning() << "Error al parsear el archivo JSON:" << error.errorString();
+        qWarning() << "Error while trying to parse json:" << error.errorString();
         return 1;
     }
 
-    // Verificar si el documento es un objeto JSON
     if (!jsonDoc.isObject()) {
-        qWarning() << "El archivo JSON no contiene un objeto JSON";
+        qWarning() << "File doesn't have a JSON object";
         return 1;
     }
 
-    // Obtener el objeto JSON raíz
-    QJsonObject jsonObj = jsonDoc.object();
+    QJsonObject jsonObj = jsonDoc.object(); // json root
 
-    // Extraer valores del objeto JSON
+    // Extract JSON object values
     ramSize = jsonObj["ramSize"].toInt() * 1024 * 1024 * 1024;
     disassemblyRouteFile = jsonObj["disassemblyFileRoute"].toString();
     ramRouteFile = jsonObj["ramFileRoute"].toString();
@@ -108,7 +102,6 @@ int readConfigFile(){
     fontsize = editorObj["fontSize"].toInt();
 
 
-    // Imprimir los valores extraídos (solo para debug)
     qDebug() << "Ram Size:" << ramSize / 1024 / 1024 / 1024 << "GB";
     qDebug() << "Ram file:" << ramRouteFile;
     qDebug() << "disassembly file:" << disassemblyRouteFile;
