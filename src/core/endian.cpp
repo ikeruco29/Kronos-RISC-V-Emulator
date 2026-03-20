@@ -5,7 +5,7 @@
 
 #include "core/endian.h"
 
-// Voltea 2 bytes
+// flip 2 bytes
 uint16_t FlipHalf(uint16_t half) {
 
     uint16_t byte1 = (half & 0xFF) << 8;
@@ -14,7 +14,7 @@ uint16_t FlipHalf(uint16_t half) {
     return byte1 | byte2;
 }
 
-// Voltea 4 bytes
+// flip 4 bytes
 uint32_t FlipWord(uint32_t word) {
     // ff a0 bb aa
     // a0 ff aa bb -

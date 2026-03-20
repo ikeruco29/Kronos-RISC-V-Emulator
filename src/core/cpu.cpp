@@ -5,15 +5,15 @@
 
 // Constructor
 CPU::CPU(Memory *ram){
-    // Inicialización de los registros
+    // Register init
     for (int i = 0; i < 32; i++)
     {
         registers[i] = 0x00000000;
     }
 
-    registers[2] = ram->iMemorySize - ram->pIo - 1; // Puntero stack
+    registers[2] = ram->iMemorySize - ram->pIo - 1; // Stack pointer
 
-    this->ram = ram;    // Puntero a la RAM
+    this->ram = ram;    // RAM pointer
 
     instDecoded.inmediate = 0;
     instDecoded.op = -1;
@@ -27,7 +27,7 @@ CPU::CPU(Memory *ram){
     }
 
 
-    // Inicialización del vector de funciones
+    // Functions vector init
     vFunctionMap[Operation::ADD] = &CPU::ADD;
     vFunctionMap[Operation::SUB] = &CPU::SUB;
     vFunctionMap[Operation::XOR] = &CPU::XOR;
@@ -39,7 +39,7 @@ CPU::CPU(Memory *ram){
     vFunctionMap[Operation::SLT] = &CPU::SLT;
     vFunctionMap[Operation::SLTU] = &CPU::SLTU;
 
-    // Formato I
+    // I format
     vFunctionMap[Operation::ADDI] = &CPU::ADDI;
     vFunctionMap[Operation::XORI] = &CPU::XORI;
     vFunctionMap[Operation::ORI] = &CPU::ORI;
@@ -59,12 +59,12 @@ CPU::CPU(Memory *ram){
     vFunctionMap[Operation::ECALL] = &CPU::ECALL;
     vFunctionMap[Operation::EBREAK] = &CPU::EBREAK;
 
-    // Formato S
+    // S format
     vFunctionMap[Operation::SB] = &CPU::SB;
     vFunctionMap[Operation::SH] = &CPU::SH;
     vFunctionMap[Operation::SW] = &CPU::SW;
 
-    // Formato B
+    // B format
     vFunctionMap[Operation::BEQ] = &CPU::BEQ;
     vFunctionMap[Operation::BNE] = &CPU::BNE;
     vFunctionMap[Operation::BLT] = &CPU::BLT;
@@ -72,10 +72,10 @@ CPU::CPU(Memory *ram){
     vFunctionMap[Operation::BLTU] = &CPU::BLTU;
     vFunctionMap[Operation::BGEU] = &CPU::BGEU;
 
-    // Formato J
+    // J format
     vFunctionMap[Operation::JAL] = &CPU::JAL;
 
-    // Formato U
+    // U format
     vFunctionMap[Operation::LUI] = &CPU::LUI;
     vFunctionMap[Operation::AUIPC] = &CPU::AUIPC;
 
@@ -84,28 +84,26 @@ CPU::CPU(Memory *ram){
 
 CPU::~CPU(){}
 
-// Función que se encarga de realizar un ciclo de reloj
 void CPU::clock(){
-    fetch();    // Extracción de la instrucción
+    fetch();
 
-    decode();   // Decodificación de la instrucción
+    decode();
 
-    if(execute() == 0)  // Ejecución de la instrucción
-        pc += 4;        // Si no es un salto, PC + 4
+    if(execute() == 0)
+        pc += 4;        // If its not a jump, PC + 4
 
-    cycles++;   // Sumamos uno al contador de ciclos
+    cycles++;
 }
 
 
-// Función que resetea la CPU
 void CPU::reset(){
-    // Inicialización de los registros
+    // Register init
     for (int i = 0; i < 32; i++)
     {
         registers[i] = 0x00000000;
     }
 
-    registers[2] = ram->iMemorySize - ram->pIo - 1; // Puntero stack
+    registers[2] = ram->iMemorySize - ram->pIo - 1; // Stack pointer
 
     instDecoded.inmediate = 0;
     instDecoded.op = -1;
@@ -118,10 +116,10 @@ void CPU::reset(){
         ciclosTipo[i] = 0;
     }
 
-    disassembly.clear();    // Vacía todo el registro de desensamblado
+    disassembly.clear();    // Empties all dissasembly
 
-    pc = ram->iRomStartAddr;    // PC apunta al inicio del programa (memoria ROM)
-    ir = 0; // Reset del registro IR
+    pc = ram->iRomStartAddr;    // PC points to the program start
+    ir = 0; // IR reset
 
     cycles = 0;
 
@@ -129,24 +127,22 @@ void CPU::reset(){
     bEcall = false;
 }
 
-// Captura de la instrucción
 void CPU::fetch(){
     ir = FlipWord(ram->readWord(pc));
 }
 
-// Decodificación de la instrucción
 void CPU::decode() {
     std::stringstream instDisassembled;
 
-    // Recoge el opcode (últimos 7 bits)
+    // opcode = last 7 bits
     uint32_t opcode = ir & 0x7F;
 
     switch (opcode)
     {
     case 0b00110011:    // R
-        instDecoded = decode_R(ir); // Recoge la instrucción decodificada y la guarda en la variable global de la clase
+        instDecoded = decode_R(ir); // Decoded instruction
 
-        // Esto es para que, si es una operación no registrada, no imprima los registros
+        // This is so it doesnt print registers on a non-recognized instruction
         if(instDecoded.op != Operation::NOP){
             instDisassembled << formatDissasembly(instDecoded);
             instDisassembled << instDecoded.registers[0] << ", X" << instDecoded.registers[1] << ", X" << instDecoded.registers[2];
@@ -253,15 +249,14 @@ void CPU::decode() {
         break;
     }
 
-    disassembly.push_back(instDisassembled.str());  // Guarda el desensamblado de la instrucción
+    disassembly.push_back(instDisassembled.str());  // Stores instruction dissasembly
 
     instDisassembled.clear();
 }
 
-// Ejecuta un ciclo de instrucción
 int CPU::execute() {
 
-    // Se ejecuta la función almacenada en instDecoded
+    // Executes the function stored in instDecoded
     int iIsJump = (this->*vFunctionMap[instDecoded.op])();
 
     ciclosTotales[instDecoded.op]++;
@@ -278,7 +273,7 @@ int CPU::execute() {
 
 // R format
 int CPU::ADD(){
-    // Suma dos variables y lo guarda en RD
+    // Add 2 vars and stores in rd
     uint8_t rd = instDecoded.registers[0];
     uint8_t rs1 = instDecoded.registers[1];
     uint8_t rs2 = instDecoded.registers[2];
@@ -287,7 +282,7 @@ int CPU::ADD(){
     return 0;
 }
 int CPU::SUB() {
-    // resta dos variables y lo guarda en RD
+    // substract 2 vars and stores in RD
     uint8_t rd = instDecoded.registers[0];
     uint8_t rs1 = instDecoded.registers[1];
     uint8_t rs2 = instDecoded.registers[2];
@@ -446,21 +441,17 @@ int CPU::LB() {
     uint8_t rs1 = instDecoded.registers[1];
     int32_t inmediate = instDecoded.inmediate;
 
-    /* La lógica de esto es la siguiente:
+    /*
+        The core logic is the following:
 
-        Con la primera línea se obtienen los
-        primeros 8 bits, pero el número resultante es
-        0x000000FF. Esto si se guarda directamente en una variable
-        de tipo int32_t, se queda tal cual representando el número
-        255.
+        Obtain from the first line the first 8 bits, but the finalnumber is 0x000000FF.
+        If it is stored like that, it will represet 255, but we want to be treated as a signed
+        number (-1), cause its just 8 bits in theory.
 
-        Pero lo que queremos es que ese número se interprete
-        como -1, que es el que realmente es si solo interpretamos los primeros
-        8 bits, por lo que lo guardamos en una variable int8_t para que lo interprete como
-        -1 y luego lo guardamos en el registro, que es un int32_t, pero como parte de un
-        -1, extiende automáticamente el signo sin tener que hcer operaciones.
-        Esta misma lógica aplica al resto de operaciones LX.
+        So we create a int8_t var and then store in int32_t so it adapt the number to a 32bit name.
+        This same logic is applied to every LX operation.
     */
+
     int8_t byte = (ram->readByte(registers[rs1] + inmediate));
 
     registers[rd] = byte;
@@ -473,8 +464,9 @@ int CPU::LH() {
     int32_t inmediate = instDecoded.inmediate;
     int16_t half = FlipHalf(ram->readHalf(registers[rs1] + inmediate));
 
-    return 0;
     registers[rd] = half;
+
+    return 0;
 }
 int CPU::LW() {
     uint8_t rd = instDecoded.registers[0];
@@ -489,8 +481,7 @@ int CPU::LBU() {
     uint8_t rs1 = instDecoded.registers[1];
     int32_t inmediate = instDecoded.inmediate;
 
-    // En este caso, al ser un unsigned, con hacer el AND ya
-    // saca el valor adecuado
+    // In this case, cause is an unsigned, just using AND will be ok.
 
     registers[rd] = (ram->readByte(registers[rs1] + inmediate)) & 0xFF;
 
@@ -501,8 +492,7 @@ int CPU::LHU() {
     uint8_t rs1 = instDecoded.registers[1];
     int32_t inmediate = instDecoded.inmediate;
 
-    // En este caso, al ser un unsigned, con hacer el AND ya
-    // saca el valor adecuado
+    // In this case, cause is an unsigned, just using AND will be ok.
 
     registers[rd] = FlipHalf(ram->readHalf(registers[rs1] + inmediate));
 
@@ -514,8 +504,8 @@ int CPU::JALR() {
     uint8_t rs1 = instDecoded.registers[1];
     uint32_t inmediate = instDecoded.inmediate;
 
-    // La dirección que tocaría si no se hiciera el salto se guarda en rd
-    // para saltar más adelante de vuelta
+    // The direction if the jump were not made is stored in rd so it
+    // can be brought back later.
 
     if(rd != 0)
         registers[rd] = pc + 4;
@@ -525,7 +515,7 @@ int CPU::JALR() {
 }
 
 int CPU::ECALL() {
-    // Detener ejecución de programa
+    // Stop program execution
     bEcall = true;
     return 0;
 }
@@ -644,8 +634,9 @@ int CPU::JAL() {
     uint8_t rd = instDecoded.registers[0];
     uint32_t inmediate = instDecoded.inmediate;
 
-    // La dirección que tocaría si no se hiciera el salto se guarda en rd
-    // para saltar más adelante de vuelta
+    // The direction if the jump were not made is stored in rd so it
+    // can be brought back later.
+
     if(rd != 0)
         registers[rd] = pc + 4;
     pc += inmediate;
@@ -676,8 +667,7 @@ int CPU::NOP(){
 }
 
 
-// Formatea el desensamblado para imprimirlo y que queden
-// todos los registros a la misma altura
+// Format disassembly for pretty print
 std::string CPU::formatDissasembly(Decoded inst){
     std::stringstream st;
     st << inst.mnemonic;

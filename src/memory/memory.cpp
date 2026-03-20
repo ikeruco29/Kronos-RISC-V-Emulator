@@ -68,37 +68,35 @@ uint32_t Memory::readWord(uint32_t addr){
 
 void Memory::reset(){
 
-    int numOfThreads = 16;  // Número de hilos. Con 16 va bien, y es un buen rendimiento entre
-                            // consumo de recursos y velocidad
-
+    int numOfThreads = 16;  // Number of threads.
 
     uint32_t subSectionSize = iMemorySize / numOfThreads;
 
-    // Crear un vector para almacenar los hilos
-    std::vector<std::thread> hilos;
+    std::vector<std::thread> threads;
 
-    // Crear numOfThreads hilos, cada uno procesará un sexto del array
+    // Each thread will process 1/6th of the array
     for (int i = 0; i < numOfThreads; ++i) {
         uint32_t start = i * subSectionSize;
         uint32_t end = (i + 1) * subSectionSize;
-        // Si es el último hilo, el rango final será el tamaño total del array
+
+        // If its the last thread, the final range will be the end of the arr
         if (i == numOfThreads - 1) {
             end = iMemorySize;
         }
-        // Crear el hilo y pasarle la función resetMemorySection y los parámetros de inicio y fin
-        hilos.emplace_back(&Memory::resetMemorySection, this, start, end);
+
+        threads.emplace_back(&Memory::resetMemorySection, this, start, end);
     }
 
-    // Esperar a que todos los hilos terminen
-    for (auto& hilo : hilos) {
-        hilo.join();
+    // Wait for all threads to finish
+    for (auto& thread : threads) {
+        thread.join();
     }
 
     this->resetIOMemory();
 
 }
 
-// Función ejecutada por cada hilo
+// Function executed per each thread
 void Memory::resetMemorySection(uint32_t inicio, uint32_t fin) {
     // reset del array
     for (uint32_t i = inicio; i < fin; ++i) {
@@ -108,7 +106,7 @@ void Memory::resetMemorySection(uint32_t inicio, uint32_t fin) {
 
 void Memory::resetIOMemory(){
     for (uint32_t i = this->iMemorySize - this->pIo; i < this->iMemorySize; ++i) {
-        this->memory[i] = 0x20; // Caracter de espacio en utf8
+        this->memory[i] = 0x20; // Space character in utf8
     }
 }
 
