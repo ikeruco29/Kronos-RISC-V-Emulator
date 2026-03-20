@@ -7,12 +7,12 @@
 
 #include "core/decoder.h"
 
-// Para el desensamblado
+// For the disassembly
 std::vector<std::string> mnemonics = {
-    // Formato R
+    // R format
     "ADD", "SUB", "XOR", "OR", "AND", "SLL", "SRL", "SRA", "SLT", "SLTU",
 
-    // Formato I
+    // I format
     "ADDI", "XORI", "ORI", "ANDI",
     "SLLI", "SRLI", "SRAI", "SLTI", "SLTIU",
     "LB", "LH", "LW", "LBU", "LHU",
@@ -20,17 +20,17 @@ std::vector<std::string> mnemonics = {
     "JALR",
     "ECALL", "EBREAK",
 
-    // Formato S
+    // S format
     "SB", "SH", "SW",
 
-    // Formato B
+    // B format
     "BEQ", "BNE", "BLT", "BGE", "BLTU",
     "BGEU",
 
-    // Formato J
+    // J format
     "JAL",
 
-    // Formato U
+    // U format
     "LUI", "AUIPC",
 
     "NOP"
@@ -38,12 +38,10 @@ std::vector<std::string> mnemonics = {
 
 Decoded decode_R(uint32_t ir) {
 
-    // Esta es la estructura de este tipo de instrucciones:
+    // Structure for this kind of instructions:
     //
     //      funct7 | rs2 | rs1 | funct3 | rd | opcode
     //
-    // Por lo que se mueven los bits para sacar cada uno de los
-    // datos.
 
     uint32_t rd = (ir >> 7) & 0x1F;
     uint8_t funct3 = (ir >> 12) & 0x7;
@@ -52,7 +50,7 @@ Decoded decode_R(uint32_t ir) {
     uint32_t funct7 = (ir >> 25) & 0x7F;
     int nOperation = -1;
 
-    // Ver qué operación hay que hacer
+    // see what operation is
     if (funct7 == 0x00) {
         switch (funct3)
         {
@@ -85,7 +83,7 @@ Decoded decode_R(uint32_t ir) {
             break;
         }
     }
-    else {	// Solo SRA y SUB
+    else {	// only SRA & SUB
         switch (funct3)
         {
         case 0x0:
@@ -100,7 +98,7 @@ Decoded decode_R(uint32_t ir) {
         }
     }
 
-    // Devuelve la operación y los registros
+    // Returns operation and registers
     Decoded dec;
     dec.mnemonic = mnemonics[nOperation];
     dec.op = nOperation;
@@ -112,12 +110,10 @@ Decoded decode_R(uint32_t ir) {
 
 Decoded decode_I(uint32_t ir, uint8_t op) {
 
-    // Esta es la estructura de este tipo de instrucciones:
+    // Structure for this kind of instructions:
     //
     //      inm | rs1 | funct3 | rd | opcode
     //
-    // Por lo que se mueven los bits para sacar cada uno de los
-    // datos.
 
     uint32_t rd = (ir >> 7) & 0x1F;
     uint8_t funct3 = (ir >> 12) & 0x7;
@@ -127,8 +123,8 @@ Decoded decode_I(uint32_t ir, uint8_t op) {
     int nOperation = -1;
 
 
-    if (inm & 0x800) { // Si el bit más significativo está establecido
-        inm |= 0xFFFFF000; // Extensión del signo
+    if (inm & 0x800) { // IF MSB is stablished
+        inm |= 0xFFFFF000; // sign extension
     }
     //           1000 0101 1100
     //                  |
@@ -206,7 +202,7 @@ Decoded decode_I(uint32_t ir, uint8_t op) {
         nOperation = NOP;
     }
 
-    // Devuelve la operación y los registros
+    // Returns operation and registers
     Decoded dec;
     dec.mnemonic = mnemonics[nOperation];
     dec.op = nOperation;
@@ -217,12 +213,10 @@ Decoded decode_I(uint32_t ir, uint8_t op) {
 
 Decoded decode_S(uint32_t ir) {
 
-    // Esta es la estructura de este tipo de instrucciones:
+    // Structure for this kind of instructions:
     //
     //      inm[11:5] | rs2 | rs1 | funct3 | inm[4:0] | opcode
     //
-    // Por lo que se mueven los bits para sacar cada uno de los
-    // datos.
 
     uint32_t inm_1 = (ir >> 7) & 0x1F;
     uint8_t funct3 = (ir >> 12) & 0x7;
@@ -231,9 +225,9 @@ Decoded decode_S(uint32_t ir) {
     uint32_t inm_2 = (ir >> 25) & 0x7F;
     int nOperation = -1;
 
-    int32_t inm = (inm_2 << 5) | inm_1; // desplaza 5 bits a la izquierda el inm_2 y lo une con inm_1
+    int32_t inm = (inm_2 << 5) | inm_1; // move 5 bits to the left from inm_2 and join it with inm_1
 
-    if ((inm & 0b100000000000) != 0)	// Para el complemento a dos de los negativos
+    if ((inm & 0b100000000000) != 0)	// For 2 complement of negative numbers
         inm = inm | 0xFFFFF000;
 
     if (funct3 == 0x0)
@@ -243,7 +237,7 @@ Decoded decode_S(uint32_t ir) {
     else
         nOperation = SW;
 
-    // Devuelve la operación y los registros
+    // Returns operation and registers
     Decoded dec;
     dec.mnemonic = mnemonics[nOperation];
     dec.op = nOperation;
@@ -289,12 +283,11 @@ Decoded decode_B(uint32_t ir) {
         break;
     }
 
-    // inm_1 tiene los bits 4:1|11
-    // inm_2 tiene los bits 12|10:5
-    // Esto con la extensión de signo hecha, es decir,
-    // con el complemento a 2 si es necesario
+    // inm_1 has the bits 4:1|11
+    // inm_2 has the bits 12|10:5
+    // with 2 complement done
 
-    // el primer bit será el último del número
+    // The first bit is the last bit of the number
     uint8_t bit11 = inm_1 & 0x01;
     uint8_t bit12 = inm_2 >> 6;
     int32_t inmediate = 0;
@@ -310,7 +303,7 @@ Decoded decode_B(uint32_t ir) {
         inmediate = inmediate | 0xFFFFF000;
     }
 
-    // Devuelve la operación y los registros
+    // returns operation and registers
     Decoded dec;
     dec.mnemonic = mnemonics[nOperation];
     dec.op = nOperation;
@@ -343,22 +336,21 @@ Decoded decode_J(uint32_t ir) {
     uint32_t rd = (ir >> 7) & 0x1F;
     int32_t inm = (ir >> 12);
 
-    // Bit 20 en la posición 19 (empezando en 0)
+    // Bit 20 in position 19 (starting in 0)
     uint32_t bit20 = inm & 0b10000000000000000000;
 
-    // Bit 11 en la posición 8 (empezando en 0)
+    // Bit 11 in position 8 (starting in 0)
     uint16_t bit11 = inm & 0b100000000;
 
     uint32_t inm_2 = (inm & 0xFF) << 12;
     uint16_t inm_1 = (inm >> 8) & 0x7FE; // 0111 1111 1110
 
     int32_t inm_fin = inm_2 | inm_1;
-    if (bit11 != 0)	// Si el bit 11 está en 1, lo añade
+    if (bit11 != 0)	// if bit 11 is 1, adds it
         inm_fin = inm_fin | 0b100000000000;
 
-    // Si el bit 20 está en 1, significa que es
-    // un número negativo, por lo que hay que rellenar todo
-    // lo demás con 1.
+    // if bit 20 is in 1, is a negative number, so
+    // the remaining 0 bits should be 1.
     if (bit20 != 0)
         inm_fin = inm_fin | 0xfff00000;
 
