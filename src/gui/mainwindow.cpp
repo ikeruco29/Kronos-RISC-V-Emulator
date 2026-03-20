@@ -31,9 +31,8 @@ MainWindow::MainWindow(QWidget *parent, Computer *comp, struct EditorConfig sEdi
     , computer(comp)
     , editorConfig(sEditorConfig)
 {
-    // Esto es para establecer ciertos valores de la interfaz
-    // Ejemplo: hasta que no cargue un programa, no puede usar el botón
-    //          "ejecutar"
+    // This is to stablish certain interface values
+    // For instance: "User can't use execute method at the start of the program"
     ui->setupUi(this);
     QString stsheet = "QPushButton:disabled {background-color: rgba(255, 255, 255, 0.1); }";
     ui->centralwidget->setStyleSheet(stsheet);
@@ -47,7 +46,7 @@ MainWindow::MainWindow(QWidget *parent, Computer *comp, struct EditorConfig sEdi
 
     editor = new CodeEditor(ui->CodeEditor->parentWidget(), sEditorConfig.tabsize);
 
-    // Copiar geometría y políticas
+    // Copy geometry and politics
     editor->setGeometry(ui->CodeEditor->geometry());
     editor->setSizePolicy(ui->CodeEditor->sizePolicy());
 
@@ -74,6 +73,12 @@ MainWindow::MainWindow(QWidget *parent, Computer *comp, struct EditorConfig sEdi
     // se llama al método conectado en un hilo a parte, lo que hace que el hilo principal
     // (que es el que contiene la interfaz) no se bloquee, y el usuario pueda pulsar otros
     // botones como el botón de pausa.
+
+    // In QT you can link a method to another. This other method is called "signal",
+    // and you don't have to implement it. At the moment you "emit" them by using "emit signalName()",
+    // Connected method is called in a separate thread, so the main thread doens't block (which is
+    // the one that's managing the interface), and the user can use other buttons such as
+    // pause or stop.
     connect(this, &MainWindow::runProgram, this, &MainWindow::on_runButton_clicked);
     connect(this, &MainWindow::runProgramCompleted, this, &MainWindow::updateCampaignAfterProgramExecution);
     connect(this, &MainWindow::runCampaignIter, this, &MainWindow::iterationCampaign);
@@ -108,33 +113,32 @@ void MainWindow::resetFilenameText(QString text){
     ui->filenameText->setText(text.isEmpty() ? QFileInfo(programFileName).fileName() : text);
 }
 
-// Carga el programa seleccionado en memoria
+// Load desired program
 void MainWindow::on_actionCargar_programa_triggered()
 {
 
-    // Esto abre el explorador de archivos para seleccionar un programa binario
+    // Opening file explorer to select a specific binary
     QString nombreArchivo = QFileDialog::getOpenFileName(this, "Select file", "", "*.bin *.o");
     if (!nombreArchivo.isEmpty()) {
 
         qDebug() << "File selected:" << nombreArchivo;   // debug
         QFileInfo fileInfo(nombreArchivo);
-        QString filename = fileInfo.fileName(); // Para sacar solo el nombre
+        QString filename = fileInfo.fileName();
 
-        computer->reset();  // Reset del ordenador
-        computer->LoadProgram(nombreArchivo.toStdString()); // Carga el programa en memoria
+        computer->reset();
+        computer->LoadProgram(nombreArchivo.toStdString());
 
-        resetInterface();   // Reestablece la interfaz
+        resetInterface();
 
-        pageToView = computer->ram.iRomStartAddr;   // Esto es para el buscador de la RAM.
-                                                    // No quiero se muestre la RAM al completo,
-                                                    // si no solo 8 filas que es lo que cabe
-                                                    // en la caja de texto.
+        pageToView = computer->ram.iRomStartAddr;   // For the RAM loader:
+                                                    // I don't want to show all RAM
+                                                    // just 8 rows inside textbox.
 
         ui->ramText->setPlainText(QString::fromStdString(computer->showRam(pageToView)));
         resetFilenameText(filename);
 
 
-        // Al cargar el programa, se habilitan los botones de control de ejecución
+        // On program load, enable all execution buttons
         ui->runButton->setEnabled(true);
         ui->runPasoButton->setEnabled(true);
         ui->pauseButton->setEnabled(true);
@@ -146,19 +150,19 @@ void MainWindow::on_actionCargar_programa_triggered()
     stopExec = false;
 }
 
-// Botón para cargar una campaña
+// Load Campaign
 void MainWindow::on_actionCargar_campa_a_triggered()
 {
     loadCampaign();
 }
 
-// Cerrar la aplicación
+// Close app
 void MainWindow::on_actionSalir_triggered()
 {
     qApp->quit();
 }
 
-// Botón para realizar la ejecución completa del programa en memoria
+// Complete execution buton
 int MainWindow::on_runButton_clicked()
 {
     // If the program loaded is not an executable program...
@@ -197,7 +201,7 @@ int MainWindow::on_runButton_clicked()
         }
 
 
-        computer->reset();  // Reset computer
+        computer->reset();
         computer->LoadProgram(binPath.str()); // Load program to computer's memory
 
         pageToView = computer->ram.iRomStartAddr;
@@ -230,16 +234,16 @@ int MainWindow::on_runButton_clicked()
 }
 
 
-// Realiza un ciclo de ejecución (fetch, decode y execute)
+// Do just one clock cycle (fetch, decode y execute)
 void MainWindow::runLoopIteration()
 {
 
     // When ECALL instruction is called, it means the program has finished
     if (computer->cpu.bEcall == true || stopExec) {
 
-        sender()->deleteLater(); // Eliminar el QTimer después de terminar el bucle
+        sender()->deleteLater(); // Delete QTimer at the end of the loop
 
-        // Esto es para que, en caso de que se haya ejecutado por una campaña, siga con la campaña
+        // In case it is executing a campaign, continue executing
         if(this->isExecutingBeforeCampaign)
             emit runProgramCompleted();
 
@@ -253,89 +257,89 @@ void MainWindow::runLoopIteration()
         return;
     }
 
-    // Ejecutar una iteración del bucle
+    // Clock cpu
     computer->cpu.clock();
 
-    if(!this->isExecutingBeforeCampaign)    // Para no mostrar la primera ejecución del programa en una campaña
+    if(!this->isExecutingBeforeCampaign)    // Only update interface if its not a campaign
         this->UpdateInterface();
 }
 
-// Realiza un ciclo de ejecución de la campaña
+// Do one campaign cycle
 void MainWindow::runLoopIterationCampaign()
 {
     qDebug() << computer->cpu.cycles;
 
     if (computer->cpu.bEcall == true) {
 
-        // Al escribir en la posición FINISH_LOCATION un 0, para la ejecución del programa
+        // When a 0 is written at FINISH_LOCATION, stop program execution
         if(computer->ram.readByte(RESULT_LOCATION) != computer->campaign.expectedResult){
 
-            // Resultado final: Silent Data Corruption (SDC)
+            // Final result: Silent Data Corruption (SDC)
             this->campaignResults.push_back(SDC);
 
         }
         else if(computer->campaign.expectedInstructions > computer->cpu.cycles){
 
-            // Resultado final: Single Event Delay (SED)
+            // Final result: Single Event Delay (SED)
             this->campaignResults.push_back(SED);
 
         } else {
 
-            // Resultado final: NO EFFECT
+            // Final result: NO EFFECT
             this->campaignResults.push_back(NO_EFFECT);
 
         }
 
-        this->injectionNumber++;    // Inyección por la que va
+        this->injectionNumber++;    // current injection index
 
-        sender()->deleteLater(); // Eliminar el QTimer después de terminar el bucle
+        sender()->deleteLater(); // Delete QTimer at the end of the loop
         emit campaignIterComplete();
         return;
     }
 
 
-    // Si aún no ha tardado el doble en ejecuctarse, sigue ejecutándose.
+    // If the program didn't hold (x2 in total instructions executed), continue
     if(computer->campaign.expectedInstructions * 2 > computer->cpu.cycles){
 
         if(computer->cpu.cycles == this->injectionNumber){
-            int inst = computer->cpu.cycles;    // número de instrucción
-            int reg = computer->campaign.injections[inst][1];   // Registro a cambiar
-            computer->cpu.registers[reg] ^= (1 << computer->campaign.injections[inst][2]); // invierte el bit utilizando XOR
+            int inst = computer->cpu.cycles;    // instruction number
+            int reg = computer->campaign.injections[inst][1];   // Register to change
+            computer->cpu.registers[reg] ^= (1 << computer->campaign.injections[inst][2]); // Invert bit using XOR
         }
 
     }else{
-        // Resultado final: Detected Unrecovery Error (DUE)
+        // Final result: Detected Unrecovery Error (DUE)
         this->campaignResults.push_back(DUE);
 
         this->injectionNumber++;
 
-        sender()->deleteLater(); // Eliminar el QTimer después de terminar el bucle
+        sender()->deleteLater(); // Delete QTimer at the end of the loop
 
         emit campaignIterComplete();
         return;
     }
 
-    // Ejecutar una iteración del bucle
+    // Execute one loop interation
     computer->cpu.clock();
 }
 
 
 
-// Botón de reset
+// Reset button
 void MainWindow::on_stopButton_clicked()
 {
-    stopExec = true;    // Si hay una ejecución en marcha, se detiene
-    computer->reset();  // Se resetea el ordenador
-    resetInterface();   // Se resetea la interfaz
+    stopExec = true;    // If there is a program execution going on, stop it
+    computer->reset();
+    resetInterface();
 }
 
-// Botón para parar la ejecución
+// Pause execution
 void MainWindow::on_pauseButton_clicked()
 {
     stopExec = true;
 }
 
-// Botón para ejecutar solo un paso del programa
+// One-step execution
 void MainWindow::on_runPasoButton_clicked()
 {
     if (computer->ram.readByte(FINISH_LOCATION) != 0) {
@@ -344,11 +348,11 @@ void MainWindow::on_runPasoButton_clicked()
     } else {
         ui->ramText->setPlainText(QString::fromStdString(computer->showRam(pageToView)));   // Update ramBox
         QMessageBox::information(nullptr, "Execution completed", "The program execution has finished");
-        ui->generateStatsButton->setEnabled(true);  // Se habilita el botón para generar estadísticas del emulador
+        ui->generateStatsButton->setEnabled(true);  // Enable Generate Statistics button
     }
 }
 
-// Método que gestiona cuando se escribe algo para buscar en la memoria
+// This method is executed when something is written inside the RAM search box
 void MainWindow::on_searchBox_editingFinished()
 {
     QString memoryToView = ui->searchBox->text();
@@ -358,30 +362,31 @@ void MainWindow::on_searchBox_editingFinished()
     pageToView = searchBoxInt;
 
     int byteMem = pageToView & 0xF;
-    int rowMem = (pageToView >> 4) % 8; // Saca la fila (El modulo 8 es porque se muestran solo 8 filas)
+    int rowMem = (pageToView >> 4) % 8; // Take the row (% 8 cause it only shows 8 rows)
 
-    pageToView = (pageToView & 0xFFFFFF80); // Como son 8 filas
+    pageToView = (pageToView & 0xFFFFFF80); // Cause there are only 8 rows...
 
     ui->ramText->setPlainText(QString::fromStdString(computer->showRam(pageToView)));
 
     // Lo pongo en un if para que si no escribe nada, no pinte de rojo la primera posición de la RAM
+    // It is put inside an if so it doesn't colour on red the first position in RAM if nothing is written
     if(searchBoxInt != 0){
 
         QTextCursor cursor(ui->ramText->document());
 
-        cursor.setPosition(11 + byteMem * 3);  // 8 de los primeros numeros, 2 espacios después de esos + 1 para que empiece en el primer número
-            // hexadecimal. byteMem * 3 es porque son dos numeros y 1 espacio lo que separa a cada numero
-            // del siguiente
+        cursor.setPosition(11 + byteMem * 3);   // 8 of the first numbers, 2 spaces after them + 1 so it starts on the first
+                                                // hexadecimal number. byteMem * 3 is because it is 2 numbers and 1 space that
+                                                // separates a number from the next one
 
-        for (int i = 0; i < rowMem; ++i) {  // Baja a la línea que le indique, sacada anteriormente ()0x2A: línea 2
+        for (int i = 0; i < rowMem; ++i) {  // Go down to the line indicated before ()0x2A: line 2
             cursor.movePosition(QTextCursor::Down);
         }
 
-        cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, 2); // Selecciona los siguientes dos caracteres
+        cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, 2); // Select the following 2 characters
 
         QTextCharFormat format;
 
-        format.setBackground(Qt::red); // Establece el fondo en rojo
+        format.setBackground(Qt::red); // Red background
         cursor.setCharFormat(format);
 
     }
@@ -409,19 +414,16 @@ void MainWindow::on_exportDisButton_clicked()
 {
     std::string programName =  ui->filenameText->text().toStdString();
 
-    // Buscar la posición del último punto en el nombre del archivo
+    // Search for the file extension
     uint pos = programName.find('.');
     QString programNameWithoutExtension  = QString::fromStdString(programName.substr(0, pos));
 
-    // Crear un objeto QFile con la ruta especificada
     QFile file(disassemblyFileRoute + "/disassembly_" + programNameWithoutExtension + ".txt");
 
-    // Intentar abrir el archivo en modo de escritura de texto
     if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        // Crear un objeto QTextStream para escribir en el archivo
+        // To write on the file
         QTextStream out(&file);
 
-        // Escribir el contenido en el archivo
         QString header = "PROGRAM NAME: " + QString::fromStdString(programName) + "\r\n";
         int headerSize = header.size();
 
@@ -433,12 +435,10 @@ void MainWindow::on_exportDisButton_clicked()
         out << header;
         out << QString::fromStdString(computer->exportDisassembly());
 
-        // Cerrar el archivo
         file.close();
 
         QMessageBox::information(nullptr, "Export completed", "Disassembly exported. File in: " + disassemblyFileRoute);
     } else {
-        // Si no se pudo abrir el archivo, mostrar un mensaje de error
         qDebug() << "Cannot open the file:" << file.errorString();
     }
 }
@@ -448,30 +448,26 @@ void MainWindow::on_exportRamButton_clicked()
 {
     std::string programName =  ui->filenameText->text().toStdString();
 
-    // Buscar la posición del último punto en el nombre del archivo
+    // Get file extension
     uint pos = programName.find('.');
     QString programNameWithoutExtension  = QString::fromStdString(programName.substr(0, pos));
 
-    // Crear un objeto QFile con la ruta especificada
     QFile file(ramFileRoute + "/ram_" + programNameWithoutExtension + ".hex");
 
-    // Intentar abrir el archivo en modo de escritura de texto
     if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
 
-        // Crear un objeto QTextStream para escribir en el archivo
+        // To write on the file
         QDataStream out(&file);
 
-        // Escribir los datos en el archivo
+        // Write data
         for (size_t i = 0; i < computer->ram_size; i+=4) {
-            out << static_cast<quint32>(computer->ram.readWord(i)); // Escribir cada byte como un entero de 8 bits sin signo
+            out << static_cast<quint32>(computer->ram.readWord(i)); // Write each byte as an unsigned 8 bit number
         }
 
-        // Cerrar el archivo
         file.close();
 
         QMessageBox::information(nullptr, "Export completed", "RAM exported. file in: " + ramFileRoute);
     } else {
-        // Si no se pudo abrir el archivo, mostrar un mensaje de error
         qDebug() << "Cannot open the file:" << file.errorString();
         QMessageBox::critical(nullptr, "Export failed", "An error has ocurred while trying to export RAM");
     }
@@ -498,11 +494,11 @@ void MainWindow::resetInterface(){
 
 void MainWindow::UpdateInterface()
 {
-    UpdateTerminal();    // Update terminalBox
+    UpdateTerminal();
     if(updateRamInRealTime)
         ui->ramText->setPlainText(QString::fromStdString(computer->showRam(pageToView)));   // Update ramBox
-    ui->registerText->setPlainText(QString::fromStdString(computer->showRegisters()));  // Update registerBox
-    ui->codeDisassemblyText->appendPlainText(QString::fromStdString(computer->showDisassembly()));  // Update disassembly
+    ui->registerText->setPlainText(QString::fromStdString(computer->showRegisters()));
+    ui->codeDisassemblyText->appendPlainText(QString::fromStdString(computer->showDisassembly()));
 }
 
 void MainWindow::UpdateTerminal(){
@@ -525,14 +521,12 @@ void MainWindow::on_actionGenerar_campa_a_aleatoria_triggered()
 
         QDateTime currentDateTime = QDateTime::currentDateTime();
 
-        // Obteniendo el día actual
         QString currentDay = currentDateTime.toString("dddd").remove('"');
 
-        // Obteniendo la hora actual
         QString currentTime = currentDateTime.toString("hh-mm-ss").remove('"');
 
-        qDebug() << "Día actual: " << currentDay;
-        qDebug() << "Hora actual: " << currentTime;
+        qDebug() << "Current day: " << currentDay;
+        qDebug() << "Current hour: " << currentTime;
 
         QString programName =  "campaign_" + currentDay + "_" + currentTime;
 
@@ -546,7 +540,7 @@ void MainWindow::on_actionGenerar_campa_a_aleatoria_triggered()
         jsonObject["expectedResult"] = 0;
         jsonObject["expectedInstructions"] = 0;
 
-        // JSONARRAY para las inyecciones
+        // JSONARRAY for inyections
         QJsonArray injectionsArr;
 
         for (int i = 0; i < 1000; ++i) {
@@ -562,20 +556,14 @@ void MainWindow::on_actionGenerar_campa_a_aleatoria_triggered()
             injectionsArr.append(injection);
         }
 
-
-
         jsonObject["injections"] = injectionsArr;
 
-
-
-
-        // Convertir el objeto JSON en un documento JSON
         QJsonDocument jsonDocument(jsonObject);
 
-        // Convertir el documento JSON en una cadena formateada
+        // Formatted json string
         QByteArray jsonData = jsonDocument.toJson(QJsonDocument::Indented);
 
-        // Escribir la cadena JSON en un archivo
+        // Write on file
         QFile jsonFile(campaignGeneratorRoute + "/" + programName + ".json");
         if (jsonFile.open(QFile::WriteOnly | QFile::Truncate)) {
             jsonFile.write(jsonData);
@@ -595,12 +583,14 @@ void MainWindow::on_actionGenerar_campa_a_aleatoria_triggered()
 
 void MainWindow::on_executeCampaignButton_clicked()
 {
-    // Si la campaña no tiene un programa configurado...
+    // If the campaign doesn't have a program specified,
+    // it should load the program, execute one time
+    // and take note of the instructions required to be
+    // executed.
     if(computer->campaign.expectedInstructions == 0){
 
         isExecutingBeforeCampaign = true;
 
-        // Carga del programa que hay asociado a la campaña
         computer->LoadProgram(computer->campaign.programPath.toStdString());
 
         emit runProgram();
@@ -615,22 +605,18 @@ void MainWindow::on_executeCampaignButton_clicked()
 }
 
 void MainWindow::iterationCampaign(){
-    // Ejecución de la campaña
     computer->reset();
     computer->LoadProgram(computer->campaign.programPath.toStdString());
 
-    // Ejecución de la campaña
     QTimer *timerCampaign = new QTimer(this);
 
-    // Conectar el timeout del QTimer al slot para ejecutar una iteración del bucle
-    // Usar un lambda para capturar y pasar el parámetro
+    // Connect QTimer's timeout to the slot to execute one loop iteration.
+    // Use lambda to capture and pass the parameter
     connect(timerCampaign, &QTimer::timeout, this, &MainWindow::runLoopIterationCampaign);
 
     timerCampaign->start();
 
-    qDebug() << "end";
-
-    //computer->reset();
+    qDebug() << "Campaign iteration end";
 }
 
 void MainWindow::onFinishIter(){
@@ -642,8 +628,8 @@ void MainWindow::onFinishIter(){
         emit runCampaignIter();
 }
 
-// Cuando se completa la ejecución de la campaña
-// se llama a este método para imprimir las estadísticas
+// When campaign execution is completed,
+// calls the method to write the final statistics
 void MainWindow::onCampaignComplete(){
 
     QString str = "";
@@ -668,7 +654,7 @@ void MainWindow::onCampaignComplete(){
         }
     }
 
-    // Cálculo de porcentajes
+    // Percentage calculation
     noeffect = (noeffect * 100) / hundred;
     sdc = (sdc * 100) / hundred;
     sed = (sed * 100) / hundred;
@@ -687,8 +673,7 @@ void MainWindow::onCampaignComplete(){
     return;
 }
 
-// Este método guarda las estadísticas de ejecución de un programa
-// que necesita la campaña para ejecutarla
+// This method stores the program execution statistics for the campaign
 void MainWindow::updateCampaignAfterProgramExecution(){
 
     isExecutingBeforeCampaign = false;
@@ -750,15 +735,12 @@ void MainWindow::loadCampaign(){
 
 void MainWindow::on_actionOpen_File_triggered()
 {
-    // Esto abre el explorador de archivos para seleccionar un programa binario
     programFileName = QFileDialog::getOpenFileName(this, "Select file", "", "*.c *.s");
     if (!programFileName.isEmpty()) {
 
-        qDebug() << "File selected:" << programFileName;   // debug
+        qDebug() << "File selected:" << programFileName;
         QFileInfo fileInfo(programFileName);
-        QString filename = fileInfo.fileName(); // Para sacar solo el nombre
-
-        //resetInterface();   // Reestablece la interfaz
+        QString filename = fileInfo.fileName();
 
         QFile file(programFileName);
 
@@ -776,7 +758,8 @@ void MainWindow::on_actionOpen_File_triggered()
         ui->filenameText->setText(filename);
 
         ui->languageSelector->setCurrentIndex(programFileName.contains(".c") ? 1 : 0);
-        // Al cargar el programa, se habilitan los botones de control de ejecución
+
+        // On program load, enable execution buttons
         ui->runButton->setEnabled(true);
         ui->runPasoButton->setEnabled(true);
         ui->pauseButton->setEnabled(true);
@@ -799,7 +782,7 @@ void MainWindow::on_actionSave_file_triggered()
             programFileName.append(".s");
 
         if (!programFileName.isEmpty()) {
-            qDebug() << "File saving as:" << programFileName;   // debug
+            qDebug() << "File saving as:" << programFileName;
         }
         else {
             qDebug() << "No file selected...";
