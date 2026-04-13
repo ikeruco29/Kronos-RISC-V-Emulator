@@ -11,11 +11,11 @@
 #include <vector>
 
 // Constructor
-Computer::Computer(int RAM_SIZE) : ram(Memory(RAM_SIZE)), cpu(CPU(&ram)), ram_size(RAM_SIZE), loader(Loader(&this->ram, &this->cpu, RAM_SIZE)) {};
+Computer::Computer(int RAM_SIZE) : ram(Memory(RAM_SIZE)), cpu(CPU(&ram)), ram_size(RAM_SIZE), loader(Loader(this->ram)) {};
 Computer::Computer(int RAM_SIZE, QTextEdit *termb)
     : ram(Memory(RAM_SIZE)), cpu(CPU(&ram)), ram_size(RAM_SIZE)
     , terminalBox(termb)
-    , loader(Loader(&this->ram, &this->cpu, RAM_SIZE))
+    , loader(Loader(this->ram))
 {};
 
 Computer::~Computer() {}
@@ -32,7 +32,9 @@ int Computer::LoadProgram(std::string filename) {
     bool test = 0;
 
     if(test == 0){
-        loader.readELF(QString::fromStdString(filename));
+        if(loader.readELF(QString::fromStdString(filename)) == 0)
+            this->cpu.pc = loader.entryPoint();
+        return 1;
     }else {
         // Abrir el archivo en modo binario
         std::ifstream file(filename, std::ios::binary);

@@ -44,8 +44,6 @@ public:
     std::string exportDisassembly();
 
     QString showVRAMLine(int line);
-
-
 };
 
 #endif // COMPUTER_H

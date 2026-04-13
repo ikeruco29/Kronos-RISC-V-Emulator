@@ -1,62 +1,64 @@
-#ifndef LOADER_H
-#define LOADER_H
-
-#include <QFile>
+#pragma once
 #include <QString>
-#include "core/cpu.h"
+#include <cstdint>
 #include "memory/memory.h"
 
-#include <cstdint>
+// Forward declaration de tu clase RAM
 
-typedef uint64_t Elf64_Addr;
-typedef uint64_t Elf64_Off;
-typedef uint16_t Elf64_Half;
-typedef uint32_t Elf64_Word;
-typedef uint64_t Elf64_Xword;
-
-#pragma pack(push, 1)
+// Cabecera ELF32 (32 bytes de e_ident + campos)
 struct Elf32_Ehdr {
-    unsigned char e_ident[16];
+    uint8_t  e_ident[16];
     uint16_t e_type;
     uint16_t e_machine;
     uint32_t e_version;
-    uint32_t e_entry;   // <--- Entrypoint (PC)
-    uint32_t e_phoff;   // Offset of Program Headers
-    uint32_t e_shoff;   // Offset of Section Headers (ignored for this load)
+    uint32_t e_entry;
+    uint32_t e_phoff;
+    uint32_t e_shoff;
     uint32_t e_flags;
     uint16_t e_ehsize;
     uint16_t e_phentsize;
-    uint16_t e_phnum;   // number of segments
+    uint16_t e_phnum;
     uint16_t e_shentsize;
     uint16_t e_shnum;
     uint16_t e_shstrndx;
 };
+
+// Program header ELF32
 struct Elf32_Phdr {
-    uint32_t p_type;        // if it's 1 (PT_LOAD), load to RAM
-    uint32_t p_offset;      // Where the data lives on the file
-    uint32_t p_vaddr;       // Virtual address
-    uint32_t p_paddr;       // physical address (used on this emu)
-    uint32_t p_filesz;      // File size
-    uint32_t p_memsz;       // size in RAM (may be greater than p_filesz)
+    uint32_t p_type;
+    uint32_t p_offset;
+    uint32_t p_vaddr;
+    uint32_t p_paddr;
+    uint32_t p_filesz;
+    uint32_t p_memsz;
     uint32_t p_flags;
     uint32_t p_align;
 };
 
-#pragma pack(pop)
+// Valores relevantes
+static constexpr uint32_t PT_LOAD      = 1;
+static constexpr uint16_t EM_RISCV     = 243;
+static constexpr uint8_t  ELFCLASS32   = 1;
+static constexpr uint8_t  ELFDATA2LSB  = 1;   // Little-endian
 
-class Loader
-{
+class Loader {
 public:
-    Loader(Memory *comp_ram, CPU *comp_cpu, uint32_t comp_ramsize);
+    explicit Loader(Memory &ram);
+
+    // Carga el ELF32 en la RAM emulada.
+    // Devuelve 0 si OK, -1 en error.
+    // Tras la carga, entryPoint contiene e_entry.
     int readELF(QString filename);
 
+    uint32_t entryPoint() const { return m_entryPoint; }
+    QString  programName() const { return m_programName; }
+
 private:
-    Memory *ram;
-    CPU *cpu;
-    uint32_t ram_size;
+    Memory   &m_ram;
+    uint32_t m_entryPoint = 0;
+    QString  m_programName;
 
-    bool isValidElf(const Elf32_Ehdr& ehdr);
-    void loadSegment(QFile &file, const Elf32_Phdr &phdr);
+    // Helpers de lectura little-endian desde buffer raw
+    static uint16_t read16le(const uint8_t *p);
+    static uint32_t read32le(const uint8_t *p);
 };
-
-#endif // LOADER_H

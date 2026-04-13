@@ -11,6 +11,7 @@
     "disassemblyFileRoute": "C:/Users/iker.rodriguez/Desktop/disassembly.txt",
     "ramFileRoute": "C:/Users/iker.rodriguez/Desktop/Kronos-RISC-V-Emulator/ram.txt",
     "campaignGeneratorRoute": "C:/Users/iker.rodriguez/Desktop/Kronos-RISC-V-Emulator/campaigns",
+    "linkerRoute": "C:/Users/iker.rodriguez/Desktop/Kronos-RISC-V-Emulator/linker.ld",
 
     "updateRamInRealTime": false,
 

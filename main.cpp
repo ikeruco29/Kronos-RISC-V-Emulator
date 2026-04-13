@@ -10,7 +10,7 @@ const QString CONFIG_FILE = "./config.json";
 
 uint ramSize, finish_location, result_location, romAddrAlloc;
 bool updateRamInRealTime;
-QString disassemblyRouteFile, ramRouteFile, campaignRoute;
+QString disassemblyRouteFile, ramRouteFile, campaignRoute, linkerRoute;
 
 // EDITOR CONFIG
 int tabsize, fontsize;
@@ -46,6 +46,7 @@ int main(int argc, char *argv[])
     w.disassemblyFileRoute = disassemblyRouteFile;
     w.ramFileRoute = ramRouteFile;
     w.campaignGeneratorRoute = campaignRoute;
+    w.linkerRoute = linkerRoute;
 
     // Control locations to the final result and to finish the program execution
     w.RESULT_LOCATION = result_location;
@@ -95,6 +96,7 @@ int readConfigFile(){
     finish_location = jsonObj["finishRamLocation"].toString().toUInt(nullptr, 16);
     romAddrAlloc = jsonObj["romAddressAllocation"].toString().toUInt(nullptr, 16);
     updateRamInRealTime = jsonObj["updateRamInRealTime"].toBool();
+    linkerRoute = jsonObj["linkerRoute"].toString();
 
     QJsonObject editorObj = jsonObj["editor"].toObject();
     tabsize = editorObj["tabsize"].toInt();
@@ -105,6 +107,7 @@ int readConfigFile(){
     qDebug() << "Ram Size:" << ramSize / 1024 / 1024 / 1024 << "GB";
     qDebug() << "Ram file:" << ramRouteFile;
     qDebug() << "disassembly file:" << disassemblyRouteFile;
+    qDebug() << "Linker file:" << linkerRoute;
     qDebug() << "campaign route:" << campaignRoute;
     qDebug() << "Result location:" << result_location;
     qDebug() << "Finish location:" << finish_location;

@@ -1,43 +1,24 @@
+/* linker.ld */
 ENTRY(_start)
 
-MEMORY
-{
-    RAM (rwx) : ORIGIN = 0x00000000, LENGTH = 128K
+MEMORY {
+    ROM (rx) : ORIGIN = 0x00000000, LENGTH = 64K
+    RAM (rwx): ORIGIN = 0x00010000, LENGTH = 64K
 }
 
-SECTIONS
-{
-    /* Dirección actual empieza en RAM */
-    . = ORIGIN(RAM);
-
-    /* Código */
-    .text : 
-    {
+SECTIONS {
+    .text : {
+        *(.text.start)   /* asegura que _start va primero */
         *(.text*)
-    } > RAM
+    } > ROM
 
-    /* Constantes */
-    .rodata :
-    {
+    .data : {
+        *(.data*)
         *(.rodata*)
     } > RAM
 
-    /* Datos inicializados */
-    .data :
-    {
-        *(.data*)
-    } > RAM
-
-    /* Datos no inicializados */
-    .bss :
-    {
+    .bss : {
         *(.bss*)
         *(COMMON)
     } > RAM
-
-    /* Alinear a 16 bytes */
-    . = ALIGN(16);
-
-    /* Definir tope de stack */
-    _stack_top = ORIGIN(RAM) + LENGTH(RAM);
 }

@@ -35,6 +35,7 @@ public:
     QString disassemblyFileRoute;
     QString ramFileRoute;
     QString campaignGeneratorRoute;
+    QString linkerRoute;
 
     std::vector<int> campaignResults;
     int injectionNumber = 0;

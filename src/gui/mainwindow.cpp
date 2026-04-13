@@ -112,7 +112,7 @@ void MainWindow::on_actionCargar_programa_triggered()
 {
 
     // Opening file explorer to select a specific binary
-    QString nombreArchivo = QFileDialog::getOpenFileName(this, "Select file", "", "*.bin *.o");
+    QString nombreArchivo = QFileDialog::getOpenFileName(this, "Select file", "", "*.bin *.o *.elf");
     if (!nombreArchivo.isEmpty()) {
 
         qDebug() << "File selected:" << nombreArchivo;   // debug
@@ -124,7 +124,7 @@ void MainWindow::on_actionCargar_programa_triggered()
 
         resetInterface();
 
-        pageToView = computer->ram.iRomStartAddr;   // For the RAM loader:
+        pageToView = computer->cpu.pc;   // For the RAM loader:
                                                     // I don't want to show all RAM
                                                     // just 8 rows inside textbox.
 
@@ -169,12 +169,12 @@ int MainWindow::on_runButton_clicked()
         // If its an assembly file...
         if(ui->filenameText->text().contains(".s")){
             binPath << fileinfo.path().toStdString() << "/a.bin";
-            cmd << "clang --target=riscv32 -march=rv32i -mabi=ilp32 -x assembler -c " << programFileName.toStdString() << " -o " << binPath.str();
+            cmd << "clang --target=riscv32-unknown-elf -march=rv32i -mabi=ilp32 -nostdlib -nostartfiles -fuse-ld=lld \"-Wl,-T," << linkerRoute.toStdString() << "\" " << programFileName.toStdString() << " -o " << binPath.str();
 
         // If its a C file...
         }else if(ui->filenameText->text().contains(".c")){
             binPath << fileinfo.path().toStdString() << "/a.bin";
-            cmd << "clang --target=riscv32 -march=rv32i -mabi=ilp32 -O0 -g -nostdlib -nostartfiles -fuse-ld=lld -Wl,-T,linker.ld " << programFileName.toStdString() << " -o " << binPath.str();
+            cmd << "clang --target=riscv32-unknown-elf -march=rv32i -mabi=ilp32 -nostdlib -nostartfiles -ffreestanding -O2 -fuse-ld=lld \"-Wl,-T," << linkerRoute.toStdString() << "\" " << programFileName.toStdString() << " -o " << binPath.str();
 
         }
 
