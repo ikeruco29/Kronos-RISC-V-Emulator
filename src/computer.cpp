@@ -8,15 +8,14 @@
 #include <QJsonArray>
 #include <fstream>
 #include <iostream>
-#include <thread>
-#include <mutex>
 #include <vector>
 
 // Constructor
-Computer::Computer(int RAM_SIZE) : ram(Memory(RAM_SIZE)), cpu(CPU(&ram)), ram_size(RAM_SIZE) {};
+Computer::Computer(int RAM_SIZE) : ram(Memory(RAM_SIZE)), cpu(CPU(&ram)), ram_size(RAM_SIZE), loader(Loader(&this->ram, &this->cpu, RAM_SIZE)) {};
 Computer::Computer(int RAM_SIZE, QTextEdit *termb)
     : ram(Memory(RAM_SIZE)), cpu(CPU(&ram)), ram_size(RAM_SIZE)
     , terminalBox(termb)
+    , loader(Loader(&this->ram, &this->cpu, RAM_SIZE))
 {};
 
 Computer::~Computer() {}
@@ -30,26 +29,31 @@ void Computer::reset(){
 // Esta función carga el programa en memoria. En concreto
 // donde indica la variable iRomAddrStart
 int Computer::LoadProgram(std::string filename) {
+    bool test = 0;
 
-    // Abrir el archivo en modo binario
-    std::ifstream file(filename, std::ios::binary);
-    if (!file.is_open()) {
-        std::cerr << "Error al abrir el archivo: " << filename << std::endl;
-        return 1;
+    if(test == 0){
+        loader.readELF(QString::fromStdString(filename));
+    }else {
+        // Abrir el archivo en modo binario
+        std::ifstream file(filename, std::ios::binary);
+        if (!file.is_open()) {
+            std::cerr << "Error al abrir el archivo: " << filename << std::endl;
+            return 1;
+        }
+
+        this->programName = filename;
+
+        // Leer el archivo byte por byte
+        uint8_t byte;
+        int i = ram.iRomStartAddr;  // Índice donde empieza el programa cargado
+        while (file.read(reinterpret_cast<char*>(&byte), sizeof(uint8_t))) {
+            ram.writeByte(i, byte);
+            i++;
+        }
+
+        file.close();
+        return 0;
     }
-
-    this->programName = filename;
-
-    // Leer el archivo byte por byte
-    uint8_t byte;
-    int i = ram.iRomStartAddr;  // Índice donde empieza el programa cargado
-    while (file.read(reinterpret_cast<char*>(&byte), sizeof(uint8_t))) {
-        ram.writeByte(i, byte);
-        i++;
-    }
-
-    file.close();
-    return 0;
 }
 
 // Esta función carga una campaña de inyección de errores

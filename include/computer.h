@@ -3,6 +3,7 @@
 
 #include "core/cpu.h"
 #include "memory/memory.h"
+#include "core/loader.h"
 #include <QTextEdit>
 #include <QPlainTextEdit>
 
@@ -21,6 +22,8 @@ public:
 
     CPU cpu;
     Memory ram;
+
+    Loader loader;
 
     // Campaign vars
     Campaign campaign;
