@@ -68,12 +68,6 @@ MainWindow::MainWindow(QWidget *parent, Computer *comp, struct EditorConfig sEdi
 
     isExecutingBeforeCampaign = false;
 
-    // En QT, puedes vincular un método a otro. Este otro método se llama "signal"
-    // y no tienen implementación. Al emitirlos mediante "emit nombreSignal()"
-    // se llama al método conectado en un hilo a parte, lo que hace que el hilo principal
-    // (que es el que contiene la interfaz) no se bloquee, y el usuario pueda pulsar otros
-    // botones como el botón de pausa.
-
     // In QT you can link a method to another. This other method is called "signal",
     // and you don't have to implement it. At the moment you "emit" them by using "emit signalName()",
     // Connected method is called in a separate thread, so the main thread doens't block (which is
