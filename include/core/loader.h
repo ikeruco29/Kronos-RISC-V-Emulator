@@ -5,7 +5,7 @@
 
 // Forward declaration de tu clase RAM
 
-// Cabecera ELF32 (32 bytes de e_ident + campos)
+// EFF32 header (32 bytes: e_ident + campos)
 struct Elf32_Ehdr {
     uint8_t  e_ident[16];
     uint16_t e_type;
@@ -35,7 +35,6 @@ struct Elf32_Phdr {
     uint32_t p_align;
 };
 
-// Valores relevantes
 static constexpr uint32_t PT_LOAD      = 1;
 static constexpr uint16_t EM_RISCV     = 243;
 static constexpr uint8_t  ELFCLASS32   = 1;
@@ -45,9 +44,9 @@ class Loader {
 public:
     explicit Loader(Memory &ram);
 
-    // Carga el ELF32 en la RAM emulada.
-    // Devuelve 0 si OK, -1 en error.
-    // Tras la carga, entryPoint contiene e_entry.
+    // Load ELF32 into emulated RAM.
+    // Returns 0 if OK, -1 if error.
+    // After load, entryPoint contains e_entry.
     int readELF(QString filename);
 
     uint32_t entryPoint() const { return m_entryPoint; }
@@ -58,7 +57,7 @@ private:
     uint32_t m_entryPoint = 0;
     QString  m_programName;
 
-    // Helpers de lectura little-endian desde buffer raw
+    // Helpers for little-endian read from raw buffer
     static uint16_t read16le(const uint8_t *p);
     static uint32_t read32le(const uint8_t *p);
 };
