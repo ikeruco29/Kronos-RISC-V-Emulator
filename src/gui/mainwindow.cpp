@@ -108,7 +108,7 @@ void MainWindow::resetFilenameText(QString text){
 }
 
 // Load desired program
-void MainWindow::on_actionCargar_programa_triggered()
+void MainWindow::on_actionLoadProgram_triggered()
 {
 
     // Opening file explorer to select a specific binary
@@ -124,9 +124,9 @@ void MainWindow::on_actionCargar_programa_triggered()
 
         resetInterface();
 
-        pageToView = computer->cpu.pc;   // For the RAM loader:
-                                                    // I don't want to show all RAM
-                                                    // just 8 rows inside textbox.
+        pageToView = computer->cpu.pc;  // For the RAM loader:
+                                        // I don't want to show all RAM
+                                        // just 8 rows inside textbox.
 
         ui->ramText->setPlainText(QString::fromStdString(computer->showRam(pageToView)));
         resetFilenameText(filename);
@@ -145,13 +145,13 @@ void MainWindow::on_actionCargar_programa_triggered()
 }
 
 // Load Campaign
-void MainWindow::on_actionCargar_campa_a_triggered()
+void MainWindow::on_actionLoadCampaign_triggered()
 {
     loadCampaign();
 }
 
 // Close app
-void MainWindow::on_actionSalir_triggered()
+void MainWindow::on_actionExit_triggered()
 {
     qApp->quit();
 }
@@ -160,7 +160,7 @@ void MainWindow::on_actionSalir_triggered()
 int MainWindow::on_runButton_clicked()
 {
     // If the program loaded is not an executable program...
-    if(!ui->filenameText->text().contains(".bin")){
+    if(!ui->filenameText->text().contains(".bin") && !ui->filenameText->text().contains(".elf")){
         QFileInfo fileinfo = QFileInfo(programFileName);
         std::stringstream cmd;
 
@@ -181,7 +181,7 @@ int MainWindow::on_runButton_clicked()
         compilingDialog = new compilingProcessDialog(nullptr, cmd.str().c_str());
         compilingDialog->show();
 
-        qDebug() << "Absolute path" << fileinfo.path();
+        qDebug() << "Copmiling file path" << fileinfo.path();
         qDebug() << "CLANG Command: " << cmd.str().c_str();
         qDebug() << "Compiling...";
 
@@ -194,32 +194,31 @@ int MainWindow::on_runButton_clicked()
             return 1;
         }
 
+        qDebug() << "Compiled succesfully";
 
         computer->reset();
         computer->LoadProgram(binPath.str()); // Load program to computer's memory
 
-        pageToView = computer->ram.iRomStartAddr;
+        pageToView = computer->cpu.pc;
         ui->ramText->setPlainText(QString::fromStdString(computer->showRam(pageToView)));
     }
 
     stopExec = false;
 
-    // Todo esto del QTimer es porque si utilizo un bucle que haga
-    // estas cuatro instrucciones:
+    // QTimer is cause doing a loop with these four instructions:
     //
     //      computer->cpu.clock();
     //      ui->ramText->setPlainText(QString::fromStdString(computer->showRam(pageToView)));
     //      ui->registerText->setPlainText(QString::fromStdString(computer->showRegisters()));
     //      ui->codeDisassemblyText->appendPlainText(QString::fromStdString(computer->showDisassembly()));
     //
-    // No le da tiempo a renderizar, así que necesito que espere a que termine la iteración
-    // con el renderizado.
-    // Realmente no pasa nada porque el emulador no tenga una velocidad vertiginosa
-    // (que la tiene), ya que lo importante es que lleve bien el número de instrucciones
+    // The app will not have enough time to render. Eventhough this method
+    // will make the emulator slower, the important thing is that it will work with
+    // instructions executed number, which is the real purpose.
 
     QTimer *timer = new QTimer(this);
 
-    // Conectar el timeout del QTimer al slot para ejecutar una iteración del bucle
+    // Connect QTimer to the slot so it runs one iteration.
     connect(timer, &QTimer::timeout, this, &MainWindow::runLoopIteration);
 
     timer->start();
@@ -266,22 +265,19 @@ void MainWindow::runLoopIterationCampaign()
     if (computer->cpu.bEcall == true) {
 
         // When a 0 is written at FINISH_LOCATION, stop program execution
-        if(computer->ram.readByte(RESULT_LOCATION) != computer->campaign.expectedResult){
-
+        if(computer->ram.readByte(RESULT_LOCATION) != computer->campaign.expectedResult)
+        {
             // Final result: Silent Data Corruption (SDC)
             this->campaignResults.push_back(SDC);
-
         }
-        else if(computer->campaign.expectedInstructions > computer->cpu.cycles){
-
+        else if(computer->campaign.expectedInstructions > computer->cpu.cycles)
+        {
             // Final result: Single Event Delay (SED)
             this->campaignResults.push_back(SED);
-
-        } else {
-
+        } else
+        {
             // Final result: NO EFFECT
             this->campaignResults.push_back(NO_EFFECT);
-
         }
 
         this->injectionNumber++;    // current injection index
@@ -362,7 +358,6 @@ void MainWindow::on_searchBox_editingFinished()
 
     ui->ramText->setPlainText(QString::fromStdString(computer->showRam(pageToView)));
 
-    // Lo pongo en un if para que si no escribe nada, no pinte de rojo la primera posición de la RAM
     // It is put inside an if so it doesn't colour on red the first position in RAM if nothing is written
     if(searchBoxInt != 0){
 
@@ -488,23 +483,14 @@ void MainWindow::resetInterface(){
 
 void MainWindow::UpdateInterface()
 {
-    UpdateTerminal();
     if(updateRamInRealTime)
         ui->ramText->setPlainText(QString::fromStdString(computer->showRam(pageToView)));   // Update ramBox
     ui->registerText->setPlainText(QString::fromStdString(computer->showRegisters()));
     ui->codeDisassemblyText->appendPlainText(QString::fromStdString(computer->showDisassembly()));
 }
 
-void MainWindow::UpdateTerminal(){
-    /*ui->terminalBox->setPlainText("");
-    for(int i = 0; i < 20; i++){
-        ui->terminalBox->appendPlainText(computer->showVRAMLine(i));
-    }*/
-}
 
-
-
-void MainWindow::on_actionGenerar_campa_a_aleatoria_triggered()
+void MainWindow::on_actionGenerateRandomCampaign_triggered()
 {
     QMessageBox::information(nullptr, "Select a file", "Please, select the file that will be bounded to the campaign");
     QString program = QFileDialog::getOpenFileName(nullptr, "Select file", "", "Files (*.bin *.o)");
@@ -558,6 +544,7 @@ void MainWindow::on_actionGenerar_campa_a_aleatoria_triggered()
         QByteArray jsonData = jsonDocument.toJson(QJsonDocument::Indented);
 
         // Write on file
+        // TODO: Check if path exists
         QFile jsonFile(campaignGeneratorRoute + "/" + programName + ".json");
         if (jsonFile.open(QFile::WriteOnly | QFile::Truncate)) {
             jsonFile.write(jsonData);
@@ -819,6 +806,3 @@ void MainWindow::on_languageSelector_currentIndexChanged(int index)
     qDebug() << "Language: " << index;
     highlighter = new Highlighter(editor->document(), index);
 }
-
-
-

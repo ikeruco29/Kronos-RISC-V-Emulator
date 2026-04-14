@@ -49,12 +49,6 @@ public:
 
 
 private slots:
-    void on_actionCargar_programa_triggered();
-
-    void on_actionCargar_campa_a_triggered();
-
-    void on_actionSalir_triggered();
-
     int on_runButton_clicked();
 
     void on_stopButton_clicked();
@@ -75,8 +69,6 @@ private slots:
 
     void on_pauseButton_clicked();
 
-    void on_actionGenerar_campa_a_aleatoria_triggered();
-
     void on_executeCampaignButton_clicked();
     void iterationCampaign();
 
@@ -92,6 +84,14 @@ private slots:
     void on_actionNew_triggered();
 
     void on_languageSelector_currentIndexChanged(int index);
+
+    void on_actionLoadProgram_triggered();
+
+    void on_actionLoadCampaign_triggered();
+
+    void on_actionExit_triggered();
+
+    void on_actionGenerateRandomCampaign_triggered();
 
 signals:
     void runProgram();
@@ -119,8 +119,6 @@ private:
 
     void loadCampaign();
     void updateCampaignAfterProgramExecution();
-
-    void UpdateTerminal();
 
     void updateFilenameText(bool isChanged = false);
     void resetFilenameText(QString text = "");

@@ -29,7 +29,7 @@
    <string>Kronos - RISC V Emulator</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="res.qrc">
+   <iconset resource="../res.qrc">
     <normaloff>:/resources/resources/icons/icono_kronos.jpg</normaloff>:/resources/resources/icons/icono_kronos.jpg</iconset>
   </property>
   <property name="styleSheet">
@@ -1115,7 +1115,7 @@ border: 0px;
            <string/>
           </property>
           <property name="icon">
-           <iconset resource="res.qrc">
+           <iconset resource="../res.qrc">
             <normaloff>:/resources/resources/icons/executePaso.png</normaloff>:/resources/resources/icons/executePaso.png</iconset>
           </property>
           <property name="iconSize">
@@ -1153,7 +1153,7 @@ border: 0px;
            <string/>
           </property>
           <property name="icon">
-           <iconset resource="res.qrc">
+           <iconset resource="../res.qrc">
             <normaloff>:/resources/resources/icons/execute.png</normaloff>:/resources/resources/icons/execute.png</iconset>
           </property>
           <property name="iconSize">
@@ -1188,7 +1188,7 @@ border: 0px;
            <string/>
           </property>
           <property name="icon">
-           <iconset resource="res.qrc">
+           <iconset resource="../res.qrc">
             <normaloff>:/resources/resources/icons/pause.png</normaloff>:/resources/resources/icons/pause.png</iconset>
           </property>
           <property name="iconSize">
@@ -1223,7 +1223,7 @@ border: 0px;
            <string/>
           </property>
           <property name="icon">
-           <iconset resource="res.qrc">
+           <iconset resource="../res.qrc">
             <normaloff>:/resources/resources/icons/stopExe.png</normaloff>:/resources/resources/icons/stopExe.png</iconset>
           </property>
           <property name="iconSize">
@@ -3193,8 +3193,8 @@ border: 0px;
      <property name="title">
       <string>Load...</string>
      </property>
-     <addaction name="actionCargar_programa"/>
-     <addaction name="actionCargar_campa_a"/>
+     <addaction name="actionLoadProgram"/>
+     <addaction name="actionLoadCampaign"/>
     </widget>
     <addaction name="separator"/>
     <addaction name="actionNew"/>
@@ -3203,19 +3203,19 @@ border: 0px;
     <addaction name="separator"/>
     <addaction name="menuLoad"/>
     <addaction name="separator"/>
-    <addaction name="actionSalir"/>
+    <addaction name="actionExit"/>
    </widget>
    <widget class="QMenu" name="menuGenerar">
     <property name="title">
      <string>Generate</string>
     </property>
-    <addaction name="actionGenerar_campa_a_aleatoria"/>
+    <addaction name="actionGenerateRandomCampaign"/>
    </widget>
    <addaction name="menuArchivo"/>
    <addaction name="menuGenerar"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <action name="actionCargar_programa">
+  <action name="actionLoadProgram">
    <property name="text">
     <string>Load program</string>
    </property>
@@ -3225,7 +3225,7 @@ border: 0px;
     </font>
    </property>
   </action>
-  <action name="actionCargar_campa_a">
+  <action name="actionLoadCampaign">
    <property name="text">
     <string>Load campaign</string>
    </property>
@@ -3235,7 +3235,7 @@ border: 0px;
     </font>
    </property>
   </action>
-  <action name="actionSalir">
+  <action name="actionExit">
    <property name="text">
     <string>Exit</string>
    </property>
@@ -3245,7 +3245,7 @@ border: 0px;
     </font>
    </property>
   </action>
-  <action name="actionGenerar_campa_a_aleatoria">
+  <action name="actionGenerateRandomCampaign">
    <property name="text">
     <string>Generate random campaign</string>
    </property>
@@ -3297,7 +3297,7 @@ border: 0px;
   <tabstop>exportRamButton</tabstop>
  </tabstops>
  <resources>
-  <include location="res.qrc"/>
+  <include location="../res.qrc"/>
  </resources>
  <connections/>
 </ui>
